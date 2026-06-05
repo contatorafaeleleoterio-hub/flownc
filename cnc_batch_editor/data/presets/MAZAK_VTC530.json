@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "machine": "MAZAK_VTC530",
+  "description": "Centro de usinagem principal (preset de exemplo)",
+  "extensions": ["*"],
+  "case_sensitive": false,
+  "global_rules": [
+    {
+      "id": "rule_m08_to_m07",
+      "active": true,
+      "scope": "global",
+      "find": "M08",
+      "replace": "M07",
+      "mode": "auto",
+      "comment": "Nevoa no lugar de fluido",
+      "on_zero_matches": "warn",
+      "priority": 100
+    },
+    {
+      "id": "rule_g54_to_g55",
+      "active": true,
+      "scope": "global",
+      "find": "G54",
+      "replace": "G55",
+      "mode": "auto",
+      "comment": "Offset de origem 2",
+      "on_zero_matches": "warn",
+      "priority": 100
+    }
+  ],
+  "file_rules": [
+    {
+      "id": "rule_peca01_t1_to_t21",
+      "active": true,
+      "scope": "file",
+      "file": "PECA01.nc",
+      "find": "T1",
+      "replace": "T21",
+      "mode": "auto",
+      "comment": "Fresa de topo posicao 21",
+      "on_zero_matches": "warn",
+      "priority": 100
+    }
+  ],
+  "verifications": [
+    {
+      "id": "verify_m30",
+      "type": "must_exist",
+      "find": "M30",
+      "mode": "literal",
+      "label": "Fim de programa"
+    },
+    {
+      "id": "verify_m01_absent",
+      "type": "must_not_exist",
+      "find": "M01",
+      "mode": "literal",
+      "label": "Parada opcional removida"
+    }
+  ]
+}

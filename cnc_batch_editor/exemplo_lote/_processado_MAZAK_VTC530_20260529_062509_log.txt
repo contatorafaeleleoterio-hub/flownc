@@ -1,0 +1,4 @@
+[06:25:09] Perfil MAZAK_VTC530; 2 arquivos
+[06:25:09] PECA01.nc: 3 edicoes, 0 alertas
+[06:25:09] PECA02.nc: 2 edicoes, 1 alertas
+[06:25:09] Salvos 2 arquivos em _processado_MAZAK_VTC530_20260529_062509

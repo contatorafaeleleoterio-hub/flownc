@@ -1,0 +1,25 @@
+CNC BATCH EDITOR — versao portatil
+===================================
+
+COMO USAR (no pen drive ou em qualquer PC Windows 10/11):
+1. Copie a pasta CNC_BatchEditor inteira para o pen drive.
+2. Abra a pasta e rode CNC_BatchEditor.exe (duplo clique).
+   Nao precisa instalar nada, nem ter Python.
+3. Em "Perfil", escolha a maquina (ex.: MAZAK_VTC530).
+4. Clique "Escolher pasta..." e aponte para a pasta com os programas NC.
+5. Clique "Analisar (dry-run)": veja por arquivo o que muda, em cores
+   (verde = ok, amarelo = atencao, vermelho = bloqueia).
+6. Revise no preview. Se estiver ok, clique "Salvar lote".
+   - Os ORIGINAIS NUNCA sao alterados.
+   - O resultado vai para uma pasta nova "_processado_PERFIL_data_hora" ao
+     lado dos arquivos originais, junto com um log .txt.
+
+PERFIS (presets):
+- Ficam na pasta data\presets ao lado do .exe (arquivos .json).
+- Voce pode editar/criar perfis ali. Cada perfil tem as regras de
+  substituicao e as verificacoes daquela maquina.
+
+IMPORTANTE:
+- Esta ferramenta faz SUBSTITUICAO DE TEXTO segura, nao e um validador CNC
+  completo. Sempre revise o preview antes de salvar.
+- 100% offline. Nao envia nada pela internet.

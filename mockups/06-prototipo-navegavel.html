@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC Batch Editor — protótipo navegável</title>
+<style>
+  :root{
+    --bg:#eceff1; --panel:#f7f8f9; --line:#c8ccd0; --line2:#dce0e3;
+    --ink:#1f2933; --muted:#5b6770; --muted2:#7b858d;
+    --primary:#2d7d46; --primary-d:#256138; --danger:#b23a3a;
+    --green:#e1f5e1; --yellow:#fff7cd; --red:#fadcdc;
+    --accent:#1d6fb8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#cfd4d8;color:var(--ink);
+    font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:13px;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:22px 16px 40px}
+  .hint{color:#6a747c;font-size:12px;margin-bottom:12px}
+  .hint b{color:#3a444c}
+
+  .win{width:1180px;max-width:100%;background:var(--bg);
+    border:1px solid #b0b5b9;border-radius:8px;overflow:hidden;
+    box-shadow:0 10px 34px rgba(0,0,0,.22)}
+  .titlebar{background:#cfd4d7;padding:7px 12px;font-size:12px;color:#333;
+    border-bottom:1px solid #b4b9bd;display:flex;justify-content:space-between;align-items:center}
+  .titlebar .dots span{display:inline-block;width:11px;height:11px;border-radius:50%;
+    margin-left:6px;background:#b9bec2}
+  .pad{padding:14px 16px}
+
+  /* faixa de etapas (clicável p/ navegar) */
+  .steps{display:flex;align-items:center;margin:2px 0 14px;user-select:none}
+  .step{display:flex;align-items:center;gap:7px;padding:6px 14px;color:var(--muted2);
+    font-size:12.5px;font-weight:600;border-radius:6px}
+  .step.click{cursor:pointer}
+  .step.click:hover{background:#e2e7ea}
+  .step .num{width:20px;height:20px;border-radius:50%;background:#cdd3d7;color:#fff;
+    display:grid;place-items:center;font-size:12px}
+  .step.active{color:var(--ink)}
+  .step.active .num{background:var(--accent)}
+  .step.done{color:var(--muted)}
+  .step.done .num{background:var(--primary)}
+  .step .arr{color:#b4bbc0;margin:0 2px}
+
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .row + .row{margin-top:9px}
+  label.lbl{color:var(--muted);font-weight:600;font-size:12.5px}
+  select,input.txt{padding:5px 8px;border:1px solid var(--line);border-radius:4px;background:#fff;font-size:12.5px}
+  select{min-width:150px}
+  input.txt{min-width:230px;color:#555}
+  .group{display:inline-flex;gap:6px;align-items:center;padding:0 10px;border-right:1px solid var(--line2)}
+  .group:first-child{padding-left:0}
+  .group:last-child{border-right:none}
+  .grp-cap{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);margin-right:2px}
+
+  button.btn{font-size:12.5px;padding:6px 11px;border:1px solid var(--line);
+    background:#fff;border-radius:5px;cursor:pointer;color:var(--ink)}
+  button.tiny{padding:4px 9px;font-size:12px;color:var(--muted)}
+  button.danger{color:var(--danger);border-color:#e0bcbc}
+  button.secondary{background:#fff}
+  button.primary{background:var(--primary);border-color:var(--primary-d);color:#fff;
+    font-weight:700;padding:11px 22px;font-size:14px;border-radius:6px;cursor:pointer}
+  button.primary:hover{background:var(--primary-d)}
+  .dirty{color:#b35900;font-weight:600;font-size:12px}
+  .muted{color:var(--muted)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:10px;background:#dde3e7;color:#48535b}
+  .dest-resolved{font-size:12px;color:var(--primary-d);background:#e8f3ec;
+    border:1px solid #c4e0cd;border-radius:4px;padding:4px 9px}
+
+  .summary{display:flex;background:#e4e9ec;border:1px solid var(--line2);
+    border-radius:6px;margin:12px 0;overflow:hidden}
+  .summary .cell{flex:1;padding:8px 12px;border-right:1px solid #d4dadd;text-align:center}
+  .summary .cell:last-child{border-right:none}
+  .summary .big{font-size:18px;font-weight:700;line-height:1}
+  .summary .cap{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted2);margin-top:3px}
+  .summary .cell.warn .big{color:#b35900}
+  .summary .cell.ok .big{color:var(--primary-d)}
+
+  .split{display:flex;gap:12px;margin-top:4px}
+  .pane-l{width:270px;flex-shrink:0}
+  .pane-r{flex:1;min-width:0}
+  .panetitle{font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+    color:var(--muted2);font-weight:700;margin:0 0 6px}
+
+  .proglist{border:1px solid var(--line);border-radius:6px;background:#fff;overflow:hidden}
+  .proglist .it{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line2);font-size:12.5px}
+  .proglist .it:last-child{border-bottom:none}
+  .proglist .it.sel{background:#e7f0f8;box-shadow:inset 3px 0 0 var(--accent)}
+  .proglist .it .nm{flex:1;font-variant-numeric:tabular-nums}
+  .proglist .it .tag{font-size:11px;color:var(--muted)}
+  .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .dot.g{background:#3d9a57}.dot.y{background:#caa83a}.dot.r{background:#c14b4b}.dot.n{background:#c2c8cc}
+  input[type=checkbox]{width:15px;height:15px}
+
+  .tblbox{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+  .tblbox.specific{border-color:#bcd2e6}
+  .tblhead{display:flex;align-items:center;justify-content:space-between;
+    padding:6px 10px;font-weight:700;font-size:12px;letter-spacing:.3px}
+  .tblhead.common{background:#e6ebee;color:#36424b;text-transform:uppercase}
+  .tblhead.specific{background:#dcebf7;color:#1d4e78}
+  .tblhead .who{font-weight:800}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{background:#f0f3f5;text-align:left;font-weight:600;color:var(--muted);
+    padding:5px 8px;border-bottom:1px solid var(--line2);font-size:11.5px}
+  td{padding:5px 8px;border-bottom:1px solid #eef1f3}
+  tr:last-child td{border-bottom:none}
+  td.c{text-align:center;width:54px}
+  td code{background:#f2f4f6;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace}
+  .tblbtns{display:flex;gap:6px;padding:7px 8px;background:#fafbfc;border-top:1px solid var(--line2)}
+  .sep{height:14px}
+
+  .cta-row{display:flex;justify-content:flex-end;margin-top:14px;align-items:center;gap:12px}
+  .cta-hint{color:var(--muted);font-size:12px}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;
+    padding:8px 16px;background:#e4e9ec;border-top:1px solid var(--line2);font-size:12.5px;color:#33691e}
+
+  /* preview */
+  .pv-split{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;height:430px}
+  .pv-list{width:230px;border-right:1px solid var(--line2);overflow:auto}
+  .pv-list .it{padding:8px 11px;border-bottom:1px solid #eef1f3;font-size:12.5px}
+  .pv-list .it.head{font-weight:700;background:#f0f3f5}
+  .pv-list .it.sel{box-shadow:inset 3px 0 0 var(--accent);font-weight:600}
+  .pv-list .it.g{background:var(--green)}.pv-list .it.y{background:var(--yellow)}.pv-list .it.r{background:var(--red)}
+  .pv-body{flex:1;padding:14px 16px;overflow:auto;font-size:12.5px}
+  .pv-sec{margin-bottom:16px}
+  .pv-sec h4{margin:0 0 7px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2)}
+  .chk{display:flex;align-items:center;gap:8px;padding:3px 0;font-family:Consolas,monospace;font-size:12px}
+  .badge{font-size:11px;font-weight:700;padding:1px 7px;border-radius:4px}
+  .badge.ok{background:#dcefe1;color:#256138}
+  .badge.warn{background:#fbeec8;color:#8a6400}
+  .pv-foot{display:flex;justify-content:flex-end;align-items:center;margin-top:12px;gap:10px}
+
+  /* dialogo salvo */
+  .overlay{position:fixed;inset:0;background:rgba(20,25,30,.45);display:none;
+    place-items:center;z-index:20}
+  .overlay.show{display:grid}
+  .dialog{background:#f7f8f9;border:1px solid #b0b5b9;border-radius:8px;width:440px;
+    box-shadow:0 14px 40px rgba(0,0,0,.3);overflow:hidden}
+  .dialog .dh{background:#2d7d46;color:#fff;padding:10px 16px;font-weight:700}
+  .dialog .db{padding:18px 16px;font-size:13px;line-height:1.5}
+  .dialog .db code{background:#eef1f3;padding:1px 5px;border-radius:3px}
+  .dialog .ok-tag{color:#256138;font-weight:700}
+  .dialog .df{display:flex;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--line2)}
+
+  .screen{display:none}
+  .screen.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="hint">Protótipo navegável — clique em <b>Revisar alterações →</b>, depois <b>Confirmar e salvar</b>. As etapas no topo também navegam. Nada executa de verdade.</div>
+
+<!-- ========== TELA 1: PRINCIPAL (TROCAS) ========== -->
+<div class="screen show" id="scr-main">
+<div class="win">
+  <div class="titlebar">
+    <span>CNC Batch Editor — Substituições em programas CNC</span>
+    <span class="dots"><span></span><span></span><span></span></span>
+  </div>
+  <div class="pad">
+
+    <div class="steps">
+      <div class="step done click" onclick="go('scr-main')"><span class="num">1</span>Perfil</div><span class="arr">›</span>
+      <div class="step done click" onclick="go('scr-main')"><span class="num">2</span>Programas</div><span class="arr">›</span>
+      <div class="step active click" onclick="go('scr-main')"><span class="num">3</span>Trocas</div><span class="arr">›</span>
+      <div class="step click" onclick="go('scr-preview')"><span class="num">4</span>Revisar</div><span class="arr">›</span>
+      <div class="step"><span class="num">5</span>Salvar</div>
+    </div>
+
+    <div class="row">
+      <div class="group">
+        <span class="grp-cap">Perfil</span>
+        <select><option>MAZAK</option><option>ROMI GL240</option><option>Centro de usinagem</option></select>
+        <button class="btn tiny">Novo</button>
+        <button class="btn tiny">Duplicar</button>
+        <button class="btn tiny">Renomear</button>
+        <button class="btn tiny danger">Excluir</button>
+      </div>
+      <div class="group"><span class="dirty">● perfil modificado*</span></div>
+      <div class="group"><button class="btn secondary">Biblioteca de códigos…</button></div>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <span class="grp-cap">Programas</span>
+      <button class="btn secondary">Abrir pasta…</button>
+      <button class="btn secondary">Abrir programa(s)…</button>
+      <span class="pill">12 carregados — pasta NC_genericos</span>
+    </div>
+    <div class="row">
+      <label class="lbl">Destino:</label>
+      <label><input type="radio" name="d" checked> Ao lado dos originais</label>
+      <label><input type="radio" name="d"> Pasta fixa:</label>
+      <input class="txt" placeholder="(selecione uma pasta)" disabled>
+      <button class="btn tiny">Escolher…</button>
+      <span class="dest-resolved">→ Será salvo em: <b>…\NC_genericos\_processado_MAZAK_2026-06-02_1430\</b></span>
+    </div>
+
+    <div class="summary">
+      <div class="cell"><div class="big">12</div><div class="cap">Programas</div></div>
+      <div class="cell"><div class="big">10</div><div class="cap">Marcados</div></div>
+      <div class="cell"><div class="big">3</div><div class="cap">Trocas config.</div></div>
+      <div class="cell ok"><div class="big">—</div><div class="cap">Alertas</div></div>
+      <div class="cell"><div class="big">—</div><div class="cap">Erros</div></div>
+    </div>
+
+    <div class="split">
+      <div class="pane-l">
+        <p class="panetitle">Programas (marque os que vão receber trocas)</p>
+        <div class="proglist">
+          <div class="it sel"><input type="checkbox" checked><span class="dot g"></span><span class="nm">O2169</span><span class="tag">2 trocas</span></div>
+          <div class="it"><input type="checkbox" checked><span class="dot g"></span><span class="nm">O2170</span><span class="tag">ok</span></div>
+          <div class="it"><input type="checkbox" checked><span class="dot y"></span><span class="nm">O2171</span><span class="tag">▲ 0 trocas</span></div>
+          <div class="it"><input type="checkbox" checked><span class="dot g"></span><span class="nm">O2172</span><span class="tag">1 troca</span></div>
+          <div class="it"><input type="checkbox"><span class="dot n"></span><span class="nm">O2173</span><span class="tag muted">não marcado</span></div>
+          <div class="it"><input type="checkbox" checked><span class="dot r"></span><span class="nm">O2174.bak</span><span class="tag">■ binário</span></div>
+        </div>
+      </div>
+
+      <div class="pane-r">
+        <div class="tblbox">
+          <div class="tblhead common">Trocas para TODOS os programas</div>
+          <table>
+            <tr><th class="c">Aplicar</th><th>Buscar (o que está)</th><th>Trocar por</th><th>Obs</th></tr>
+            <tr><td class="c"><input type="checkbox" checked></td><td><code>M8</code></td><td><code>M08</code></td><td>liga fluido</td></tr>
+            <tr><td class="c"><input type="checkbox" checked></td><td><code>S2000</code></td><td><code>S1500</code></td><td>rotação máquina</td></tr>
+            <tr><td class="c"><input type="checkbox"></td><td><code>G54</code></td><td><code>G55</code></td><td>offset peça</td></tr>
+          </table>
+          <div class="tblbtns">
+            <button class="btn tiny">+ troca</button>
+            <button class="btn tiny">+ da biblioteca</button>
+            <button class="btn tiny">− remover</button>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="tblbox specific">
+          <div class="tblhead specific">Trocas EXTRAS — só de <span class="who">O2169</span></div>
+          <table>
+            <tr><th class="c">Aplicar</th><th>Buscar (o que está)</th><th>Trocar por</th><th>Obs</th></tr>
+            <tr><td class="c"><input type="checkbox" checked></td><td><code>T0101</code></td><td><code>T0303</code></td><td>ferramenta desta peça</td></tr>
+          </table>
+          <div class="tblbtns">
+            <button class="btn tiny">+ troca</button>
+            <button class="btn tiny">+ da biblioteca</button>
+            <button class="btn tiny">− remover</button>
+          </div>
+        </div>
+
+        <div class="cta-row">
+          <span class="cta-hint">F5</span>
+          <button class="primary" onclick="go('scr-preview')">Revisar alterações  →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span>10 programa(s) marcado(s). Defina as trocas e clique Revisar.</span>
+    <button class="btn secondary">Salvar perfil *</button>
+  </div>
+</div>
+</div>
+
+<!-- ========== TELA 2: REVISAR & VERIFICAR ========== -->
+<div class="screen" id="scr-preview">
+<div class="win">
+  <div class="titlebar"><span>Revisar &amp; Verificar — antes de salvar</span>
+    <span class="dots"><span></span><span></span><span></span></span></div>
+  <div class="pad">
+
+    <div class="steps">
+      <div class="step done click" onclick="go('scr-main')"><span class="num">1</span>Perfil</div><span class="arr">›</span>
+      <div class="step done click" onclick="go('scr-main')"><span class="num">2</span>Programas</div><span class="arr">›</span>
+      <div class="step done click" onclick="go('scr-main')"><span class="num">3</span>Trocas</div><span class="arr">›</span>
+      <div class="step active"><span class="num">4</span>Revisar</div><span class="arr">›</span>
+      <div class="step"><span class="num">5</span>Salvar</div>
+    </div>
+
+    <div class="summary" style="margin-top:4px">
+      <div class="cell"><div class="big">10</div><div class="cap">Programas</div></div>
+      <div class="cell ok"><div class="big">14</div><div class="cap">Trocas no total</div></div>
+      <div class="cell warn"><div class="big">1</div><div class="cap">Alertas</div></div>
+      <div class="cell ok"><div class="big">0</div><div class="cap">Erros</div></div>
+      <div class="cell ok"><div class="big">OK</div><div class="cap">Verificações</div></div>
+    </div>
+
+    <div class="pv-split">
+      <div class="pv-list">
+        <div class="it head sel">== RESUMO ==</div>
+        <div class="it g">O2169</div>
+        <div class="it g">O2170</div>
+        <div class="it y">O2171  ▲</div>
+        <div class="it g">O2172</div>
+      </div>
+      <div class="pv-body">
+        <div class="pv-sec">
+          <h4>Alterações planejadas (checklist)</h4>
+          <div class="chk"><span class="badge ok">OK</span> 'M8' → 'M08' : 8 ocorrência(s)</div>
+          <div class="chk"><span class="badge ok">OK</span> 'S2000' → 'S1500' : 4 ocorrência(s)</div>
+          <div class="chk"><span class="badge ok">OK</span> 'T0101' → 'T0303' : 2 ocorrência(s)</div>
+          <div class="chk"><span class="badge warn">aviso</span> 'G54' → 'G55' : 0 ocorrências (achei 'G540'?)</div>
+        </div>
+        <div class="pv-sec">
+          <h4>Verificações de segurança (sobre o resultado)</h4>
+          <div class="chk"><span class="badge ok">passou</span> Deve existir: <code>M30</code> (fim de programa)</div>
+          <div class="chk"><span class="badge ok">passou</span> Não pode existir: <code>M6</code> sem T</div>
+          <div class="chk"><span class="badge ok">passou</span> Deve existir: <code>G43</code> (compensação de altura)</div>
+        </div>
+        <div class="pv-sec">
+          <h4>Alertas / conflitos</h4>
+          <div class="chk"><span class="badge warn">amarelo</span> O2171: nenhuma troca encontrou ocorrência</div>
+        </div>
+        <div class="pv-sec">
+          <h4>Prévia (linhas alteradas) — O2169</h4>
+          <div class="chk">linha   12: 'M8' → 'M08'</div>
+          <div class="chk">linha   88: 'S2000' → 'S1500'</div>
+          <div class="chk">linha  104: 'T0101' → 'T0303'</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pv-foot">
+      <button class="btn secondary" onclick="go('scr-main')">Cancelar</button>
+      <button class="primary" onclick="openSaved()">Confirmar e salvar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ========== DIALOGO: SALVO ========== -->
+<div class="overlay" id="ov-saved">
+  <div class="dialog">
+    <div class="dh">Salvo</div>
+    <div class="db">
+      10 programa(s) salvos em:<br>
+      <code>…\NC_genericos\_processado_MAZAK_2026-06-02_1430\</code><br><br>
+      Originais intactos.<br>
+      <span class="ok-tag">✔ Conferência de integridade OK (SHA-256)</span>
+    </div>
+    <div class="df"><button class="primary" onclick="closeSaved()">OK — novo lote</button></div>
+  </div>
+</div>
+
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+    document.getElementById(id).classList.add('show');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function openSaved(){ document.getElementById('ov-saved').classList.add('show'); }
+  function closeSaved(){ document.getElementById('ov-saved').classList.remove('show'); go('scr-main'); }
+</script>
+</body>
+</html>

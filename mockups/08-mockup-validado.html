@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC Batch Editor — mockup validado (08)</title>
+<!--
+  Mockup 08 — incorpora a DECISÃO VALIDADA pela pesquisa do 07:
+  · Arquitetura HÍBRIDA: tela única de preparação (Perfil+Programas+Trocas) + revisão embutida
+    + ato final de Salvar separado e BLOQUEADO até a validação passar.
+  · Faixa de etapas PASSIVA (mostra onde está; não trava — NN/G: wizard puro irrita uso diário).
+  · Alvos de clique grandes (linhas/botões >=44px — chão de fábrica: luva, tela suja).
+  · Contraste forte (texto ~4.5:1) e cor SEMPRE com ícone+texto (WCAG 1.4.1 — daltonismo).
+  · Botão primário no rodapé à direita; destrutivo em outline, separado.
+  Estático/demonstrativo. Nada executa de verdade.
+-->
+<style>
+  :root{
+    --bg:#e9edf0; --panel:#f7f9fa; --line:#bcc2c7; --line2:#d6dbdf;
+    --ink:#16202a; --muted:#4d5860; --muted2:#6b757c;
+    --primary:#1f7a3d; --primary-d:#155c2c; --danger:#a32f2f;
+    --green:#e2f4e4; --greenln:#bfe2c4; --yellow:#fff4c7; --yellowln:#ecd98f;
+    --red:#f8d9d9; --redln:#e2b0b0; --accent:#1a6bb0; --accentbg:#e6f0f9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#c9cfd4;color:var(--ink);
+    font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:14px;line-height:1.35;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 14px 48px}
+  .hint{color:#3c464d;font-size:12.5px;max-width:1220px;margin-bottom:12px;background:#f1f4f6;
+    border:1px solid #cfd5da;border-radius:7px;padding:9px 13px}
+  .hint b{color:#1f7a3d}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:#4d5860}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .sw{width:13px;height:13px;border-radius:3px;border:1px solid #00000022}
+
+  .win{width:1220px;max-width:100%;background:var(--bg);border:1px solid #a6abb0;
+    border-radius:9px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.26)}
+  .titlebar{background:#c6ccd1;padding:8px 14px;font-size:12.5px;color:#28323a;
+    border-bottom:1px solid #aeb4b9;display:flex;justify-content:space-between;align-items:center}
+  .titlebar b{color:#16202a}
+  .dots span{display:inline-block;width:12px;height:12px;border-radius:50%;margin-left:7px;background:#aeb4b9}
+
+  /* ---- barra de contexto (topo): perfil | destino | status ---- */
+  .ctx{display:flex;align-items:stretch;background:#dfe4e8;border-bottom:1px solid var(--line2)}
+  .ctx .seg{display:flex;flex-direction:column;gap:4px;padding:9px 16px;border-right:1px solid #cdd3d8;justify-content:center}
+  .ctx .seg:last-child{border-right:none;margin-left:auto;text-align:right}
+  .ctx .cap{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);font-weight:700}
+  .ctx .val{font-size:13.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .ctx select{font-size:13.5px;padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:#fff;min-height:34px}
+  .ctx .dest{font-family:Consolas,monospace;font-size:12px;color:var(--primary-d);background:#e8f3ec;
+    border:1px solid var(--greenln);border-radius:5px;padding:5px 9px}
+  .statuschip{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;
+    padding:6px 12px;border-radius:18px;min-height:32px}
+  .statuschip.ok{background:var(--green);border:1px solid var(--greenln);color:var(--primary-d)}
+  .statuschip.warn{background:var(--yellow);border:1px solid var(--yellowln);color:#7a5a00}
+  .statuschip.block{background:var(--red);border:1px solid var(--redln);color:var(--danger)}
+
+  /* ---- faixa de etapas passiva ---- */
+  .steps{display:flex;align-items:center;gap:2px;padding:11px 16px 4px;user-select:none}
+  .step{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--muted2);font-size:13px;font-weight:600;border-radius:7px}
+  .step .num{width:23px;height:23px;border-radius:50%;background:#c4cacf;color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:700}
+  .step.active{color:var(--ink)} .step.active .num{background:var(--accent)}
+  .step.done{color:var(--muted)} .step.done .num{background:var(--primary)}
+  .arr{color:#aab1b6;margin:0 1px}
+
+  .pad{padding:6px 16px 14px}
+  .grp-cap{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);font-weight:700;margin-right:4px}
+
+  /* ---- resumo do lote ---- */
+  .summary{display:flex;background:#e1e7eb;border:1px solid var(--line2);border-radius:7px;margin:10px 0;overflow:hidden}
+  .summary .cell{flex:1;padding:9px 12px;border-right:1px solid #d2d8dc;text-align:center}
+  .summary .cell:last-child{border-right:none}
+  .summary .big{font-size:20px;font-weight:800;line-height:1}
+  .summary .cap{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted2);margin-top:4px;font-weight:600}
+  .summary .warn .big{color:#8a6400}.summary .ok .big{color:var(--primary-d)}.summary .err .big{color:var(--danger)}
+
+  /* ---- 3 colunas: programas | trocas | revisão ---- */
+  .cols{display:flex;gap:12px;align-items:flex-start}
+  .col-prog{width:250px;flex-shrink:0}
+  .col-mid{flex:1;min-width:0}
+  .col-rev{width:320px;flex-shrink:0}
+  .ptitle{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);font-weight:800;margin:2px 0 7px}
+
+  .card{border:1px solid var(--line);border-radius:7px;background:#fff;overflow:hidden}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+
+  /* lista de programas — linhas altas (alvo grande) */
+  .prog .it{display:flex;align-items:center;gap:9px;padding:0 11px;min-height:44px;border-bottom:1px solid var(--line2);font-size:13.5px}
+  .prog .it:last-child{border-bottom:none}
+  .prog .it.sel{background:var(--accentbg);box-shadow:inset 4px 0 0 var(--accent)}
+  .prog .nm{flex:1;font-variant-numeric:tabular-nums;font-weight:600}
+  .prog .tag{font-size:11.5px;color:var(--muted)}
+  .stat{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:11px}
+  .stat.g{background:var(--green);color:var(--primary-d)}
+  .stat.y{background:var(--yellow);color:#7a5a00}
+  .stat.r{background:var(--red);color:var(--danger)}
+  .stat.n{background:#e3e7ea;color:var(--muted)}
+  input[type=checkbox]{width:18px;height:18px;flex-shrink:0}
+
+  /* tabelas de trocas */
+  .blk{margin-bottom:12px}
+  .blkhead{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;font-weight:800;font-size:12px;letter-spacing:.3px;text-transform:uppercase}
+  .blkhead.common{background:#e3e9ed;color:#33404a}
+  .blkhead.specific{background:#dcebf7;color:#194e79}
+  .blkhead.safety{background:#efe7e1;color:#6a4632}
+  .who{font-weight:900}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{background:#f0f3f5;text-align:left;font-weight:700;color:var(--muted);padding:7px 9px;border-bottom:1px solid var(--line2);font-size:11.5px;text-transform:uppercase;letter-spacing:.3px}
+  td{padding:0 9px;border-bottom:1px solid #eef1f3;min-height:44px;height:44px}
+  tr:last-child td{border-bottom:none}
+  td.c{text-align:center;width:64px}
+  td code{background:#eef1f3;padding:2px 7px;border-radius:4px;font-family:Consolas,monospace;font-size:13px;font-weight:600}
+  .tbar{display:flex;gap:8px;padding:8px;background:#fafbfc;border-top:1px solid var(--line2)}
+
+  /* botões — área de clique generosa */
+  button{font-family:inherit}
+  .btn{font-size:13px;min-height:40px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;color:var(--ink);font-weight:600}
+  .btn:hover{background:#f0f3f5}
+  .btn.sm{min-height:36px;padding:0 11px;font-size:12.5px;color:var(--muted)}
+  .btn.danger{color:var(--danger);border-color:var(--redln)}
+  .btn.primary{background:var(--primary);border-color:var(--primary-d);color:#fff;font-weight:800;min-height:48px;padding:0 26px;font-size:15px}
+  .btn.primary:hover{background:var(--primary-d)}
+  .btn.primary:disabled{background:#c2c8cc;border-color:#b3b9bd;color:#eef0f1;cursor:not-allowed;font-weight:700}
+  .btn.big{min-height:48px;font-size:14.5px;padding:0 20px}
+
+  /* painel de revisão embutido */
+  .rev{border:1px solid var(--line);border-radius:7px;background:#fff;overflow:hidden}
+  .rev h4{margin:0;padding:9px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);background:#f3f6f7;border-bottom:1px solid var(--line2);font-weight:800}
+  .rev .body{padding:10px 12px}
+  .chk{display:flex;align-items:flex-start;gap:9px;padding:6px 0;font-size:13px;border-bottom:1px solid #f1f4f6}
+  .chk:last-child{border-bottom:none}
+  .badge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px}
+  .badge.ok{background:var(--green);color:var(--primary-d);border:1px solid var(--greenln)}
+  .badge.warn{background:var(--yellow);color:#7a5a00;border:1px solid var(--yellowln)}
+  .badge.err{background:var(--red);color:var(--danger);border:1px solid var(--redln)}
+  .chk code{background:#eef1f3;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace}
+  .integ{display:flex;align-items:center;gap:9px;padding:10px 12px;background:#f3f6f7;border-top:1px solid var(--line2);font-size:12.5px;color:var(--muted)}
+
+  /* rodapé de ações fixo */
+  .footer{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#dfe4e8;border-top:1px solid var(--line2)}
+  .footer .left{display:flex;gap:10px}
+  .footer .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .gate{font-size:12.5px;color:var(--danger);font-weight:600;display:flex;align-items:center;gap:6px}
+  .gate.ok{color:var(--primary-d)}
+  .dirty{color:#9a5b00;font-weight:700;font-size:12.5px}
+
+  /* overlay salvar */
+  .overlay{position:fixed;inset:0;background:rgba(15,20,25,.5);display:none;place-items:center;z-index:30}
+  .overlay.show{display:grid}
+  .dialog{background:var(--panel);border:1px solid #a6abb0;border-radius:9px;width:480px;box-shadow:0 16px 46px rgba(0,0,0,.34);overflow:hidden}
+  .dialog .dh{background:var(--primary);color:#fff;padding:12px 18px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:9px}
+  .dialog .db{padding:18px;font-size:13.5px;line-height:1.55}
+  .dialog .db code{background:#eef1f3;padding:1px 6px;border-radius:4px;font-family:Consolas,monospace}
+  .dialog .ok-tag{color:var(--primary-d);font-weight:800}
+  .dialog .df{display:flex;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line2)}
+  .ico{font-weight:900;display:inline-block}
+</style>
+</head>
+<body>
+
+<div class="hint">
+  <b>Mockup 08 — desenho validado pela pesquisa.</b> Tela única de preparação (Perfil + Programas + Trocas) com revisão embutida à direita; o ato de <b>Salvar fica bloqueado até a validação passar</b>.
+  Clique <b>“Validar agora”</b> no rodapé para ver o botão Salvar destravar. Nada executa de verdade.
+  <div class="legend">
+    <span><span class="sw" style="background:#e2f4e4;border-color:#bfe2c4"></span> verde = validado/pronto</span>
+    <span><span class="sw" style="background:#fff4c7;border-color:#ecd98f"></span> amarelo = atenção/revisar</span>
+    <span><span class="sw" style="background:#f8d9d9;border-color:#e2b0b0"></span> vermelho = bloqueio/falha</span>
+    <span>cor sempre com ícone + texto (daltonismo)</span>
+  </div>
+</div>
+
+<div class="win">
+  <div class="titlebar">
+    <span><b>CNC Batch Editor</b> — Substituições em programas CNC</span>
+    <span class="dots"><span></span><span></span><span></span></span>
+  </div>
+
+  <!-- barra de contexto -->
+  <div class="ctx">
+    <div class="seg">
+      <span class="cap">Perfil da máquina</span>
+      <span class="val">
+        <select><option>MAZAK VTC-530</option><option>ROMI GL-240</option><option>Centro de usinagem</option></select>
+        <span class="dirty" title="trocas mudaram desde o último salvar">● modificado*</span>
+      </span>
+    </div>
+    <div class="seg">
+      <span class="cap">Pasta de destino</span>
+      <span class="val"><span class="dest">…\NC\_processado_MAZAK_2026-06-03_0915\</span></span>
+    </div>
+    <div class="seg">
+      <span class="cap">Situação do lote</span>
+      <span class="val"><span class="statuschip block" id="topStatus"><span class="ico">⚠</span> Falta validar</span></span>
+    </div>
+  </div>
+
+  <!-- faixa de etapas passiva -->
+  <div class="steps">
+    <div class="step done"><span class="num">✓</span>Perfil</div><span class="arr">›</span>
+    <div class="step done"><span class="num">✓</span>Programas</div><span class="arr">›</span>
+    <div class="step active"><span class="num">3</span>Trocas</div><span class="arr">›</span>
+    <div class="step"><span class="num">4</span>Revisar</div><span class="arr">›</span>
+    <div class="step"><span class="num">5</span>Salvar</div>
+  </div>
+
+  <div class="pad">
+    <!-- resumo do lote -->
+    <div class="summary">
+      <div class="cell"><div class="big">12</div><div class="cap">Programas</div></div>
+      <div class="cell"><div class="big">10</div><div class="cap">Marcados</div></div>
+      <div class="cell"><div class="big">14</div><div class="cap">Trocas previstas</div></div>
+      <div class="cell warn"><div class="big">1</div><div class="cap">Alertas</div></div>
+      <div class="cell ok"><div class="big">0</div><div class="cap">Erros</div></div>
+    </div>
+
+    <div class="cols">
+      <!-- COLUNA 1: programas -->
+      <div class="col-prog">
+        <p class="ptitle">Programas — marque os que recebem trocas</p>
+        <div class="toolbar">
+          <button class="btn sm">Abrir pasta…</button>
+          <button class="btn sm">Abrir programa(s)…</button>
+        </div>
+        <div class="card prog">
+          <div class="it sel"><input type="checkbox" checked><span class="nm">O2169</span><span class="stat g">● 3 trocas</span></div>
+          <div class="it"><input type="checkbox" checked><span class="nm">O2170</span><span class="stat g">● ok</span></div>
+          <div class="it"><input type="checkbox" checked><span class="nm">O2171</span><span class="stat y">▲ 0 trocas</span></div>
+          <div class="it"><input type="checkbox" checked><span class="nm">O2172</span><span class="stat g">● 1 troca</span></div>
+          <div class="it"><input type="checkbox"><span class="nm">O2173</span><span class="stat n">○ não marcado</span></div>
+          <div class="it"><input type="checkbox"><span class="nm">O2174.bak</span><span class="stat r">■ binário</span></div>
+        </div>
+      </div>
+
+      <!-- COLUNA 2: trocas + segurança -->
+      <div class="col-mid">
+        <p class="ptitle">Trocas a aplicar</p>
+
+        <div class="card blk">
+          <div class="blkhead common"><span>Trocas para TODOS os programas</span><span>comuns</span></div>
+          <table>
+            <tr><th class="c">Aplicar</th><th>Buscar (o que está)</th><th>Trocar por</th><th>Observação</th></tr>
+            <tr><td class="c"><input type="checkbox" checked></td><td><code>M8</code></td><td><code>M08</code></td><td>liga fluido</td></tr>
+            <tr><td class="c"><input type="checkbox" checked></td><td><code>S2000</code></td><td><code>S1500</code></td><td>rotação da máquina</td></tr>
+            <tr><td class="c"><input type="checkbox"></td><td><code>G54</code></td><td><code>G55</code></td><td>offset da peça</td></tr>
+          </table>
+          <div class="tbar"><button class="btn sm">+ troca</button><button class="btn sm">+ da biblioteca</button><button class="btn sm">− remover</button></div>
+        </div>
+
+        <div class="card blk" style="border-color:#bcd2e6">
+          <div class="blkhead specific"><span>Trocas EXTRAS — só de <span class="who">O2169</span></span><span>específicas</span></div>
+          <table>
+            <tr><th class="c">Aplicar</th><th>Buscar (o que está)</th><th>Trocar por</th><th>Observação</th></tr>
+            <tr><td class="c"><input type="checkbox" checked></td><td><code>T0101</code></td><td><code>T0303</code></td><td>ferramenta desta peça</td></tr>
+          </table>
+          <div class="tbar"><button class="btn sm">+ troca</button><button class="btn sm">+ da biblioteca</button><button class="btn sm">− remover</button></div>
+        </div>
+
+        <div class="card blk" style="border-color:#dcc6b6">
+          <div class="blkhead safety"><span>Verificações de segurança</span><span>porteiro</span></div>
+          <table>
+            <tr><th>Regra</th><th>Alvo</th><th class="c">Tipo</th></tr>
+            <tr><td>Deve existir</td><td><code>M30</code> (fim de programa)</td><td class="c"><span class="badge ok">obrig.</span></td></tr>
+            <tr><td>Não pode existir</td><td><code>M6</code> sem ferramenta</td><td class="c"><span class="badge err">bloqueio</span></td></tr>
+          </table>
+          <div class="tbar"><button class="btn sm">+ verificação</button></div>
+        </div>
+      </div>
+
+      <!-- COLUNA 3: revisão embutida -->
+      <div class="col-rev">
+        <p class="ptitle">Revisão (sobre o resultado)</p>
+        <div class="rev">
+          <h4>Alterações previstas — O2169</h4>
+          <div class="body">
+            <div class="chk"><span class="badge ok"><span class="ico">✓</span> OK</span> <span><code>M8</code>→<code>M08</code> · 8 ocorr.</span></div>
+            <div class="chk"><span class="badge ok"><span class="ico">✓</span> OK</span> <span><code>S2000</code>→<code>S1500</code> · 4 ocorr.</span></div>
+            <div class="chk"><span class="badge ok"><span class="ico">✓</span> OK</span> <span><code>T0101</code>→<code>T0303</code> · 2 ocorr.</span></div>
+            <div class="chk"><span class="badge warn"><span class="ico">▲</span> aviso</span> <span><code>G54</code>→<code>G55</code> · 0 ocorr. (achei <code>G540</code>?)</span></div>
+          </div>
+          <h4>Verificações de segurança</h4>
+          <div class="body">
+            <div class="chk"><span class="badge ok"><span class="ico">✓</span> passou</span> <span>Deve existir <code>M30</code></span></div>
+            <div class="chk"><span class="badge ok"><span class="ico">✓</span> passou</span> <span>Sem <code>M6</code> solto</span></div>
+          </div>
+          <div class="integ"><span class="ico">🔒</span> Integridade SHA-256 será conferida ao salvar · originais nunca alterados</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- rodapé de ações: primário à direita, destrutivo separado à esquerda -->
+  <div class="footer">
+    <div class="left">
+      <button class="btn">Salvar perfil*</button>
+      <button class="btn danger">Descartar trocas</button>
+    </div>
+    <div class="right">
+      <span class="gate" id="gate"><span class="ico">⚠</span> Valide antes de salvar</span>
+      <button class="btn big" onclick="validar()">Validar agora</button>
+      <button class="btn primary" id="btnSave" disabled onclick="openSaved()">Salvar em nova pasta</button>
+    </div>
+  </div>
+</div>
+
+<!-- overlay: salvo -->
+<div class="overlay" id="ov">
+  <div class="dialog">
+    <div class="dh"><span class="ico">✓</span> Salvo com sucesso</div>
+    <div class="db">
+      10 programa(s) gravados em:<br>
+      <code>…\NC\_processado_MAZAK_2026-06-03_0915\</code><br><br>
+      Originais intactos.<br>
+      <span class="ok-tag"><span class="ico">🔒</span> Conferência de integridade OK (SHA-256)</span>
+    </div>
+    <div class="df"><button class="btn primary" onclick="closeSaved()">OK — novo lote</button></div>
+  </div>
+</div>
+
+<script>
+  function validar(){
+    document.getElementById('btnSave').disabled = false;
+    document.getElementById('gate').className = 'gate ok';
+    document.getElementById('gate').innerHTML = '<span class="ico">✓</span> Validado — pode salvar';
+    var s = document.getElementById('topStatus');
+    s.className = 'statuschip warn';
+    s.innerHTML = '<span class="ico">▲</span> Validado · 1 alerta';
+  }
+  function openSaved(){ document.getElementById('ov').classList.add('show'); }
+  function closeSaved(){ document.getElementById('ov').classList.remove('show'); }
+</script>
+</body>
+</html>
