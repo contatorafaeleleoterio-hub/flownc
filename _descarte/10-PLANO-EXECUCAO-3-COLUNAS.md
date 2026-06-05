@@ -1,6 +1,6 @@
 # 10 — PLANO DE EXECUÇÃO — Interface "3 Colunas" (dinâmica por código)
 
-**Projeto:** CNC Batch Editor.
+**Projeto:** FlowNC.
 **Status:** plano aprovado para implementação (a executar, uma mudança por vez via OpenSpec).
 **Data:** 2026-06-03
 **Revisão:** 2026-06-03 — confrontado com o código real (`matcher.py`, `replacement_plan.py`, `file_handler.py`, `models.py`). · **2026-06-04** — política de salvamento vira **publicação na pasta de trabalho + backup versionado** (decisão #5). Mudanças resumidas em §9.

@@ -1,4 +1,4 @@
-# PRD v2.3 — CNC Batch Editor
+# PRD v2.3 — FlowNC
 ## Editor Seguro de Substituições em Lote para Programas CNC
 
 **Versão:** 2.3 — baseline de desenvolvimento (substitui v2.2)
@@ -586,7 +586,7 @@ cnc_batch_editor/
 │   ├── test_preset_store.py
 │   └── fixtures/
 └── build/
-    └── CNC_BatchEditor/
+    └── FlowNC/
 ```
 
 ### 12.3 Responsabilidades

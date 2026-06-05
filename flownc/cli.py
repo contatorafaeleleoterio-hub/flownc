@@ -1,4 +1,4 @@
-"""CLI do CNC Batch Editor — protótipo executável da fatia vertical (PRD v2.3).
+"""CLI do FlowNC — protótipo executável da fatia vertical (PRD v2.3).
 
 Fluxo (secao 11.3): carregar perfil -> ler arquivos -> dry-run com contagem e
 preview -> verificacoes -> salvar em pasta separada (so com --salvar e sem
@@ -140,7 +140,7 @@ def processar(source_dir: Path, preset_path: Path, salvar: bool) -> int:
 def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
-    parser = argparse.ArgumentParser(description="CNC Batch Editor (protótipo CLI)")
+    parser = argparse.ArgumentParser(description="FlowNC (protótipo CLI)")
     parser.add_argument("pasta", type=Path, help="pasta com os arquivos NC")
     parser.add_argument("--preset", type=Path, required=True, help="arquivo de preset JSON")
     parser.add_argument("--salvar", action="store_true", help="grava o resultado")

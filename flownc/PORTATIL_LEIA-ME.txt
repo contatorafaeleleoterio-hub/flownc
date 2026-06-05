@@ -1,9 +1,9 @@
-CNC BATCH EDITOR — versao portatil
-===================================
+FlowNC — versao portatil
+=========================
 
 COMO USAR (no pen drive ou em qualquer PC Windows 10/11):
-1. Copie a pasta CNC_BatchEditor inteira para o pen drive.
-2. Abra a pasta e rode CNC_BatchEditor.exe (duplo clique).
+1. Copie a pasta FlowNC inteira para o pen drive.
+2. Abra a pasta e rode FlowNC.exe (duplo clique).
    Nao precisa instalar nada, nem ter Python.
 3. Em "Perfil", escolha a maquina (ex.: MAZAK_VTC530).
 4. Clique "Escolher pasta..." e aponte para a pasta com os programas NC.
@@ -18,6 +18,8 @@ PERFIS (presets):
 - Ficam na pasta data\presets ao lado do .exe (arquivos .json).
 - Voce pode editar/criar perfis ali. Cada perfil tem as regras de
   substituicao e as verificacoes daquela maquina.
+- Migracao do app antigo: copie os arquivos data\presets\*.json da pasta
+  antiga para data\presets nesta pasta FlowNC antes de rodar.
 
 IMPORTANTE:
 - Esta ferramenta faz SUBSTITUICAO DE TEXTO segura, nao e um validador CNC

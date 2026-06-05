@@ -2,7 +2,7 @@
 
 O `core/` é estável (106 testes verdes, `mypy --strict` limpo) e já contém o motor de substituição não-cascata: `matcher.find_matches` (boundary CNC `(?<![A-Z])…(?![0-9.])`), `replacement_plan.build_plan` (plano + conflito por `Suppression`), `replacer.apply_edits` (composição do fim para o início), `file_handler` (encoding/EOL + escrita atômica `_write_bytes_atomic`/`os.replace`) e `conference` (SHA-256 `integrity_hash`/`verify_saved`).
 
-A nova dinâmica "por código" precisa de quatro capacidades de motor (ver `proposal.md` e `specs/`): **Retirar**, **varredura/contagem**, **validação de lote** e **publicação segura**. Esta mudança entrega só o `core/` — sem UI. As decisões de produto estão travadas em `10-PLANO-EXECUCAO-3-COLUNAS.md` §0 (decisões #1, #2, #5) e não se reabrem aqui.
+A nova dinâmica "por código" precisa de quatro capacidades de motor (ver `proposal.md` e `specs/`): **Retirar**, **varredura/contagem**, **validação de lote** e **publicação segura**. Esta mudança entrega só o `core/` — sem UI. As decisões de produto estão travadas em `docs/DECISOES.md` (decisões `#1`, `#2`, `#5`) e não se reabrem aqui.
 
 ## Goals / Non-Goals
 

@@ -1,6 +1,6 @@
 ## Why
 
-A nova dinâmica "por código" (decidida em `08-WORKFLOW-NOVA-DINAMICA.md`, planejada em `10-PLANO-EXECUCAO-3-COLUNAS.md`) exige quatro capacidades de motor que hoje não existem: **retirar** um código (não só substituir), **contar** ocorrências por arquivo antes de executar (a varredura que alimenta os chips e o match-banner), **validar o lote** (1 Retirar por execução, allowlist, conflito de regra) e **publicar** o resultado direto na pasta de trabalho da máquina com **backup versionado** dos originais. Esta é a **Mudança 1** do plano — a parte mais arriscada e 100% testável, base de toda a UI que vem depois. Sem UI: só `core/` puro/sensível.
+A nova dinâmica "por código" (agora sintetizada em `docs/PRODUTO.md` e planejada em `docs/PLANO.md`) exige quatro capacidades de motor que hoje não existem: **retirar** um código (não só substituir), **contar** ocorrências por arquivo antes de executar (a varredura que alimenta os chips e o match-banner), **validar o lote** (1 Retirar por execução, allowlist, conflito de regra) e **publicar** o resultado direto na pasta de trabalho da máquina com **backup versionado** dos originais. Esta é a **Mudança 1** do plano — a parte mais arriscada e 100% testável, base de toda a UI que vem depois. Sem UI: só `core/` puro/sensível.
 
 ## What Changes
 

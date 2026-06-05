@@ -53,4 +53,4 @@
 - [ ] 7.2 Rodar a suíte completa (`pytest`) — todos verdes, sem regressão dos 106 existentes.
 - [ ] 7.3 `mypy --strict` limpo no `core/` inteiro; `ruff` (line-length 100) limpo nos arquivos novos/alterados.
 - [ ] 7.4 Conferir DoD: vetores do Retirar passam · lote misto compõe · publicação testada (backup versionado + troca atômica + dupla conferência; falha simulada não corrompe a produção) · invariante "o original nunca se perde" preservado.
-- [ ] 7.5 Atualizar `00-HANDOFF.md` e a memória ao concluir; preparar para `/opsx:archive`.
+- [ ] 7.5 Atualizar `docs/CONTEXTO.md` e a memória ao concluir; preparar para `/opsx:archive`.

@@ -1,15 +1,15 @@
-# 00 — HANDOFF / PONTO DE RETOMADA — CNC Batch Editor
+# 00 — HANDOFF / PONTO DE RETOMADA — FlowNC
 
 > **PRÓXIMA SESSÃO: leia SÓ este arquivo para retomar.** Ele resume o que existe,
 > o que foi feito, por quê, os erros/aprendizados e o próximo passo. Não precisa
 > reexplicar nada.
 
-**Projeto:** CNC Batch Editor — ferramenta desktop Windows para **substituição de
+**Projeto:** FlowNC — ferramenta desktop Windows para **substituição de
 texto em programas CNC** (.nc/.txt/.iso), com preview e preservação do original.
 **É outro projeto, separado do ToolOptimizer CNC** (calculadora de parâmetros).
 **Última sessão:** 2026-06-03
 **Pasta do app:** `C:\Users\USUARIO\Desktop\Projetos\Sistema_verificador_codigos_cnc\cnc_batch_editor\`
-**Baseline/spec:** `02-PRD_CNC_BatchEditor_v2.3.md` (motor/código atual) +
+**Baseline/spec:** `docs/PRD.md` (motor/código atual) +
 **`08-WORKFLOW-NOVA-DINAMICA.md` (nova dinâmica de produto DECIDIDA — fonte da UX a implementar)**
 
 ---
@@ -23,7 +23,7 @@ texto em programas CNC** (.nc/.txt/.iso), com preview e preservação do origina
 | `mypy --strict` no `core/` | ✅ **limpo (13 arquivos)** |
 | CLI (`cli.py`) | ✅ funciona (dry-run e salvar) |
 | GUI PySide6 (`ui/`) — **modelo por programa, com abas** | ✅ funciona (validada headless) |
-| EXE portátil onedir (`dist\CNC_BatchEditor\`, ~115 MB) | ✅ **regenerado 2026-06-01 com conferência (Sessão D)**, smoke test OK |
+| EXE portátil onedir antigo (`dist\CNC_BatchEditor\`, ~115 MB) | ✅ **regenerado 2026-06-01 com conferência (Sessão D)**, smoke test OK; preservado ate o novo `FlowNC.exe` passar no smoke |
 | Programas de teste (`programas_teste\`) | ✅ 3 programas Fanuc realistas |
 
 **Sessões do plano `04-PLANO-MELHORIAS`:** Stage 0 (H0.1–H0.6) ✅ · A (biblioteca) ✅ ·
@@ -43,8 +43,8 @@ cd C:\Users\USUARIO\Desktop\Projetos\Sistema_verificador_codigos_cnc\cnc_batch_e
 powershell -ExecutionPolicy Bypass -File build_exe.ps1   # regera o EXE portátil
 ```
 
-**EXE portátil (pen drive):** copie a pasta `dist\CNC_BatchEditor\` inteira e rode
-`CNC_BatchEditor.exe` (duplo clique, sem Python). Presets editáveis em
+**EXE portátil (pen drive):** depois do build do rebrand, copie a pasta `dist\FlowNC\` inteira e rode
+`FlowNC.exe` (duplo clique, sem Python). Presets editáveis em
 `data\presets\*.json` ao lado do exe.
 
 ---
@@ -66,7 +66,7 @@ Exemplo do uso real (validado): comuns `M08→M07`, `G54→G55`; PECA01 tem só 
 
 ## 4. O QUE FOI FEITO NESTA SESSÃO (resumo)
 
-1. **Analisei e refinei o PRD** v2.2 → **v2.3** (`02-PRD_CNC_BatchEditor_v2.3.md`), corrigindo erros e adicionando rastreabilidade.
+1. **Analisei e refinei o PRD** v2.2 → **v2.3** (agora sintetizado em `docs/PRD.md`), corrigindo erros e adicionando rastreabilidade.
 2. **Construí o núcleo** (motor de substituição seguro) + **33 testes** cobrindo os vetores §15.
 3. **CLI** funcional como primeira fatia (dry-run/salvar).
 4. **GUI PySide6**: 1ª versão simples → reescrita para painel de regras → **reescrita final para modelo por programa** (abas, comuns + por-programa, verificações separadas), atendendo ao pedido do Rafael de escolher individualmente o que mudar em cada programa.
@@ -111,8 +111,8 @@ Exemplo do uso real (validado): comuns `M08→M07`, `G54→G55`; PECA01 tem só 
 ```
 Sistema_verificador_codigos_cnc\
 ├── 00-HANDOFF.md                 <- ESTE arquivo (leia primeiro)
-├── 02-PRD_CNC_BatchEditor_v2.3.md  <- spec/baseline
-├── 02-PRD_CNC_BatchEditor_v2.0.md  <- versão antiga (histórico)
+├── docs\PRD.md                     <- spec/baseline enxuta
+├── _descarte\02-PRD_CNC_BatchEditor_v2.0.md  <- versão antiga (histórico)
 ├── 04-PLANO-MELHORIAS-2026-06-01.md <- plano Stage 0 + Sessões A–E (CONCLUÍDO)
 ├── 05-PLANO-UI-UX.md             <- redesenho de interface (skill, dores, workflow-base)
 ├── 06-ANALISE-UX-WORKFLOW.md     <- relatório de UX: 12 problemas + layout/fluxo (etapa anterior)
@@ -133,7 +133,7 @@ Sistema_verificador_codigos_cnc\
     ├── data\presets\             <- MAZAK_VTC530.json (perfil exemplo)
     ├── programas_teste\          <- PECA01/02/03 (teste)
     ├── tests\                    <- 33 testes pytest
-    └── dist\CNC_BatchEditor\     <- EXE portátil pronto (copiar p/ pen drive)
+    └── dist\FlowNC\              <- EXE portátil alvo do rebrand
 ```
 
 ---
@@ -141,7 +141,7 @@ Sistema_verificador_codigos_cnc\
 ## 9. PRÓXIMOS PASSOS — RETOMAR AQUI
 
 > ### 🚨 PRÓXIMO PASSO IMEDIATO (decidido 2026-06-04 cont. 2): EXECUTAR O REBRAND "FlowNC" + LIMPEZA DE DOCS
-> O app vai ser renomeado de **CNC Batch Editor → FlowNC** e a documentação será consolidada
+> O app agora usa o nome **FlowNC** e a documentação foi consolidada
 > (14 docs dispersos → conjunto enxuto em `docs\` + entrada única; obsoletos → `_descarte\`).
 > **O plano está pronto, revisado e APROVADO:** **`PLANO-RENAME-FLOWNC.md`** (v3 — incorpora 17
 > questões de revisão técnica; premissas verificadas contra o código real). **Comece pela Fase 0**
@@ -233,7 +233,7 @@ Sistema_verificador_codigos_cnc\
    `proposal.md` + `design.md` (8 decisões técnicas) + `specs\` (4 capacidades) + `tasks.md` (7 grupos/33 tarefas).
    `openspec validate` = **válida**. Tudo fiel ao código real relido (`models`/`matcher`/`replacement_plan`/
    `replacer`/`file_handler`/`conference`/`settings_store`). **Ainda NÃO implementada** → `/opsx:apply` depois.
-2. **Rafael decidiu renomear o app: `CNC Batch Editor` → `FlowNC`** (todas as formas: exibição, EXE,
+2. **Rafael decidiu adotar o nome `FlowNC`** (todas as formas: exibição, EXE,
    pacote `pyproject`, pasta `cnc_batch_editor`→`flownc` com venv recriado). E **consolidar a documentação**
    (objetivo: parar de queimar token lendo 14 docs redundantes) → estrutura enxuta `docs\` + entrada única;
    obsoletos para `_descarte\` (rastreável, com `_INDICE.md`); o útil sintetizado.
@@ -281,7 +281,7 @@ revisão útil de ruído.
    **varredura** que o `08` tinha rejeitado. Rafael decidiu: **entra, em 2º plano (QThread)**.
 3. **Produzi o plano** → **`10-PLANO-EXECUCAO-3-COLUNAS.md`**: 4 mudanças OpenSpec em ordem + infra
    (fontes IBM Plex, threading, ícones, migração de preset, rebuild EXE). 4 decisões travadas (ver bloco FOCO).
-4. **Próximo:** proposta OpenSpec da Mudança 1 (`motor-retirar-e-contagem`).
+4. **Próximo:** proposta OpenSpec da Mudança 1 (`motor-retirar-contagem-e-publicacao`).
 
 **Aprendizado:** o motor (`core/`) muda pouco — escopo (quais programas) é estado de SESSÃO, não de
 perfil; o motor já planeja por arquivo. O grosso é UI + biblioteca; o sensível é "Retirar" (core+testes).
@@ -318,7 +318,7 @@ perfil; o motor já planeja por arquivo. O grosso é UI + biblioteca; o sensíve
 
 1. **Reverificação do sistema atual (sem mudar código):** `pytest` → **106/106 verdes** em
    ~3,4s (inclui `test_ui_smoke.py`); **EXE empacotado abre** sem erro (subiu com o título
-   correto da janela, encerrado limpo); conteúdo da pasta `dist\CNC_BatchEditor\` conferido
+   correto da janela, encerrado limpo); conteúdo da pasta antiga `dist\CNC_BatchEditor\` conferido
    (EXE + `_internal\` + `data\presets\MAZAK_VTC530.json` + `GUIA-DE-USO.txt` idêntico ao
    `.md` da raiz + `LEIA-ME.txt`). **Pacote pronto para pendrive** (entregue como pasta, sem
    ZIP, por opção do Rafael).
@@ -349,8 +349,8 @@ perfil; o motor já planeja por arquivo. O grosso é UI + biblioteca; o sensíve
 **Único passo restante (e SÓ o Rafael pode fazer): validação operacional manual.**
 DoD da Sessão E: "Teste real assinado pelo operador". Ou seja:
 
-1. Copiar `cnc_batch_editor\dist\CNC_BatchEditor\` para um pen drive.
-2. Rodar `CNC_BatchEditor.exe` num PC sem Python (de preferência no chão de fábrica).
+1. Copiar `cnc_batch_editor\dist\FlowNC\` para um pen drive.
+2. Rodar `FlowNC.exe` num PC sem Python (de preferência no chão de fábrica).
 3. Fazer o fluxo completo com **arquivos NC reais da fábrica** (pasta `prog\` ou da máquina):
    abrir → marcar trocas comuns + por programa → Executar (preview com **checklist**) →
    Confirmar e salvar → conferir o **log** (`_log.txt`) com a seção

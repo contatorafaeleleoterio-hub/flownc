@@ -3,7 +3,7 @@ schema: spec-driven
 # Project context (optional)
 # This is shown to AI when creating artifacts.
 context: |
-  Projeto: CNC Batch Editor — editor seguro de substituições em lote para programas CNC (PRD v2.3).
+  Projeto: FlowNC — editor seguro de substituições em lote para programas CNC.
   Stack: Python >=3.11, CLI (cli.py), GUI opcional com PySide6.
   Estrutura: core/ (models, matcher, replacer, replacement_plan, verifier, session_log), tests/ (pytest).
   Convenções: nomenclatura e documentação em português; mypy strict no core/; ruff line-length 100.

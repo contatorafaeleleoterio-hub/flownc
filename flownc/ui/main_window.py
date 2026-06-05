@@ -1,4 +1,4 @@
-"""Janela principal do CNC Batch Editor (PRD secao 11) — modelo por programa.
+"""Janela principal do FlowNC (PRD secao 11) — modelo por programa.
 
 Aba SUBSTITUICOES: lista de programas + 'Trocas comuns (todos)' + 'Trocas so do
 programa selecionado'. Funciona com 1 ou varios programas. So as marcadas sao
@@ -125,7 +125,7 @@ class FileOutcome:
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("CNC Batch Editor — Substituicoes em programas CNC")
+        self.setWindowTitle("FlowNC — Substituicoes em programas CNC")
         self.resize(1180, 720)
         self._preset: Preset | None = None
         self._programs: list[Path] = []

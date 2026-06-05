@@ -1,4 +1,4 @@
-"""Ponto de entrada do CNC Batch Editor (GUI PySide6)."""
+"""Ponto de entrada do FlowNC (GUI PySide6)."""
 from __future__ import annotations
 
 import sys
@@ -40,7 +40,7 @@ def main() -> int:
     from ui.main_window import MainWindow
 
     app = QApplication(sys.argv)
-    app.setApplicationName("CNC Batch Editor")
+    app.setApplicationName("FlowNC")
     _install_excepthook()
     window = MainWindow()
     window.show()

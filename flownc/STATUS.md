@@ -1,9 +1,9 @@
-# STATUS — CNC Batch Editor
+# STATUS — FlowNC
 
-> Para retomar o projeto, leia primeiro `..\00-HANDOFF.md`. Este arquivo é o
+> Para retomar o projeto, leia primeiro `..\docs\README.md`. Este arquivo é o
 > detalhe por fase.
 
-**Baseline:** `..\02-PRD_CNC_BatchEditor_v2.3.md`
+**Baseline:** `..\docs\PRD.md`
 **Última atualização:** 2026-06-02
 
 ## Onde estamos no roadmap (PRD §19)
@@ -24,7 +24,7 @@
 ## Sessão 2026-06-02 — entrega verificada + análise de UX (sem mudança de código)
 
 - **Reverificação do sistema atual:** `pytest tests -q` → **106/106 verdes** (~3,4s; inclui
-  `test_ui_smoke.py`). **EXE `dist\CNC_BatchEditor\CNC_BatchEditor.exe` abre** sem erro
+  `test_ui_smoke.py`). **EXE antigo em `dist` abre** sem erro
   (título de janela correto, encerrado limpo). Pacote conferido: EXE + `_internal\` +
   `data\presets\MAZAK_VTC530.json` + `GUIA-DE-USO.txt` (idêntico ao `.md`) + `LEIA-ME.txt`.
   **Entregue como pasta pronta para pendrive** (sem ZIP, por opção do Rafael). Nenhuma linha
@@ -110,23 +110,23 @@ Novos testes: `tests/test_json_store.py` (4), `tests/test_preset_store.py` (12),
 - Leitura/escrita preservando encoding/BOM/EOL; escrita atômica; original nunca alterado; ignora `_processado_*`.
 - Verificações estruturais (bloqueiam no salvar) e configuráveis (aba Verificações).
 - **GUI por programa** (abas Substituições/Verificações; comuns + específicas; preview antes de salvar). Funciona com 1 ou vários programas.
-- **EXE portátil** em `dist\CNC_BatchEditor\` (~115 MB), regenerado com a UI nova, abre OK.
+- **EXE portátil antigo** em `dist` (~115 MB), preservado ate o smoke do novo `FlowNC.exe`.
 
 ## Como rodar
 
 ```powershell
-cd C:\Users\USUARIO\Desktop\Projetos\Sistema_verificador_codigos_cnc\cnc_batch_editor
+cd C:\Users\USUARIO\Desktop\Projetos\Sistema_verificador_codigos_cnc\flownc
 .\.venv\Scripts\python.exe main.py            # GUI (dev)
 .\.venv\Scripts\python.exe -m pytest tests -q # 33 testes
 powershell -ExecutionPolicy Bypass -File build_exe.ps1   # regenerar EXE
 ```
 
-EXE portátil: copiar `dist\CNC_BatchEditor\` p/ pen drive → rodar `CNC_BatchEditor.exe`.
+EXE portátil: depois do build do rebrand, copiar `dist\FlowNC\` p/ pen drive e rodar `FlowNC.exe`.
 
 ## Próximo passo (retomar)
 
 Plano `04-PLANO-MELHORIAS` concluído em código (Stage 0 + Sessões A–E). Sistema **entregue e
-verificado** (pacote pronto em `dist\CNC_BatchEditor\`).
+verificado** (pacote antigo preservado em `dist` ate o smoke de `FlowNC.exe`).
 
 **Duas frentes em aberto:**
 1. **Validação operacional (só o Rafael):** rodar o EXE no chão de fábrica com **arquivos

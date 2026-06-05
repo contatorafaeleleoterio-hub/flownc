@@ -1,4 +1,4 @@
-# GUIA DE USO — CNC Batch Editor
+# GUIA DE USO — FlowNC
 
 > Guia passo a passo para trocar códigos em lote nos seus programas CNC, com
 > segurança. **O programa NUNCA altera seus arquivos originais** — ele sempre
@@ -8,11 +8,11 @@
 
 ## 0. Antes de começar (1 minuto)
 
-1. A pasta `CNC_BatchEditor` (no pen drive ou no PC) precisa ter, lado a lado:
-   - `CNC_BatchEditor.exe`  ← o programa
+1. A pasta `FlowNC` (no pen drive ou no PC) precisa ter, lado a lado:
+   - `FlowNC.exe`           ← o programa
    - pasta `_internal`      ← as "tripas" (não precisa abrir)
    - pasta `data`           ← dentro tem `presets` (os perfis de máquina)
-2. Dê **dois cliques** em `CNC_BatchEditor.exe`. A janela abre direto, sem instalar
+2. Dê **dois cliques** em `FlowNC.exe`. A janela abre direto, sem instalar
    nada e sem tela preta de comando. **Isso é o normal.**
 3. Se o Windows mostrar "SmartScreen" (tela azul "Windows protegeu seu PC"):
    clique em **"Mais informações" → "Executar assim mesmo"**. É falso positivo

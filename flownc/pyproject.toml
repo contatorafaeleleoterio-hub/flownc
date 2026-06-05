@@ -1,13 +1,14 @@
 [project]
-name = "cnc-batch-editor"
-version = "0.1.0"
-description = "Editor seguro de substituicoes em lote para programas CNC (PRD v2.3)"
+name = "flownc"
+version = "0.2.0"
+description = "FlowNC: editor seguro de substituicoes em lote para programas CNC"
 requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
 gui = ["PySide6>=6.6"]
 dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.10"]
+build = ["pyinstaller"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
