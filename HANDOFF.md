@@ -1,37 +1,25 @@
-# Handoff — redesign-fundacao-visual (2026-06-06)
+# Handoff — redesign-layout-principal (2026-06-06)
 
-Status: 22/24 tarefas (2 bloqueadas por TTFs IBM Plex)
+Status: 0/29 tarefas (pronto para implementar)
 
 Feito nesta sessão:
-- `/opsx:archive motor-contagem-e-publicacao` — change arquivada
-- `/opsx:propose redesign-fundacao-visual` — proposal + design + spec + tasks criados
-- `/opsx:apply redesign-fundacao-visual` — implementação parcial:
-  - `flownc/ui/theme.py` — todos os tokens do mockup
-  - `flownc/assets/fonts/` — pasta criada (TTFs pendentes)
-  - `flownc/ui/style.qss` — 8 seletores obrigatórios
-  - `flownc/ui/main_window.py` — `_register_fonts()` + `_apply_stylesheet()` no boot
-  - `flownc/app_paths.py` — `fonts_dir()` + `qss_path()`
-  - Smoke: app abre, sem widget quebrado; QTableWidget dark = comportamento nativo (não causado pelo QSS)
+- `/opsx:archive redesign-fundacao-visual` — Mudança A arquivada (delta spec sincronizado)
+- `/opsx:propose redesign-layout-principal` — Mudança B proposta + todos os artefatos criados
 
 Onde parou:
-- Mudança A 22/24 (tarefas 2.2 e 2.3 bloqueadas: TTFs IBM Plex não encontrados)
-- Change ainda NÃO arquivada (aguarda decisão do Mestre)
+- Mudança B criada, aguardando `/opsx:apply`
+- Nenhuma linha de código escrita ainda
 
 Próximo passo:
-- Decidir: arquivar Mudança A e seguir para Mudança B (layout novo — onde o design do mockup aparece de verdade)
-- Mudança B = criar `flownc/ui/components/` (header, compositor, program_list, resumo) + 2 colunas + `main_window.py` como maestro
+- `/opsx:apply redesign-layout-principal` — iniciar implementação
+- Ordem recomendada: grupos 1→2→3→4→5→6→7→8 (pytest após cada grupo)
 
 Blockers:
-- TTFs IBM Plex Sans / Mono não encontrados no sistema (fallback Segoe UI ativo)
-- Rafael ficou surpreso que Mudança A não muda o layout — esclarecer que o design visível do mockup só aparece na Mudança B
+- Nenhum
 
 Arquivos tocados:
-- flownc/ui/theme.py (novo)
-- flownc/ui/style.qss (novo)
-- flownc/assets/fonts/.gitkeep (novo)
-- flownc/app_paths.py (fonts_dir + qss_path)
-- flownc/ui/main_window.py (_register_fonts + _apply_stylesheet)
-- openspec/changes/redesign-fundacao-visual/ (todos os artefatos)
-- openspec/changes/archive/2026-06-06-motor-contagem-e-publicacao/ (arquivado)
+- openspec/changes/redesign-layout-principal/ (proposal, design, specs, tasks — todos novos)
+- openspec/changes/archive/2026-06-06-redesign-fundacao-visual/ (arquivado)
+- openspec/specs/fundacao-visual/spec.md (sincronizado)
 
 Retomar com: "continuar"
