@@ -68,7 +68,13 @@ ainda passará por uma rodada de refino de etapas antes de codar.
 entrega de cópia limpa na Área de Trabalho e afastamento da versão antiga
 (`Desktop/CNC_BatchEditor/`, de 2026-06-01) ficam para o **fim do redesenho** (Sessão 7).
 
-### Prioridade 3 — OpenSpec `motor-contagem-e-publicacao`
+### Prioridade 3 — OpenSpec `motor-contagem-e-publicacao` — IMPLEMENTADO (2026-06-06)
 
-Implementar via `/opsx:apply` — converge com a remoção da contagem automática (Mudança C / Sessão 6).
-Retomar depois do redesenho.
+Todos os grupos implementados via `/opsx:apply`:
+
+- **Grupo 1–2** (`core/models.py`, `core/scan.py`): `ScanResult`, `Issue`, `count_occurrences` com boundary.
+- **Grupo 3** (`core/batch.py`): `validate_batch` — detecta conflito de regra (≥2 regras no mesmo código).
+- **Grupo 4** (`core/publisher.py`, `core/settings_store.py` v2): `publish_batch` — backup versionado por data/hora, troca atômica, dupla conferência SHA-256; settings migrado v1→v2 com `working_dir`/`backup_dir`.
+- **Testes**: `test_scan.py` (5), `test_batch_validate.py` (4), `test_publisher.py` (9), `test_settings_store.py` (7) — todos verdes.
+
+Próxima ação: `/opsx:archive motor-contagem-e-publicacao`.

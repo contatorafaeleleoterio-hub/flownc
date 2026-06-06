@@ -25,3 +25,11 @@ def library_path() -> Path:
 
 def settings_path() -> Path:
     return base_dir() / "data" / "settings.json"
+
+
+def fonts_dir() -> Path:
+    return base_dir() / "assets" / "fonts"
+
+
+def qss_path() -> Path:
+    return base_dir() / "ui" / "style.qss"

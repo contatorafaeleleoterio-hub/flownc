@@ -15,7 +15,7 @@ from pathlib import Path
 from core.conference import format_integrity_report, verify_saved
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QFont
+from PySide6.QtGui import QColor, QFont, QFontDatabase
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QButtonGroup,
@@ -126,6 +126,8 @@ class FileOutcome:
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
+        self._register_fonts()
+        self._apply_stylesheet()
         self.setWindowTitle("FlowNC — Substituicoes em programas CNC")
         self.resize(1180, 720)
         self._preset: Preset | None = None
@@ -140,6 +142,23 @@ class MainWindow(QMainWindow):
         self._load_presets()
         self._load_library()
         self._load_settings()
+
+    # ============ tema visual ============
+    def _register_fonts(self) -> None:
+        fonts_dir = app_paths.fonts_dir()
+        for ttf in fonts_dir.glob("*.ttf"):
+            font_id = QFontDatabase.addApplicationFont(str(ttf))
+            if font_id < 0:
+                import sys
+                print(f"[FlowNC] fonte nao carregada: {ttf}", file=sys.stderr)
+
+    def _apply_stylesheet(self) -> None:
+        qss_file = app_paths.qss_path()
+        try:
+            qss = qss_file.read_text(encoding="utf-8")
+            self.setStyleSheet(qss)
+        except OSError:
+            pass  # sem QSS: app usa estilo padrao do Qt
 
     # ============ construcao ============
     def _build_ui(self) -> None:

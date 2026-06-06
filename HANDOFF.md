@@ -1,23 +1,37 @@
-# Handoff — motor-contagem-e-publicacao (2026-06-06)
+# Handoff — redesign-fundacao-visual (2026-06-06)
 
-Status: 9/21 tarefas (grupos 1–3 concluídos)
+Status: 22/24 tarefas (2 bloqueadas por TTFs IBM Plex)
 
 Feito nesta sessão:
-- Tarefas 1–3: `ScanResult`/`Issue` em models.py; helper `find_spans` em matcher.py
-- `scan.py` com `count_occurrences(find, mode, case_sensitive, files, read_fn)` — pura, injetável
-- `batch.py` com `validate_batch(rules, library)` — detecta conflito de regra (≥2 regras no mesmo código)
-- Testes: `test_scan.py` (5) + `test_batch_validate.py` (4) — 9 verdes; mypy + ruff limpos
+- `/opsx:archive motor-contagem-e-publicacao` — change arquivada
+- `/opsx:propose redesign-fundacao-visual` — proposal + design + spec + tasks criados
+- `/opsx:apply redesign-fundacao-visual` — implementação parcial:
+  - `flownc/ui/theme.py` — todos os tokens do mockup
+  - `flownc/assets/fonts/` — pasta criada (TTFs pendentes)
+  - `flownc/ui/style.qss` — 8 seletores obrigatórios
+  - `flownc/ui/main_window.py` — `_register_fonts()` + `_apply_stylesheet()` no boot
+  - `flownc/app_paths.py` — `fonts_dir()` + `qss_path()`
+  - Smoke: app abre, sem widget quebrado; QTableWidget dark = comportamento nativo (não causado pelo QSS)
 
 Onde parou:
-- Implementação completa dos grupos 1–3 (motor puro: scan + batch)
-- Preparado para o grupo 4 (publicação segura + settings v2)
+- Mudança A 22/24 (tarefas 2.2 e 2.3 bloqueadas: TTFs IBM Plex não encontrados)
+- Change ainda NÃO arquivada (aguarda decisão do Mestre)
 
 Próximo passo:
-1. Tarefa 4.1: Estender `settings_store.py` — schema v1 → v2, adicionar `working_dir`/`backup_dir`
-2. Tarefas 4.2–4.6: `publisher.py` — pub_batch, backup versionado, troca atômica, dupla conferência SHA
-3. Tarefas 4.7–4.8: Testes `test_publisher.py` + settings
-4. Tarefas 5.1–5.4: QA (suíte completa, mypy, DoD, docs)
+- Decidir: arquivar Mudança A e seguir para Mudança B (layout novo — onde o design do mockup aparece de verdade)
+- Mudança B = criar `flownc/ui/components/` (header, compositor, program_list, resumo) + 2 colunas + `main_window.py` como maestro
 
-Blockers: Nenhum.
+Blockers:
+- TTFs IBM Plex Sans / Mono não encontrados no sistema (fallback Segoe UI ativo)
+- Rafael ficou surpreso que Mudança A não muda o layout — esclarecer que o design visível do mockup só aparece na Mudança B
 
-Retomar com: `continuar` ou `/opsx:apply motor-contagem-e-publicacao`
+Arquivos tocados:
+- flownc/ui/theme.py (novo)
+- flownc/ui/style.qss (novo)
+- flownc/assets/fonts/.gitkeep (novo)
+- flownc/app_paths.py (fonts_dir + qss_path)
+- flownc/ui/main_window.py (_register_fonts + _apply_stylesheet)
+- openspec/changes/redesign-fundacao-visual/ (todos os artefatos)
+- openspec/changes/archive/2026-06-06-motor-contagem-e-publicacao/ (arquivado)
+
+Retomar com: "continuar"

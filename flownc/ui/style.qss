@@ -1,0 +1,290 @@
+/* FlowNC — folha de estilo central
+   Tokens: flownc/ui/theme.py
+   Fontes: IBM Plex Sans / Segoe UI (fallback) + IBM Plex Mono / Consolas (fallback)
+*/
+
+/* -----------------------------------------------------------------------
+   QMainWindow — janela principal
+   ----------------------------------------------------------------------- */
+QMainWindow {
+    background-color: #F8FAFB;
+    color: #1B2128;
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* -----------------------------------------------------------------------
+   QPushButton — botão padrão (secundário / ghost)
+   ----------------------------------------------------------------------- */
+QPushButton {
+    background-color: #FFFFFF;
+    color: #1B2128;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    padding: 0px 16px;
+    min-height: 32px;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #ECEFF3;
+    border-color: #aeb6bf;
+}
+
+QPushButton:pressed {
+    background-color: #E1E6EC;
+    border-color: #aeb6bf;
+}
+
+QPushButton:disabled {
+    background-color: #ECEFF3;
+    color: #899099;
+    border-color: #CDD4DB;
+}
+
+/* Botão primário (CTA — classe via setProperty) */
+QPushButton[primary="true"] {
+    background-color: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3A434E,
+        stop:1 #232A33
+    );
+    color: #F4F7FA;
+    border: none;
+    border-radius: 8px;
+    min-height: 44px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+QPushButton[primary="true"]:hover {
+    background-color: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #4a5460,
+        stop:1 #2e3744
+    );
+}
+
+QPushButton[primary="true"]:pressed {
+    background-color: #232A33;
+}
+
+QPushButton[primary="true"]:disabled {
+    background-color: #9fb3c6;
+    color: #ECEFF3;
+}
+
+/* Botão interativo (azul) */
+QPushButton[interactive="true"] {
+    background-color: #E4EEF7;
+    color: #1F5F9E;
+    border: 1px solid #CDD4DB;
+}
+
+QPushButton[interactive="true"]:hover {
+    background-color: #d0e3f4;
+    border-color: #1F5F9E;
+}
+
+/* -----------------------------------------------------------------------
+   QComboBox — dropdown
+   ----------------------------------------------------------------------- */
+QComboBox {
+    background-color: #FFFFFF;
+    color: #1B2128;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    padding: 0px 12px;
+    min-height: 44px;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    selection-background-color: #E4EEF7;
+}
+
+QComboBox:hover {
+    border-color: #aeb6bf;
+}
+
+QComboBox:focus {
+    border-color: #1F5F9E;
+    border-width: 2px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 28px;
+    border-left: 1px solid #CDD4DB;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #FFFFFF;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    selection-background-color: #E4EEF7;
+    selection-color: #1B2128;
+    padding: 4px;
+    outline: none;
+}
+
+/* -----------------------------------------------------------------------
+   QListWidget — lista de programas / itens
+   ----------------------------------------------------------------------- */
+QListWidget {
+    background-color: #FFFFFF;
+    color: #1B2128;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 13px;
+    outline: none;
+}
+
+QListWidget::item {
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+QListWidget::item:hover {
+    background-color: #ECEFF3;
+}
+
+QListWidget::item:selected {
+    background-color: #E4EEF7;
+    color: #1F5F9E;
+}
+
+QListWidget::item:selected:active {
+    background-color: #E4EEF7;
+    color: #1F5F9E;
+}
+
+/* -----------------------------------------------------------------------
+   QLineEdit — campo de texto
+   ----------------------------------------------------------------------- */
+QLineEdit {
+    background-color: #FFFFFF;
+    color: #1B2128;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    padding: 0px 12px;
+    min-height: 44px;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 13px;
+    selection-background-color: #E4EEF7;
+    selection-color: #1B2128;
+}
+
+QLineEdit:hover {
+    border-color: #aeb6bf;
+}
+
+QLineEdit:focus {
+    border-color: #1F5F9E;
+    border-width: 2px;
+}
+
+QLineEdit:disabled {
+    background-color: #ECEFF3;
+    color: #899099;
+}
+
+/* -----------------------------------------------------------------------
+   QLabel — rótulos
+   ----------------------------------------------------------------------- */
+QLabel {
+    color: #1B2128;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    background: transparent;
+}
+
+QLabel[secondary="true"] {
+    color: #56616D;
+}
+
+QLabel[tertiary="true"] {
+    color: #899099;
+    font-size: 12px;
+}
+
+QLabel[heading="true"] {
+    color: #1B2128;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* -----------------------------------------------------------------------
+   QCheckBox — caixa de seleção
+   ----------------------------------------------------------------------- */
+QCheckBox {
+    color: #1B2128;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-size: 13px;
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #CDD4DB;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+}
+
+QCheckBox::indicator:hover {
+    border-color: #aeb6bf;
+    background-color: #ECEFF3;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #1F5F9E;
+    border-color: #1F5F9E;
+    image: none;
+}
+
+QCheckBox::indicator:checked:hover {
+    background-color: #2B76C0;
+    border-color: #2B76C0;
+}
+
+QCheckBox:disabled {
+    color: #899099;
+}
+
+QCheckBox::indicator:disabled {
+    background-color: #ECEFF3;
+    border-color: #CDD4DB;
+}
+
+/* -----------------------------------------------------------------------
+   QSplitter — divisor de painéis
+   ----------------------------------------------------------------------- */
+QSplitter {
+    background-color: #F8FAFB;
+}
+
+QSplitter::handle {
+    background-color: #E1E6EC;
+    width: 4px;
+    height: 4px;
+}
+
+QSplitter::handle:hover {
+    background-color: #CDD4DB;
+}
+
+QSplitter::handle:horizontal {
+    width: 4px;
+}
+
+QSplitter::handle:vertical {
+    height: 4px;
+}
