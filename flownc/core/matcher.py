@@ -46,14 +46,25 @@ def compile_rule(find: str, mode: Mode, case_sensitive: bool = True) -> re.Patte
     return re.compile(build_pattern(find, resolved), flags)
 
 
+def find_spans(
+    text: str, find: str, mode: Mode, case_sensitive: bool = True
+) -> list[tuple[int, int]]:
+    """Intervalos (start, end) de cada ocorrencia de `find` no texto, com boundary.
+
+    Helper sem `Rule`: reaproveitado pela varredura/contagem (`core.scan`) para
+    contar ocorrencias com o mesmo boundary CNC do motor de substituicao.
+    """
+    if not find:
+        return []
+    pattern = compile_rule(find, mode, case_sensitive)
+    return [(m.start(), m.end()) for m in pattern.finditer(text)]
+
+
 def find_matches(
     text: str, rule: Rule, case_sensitive: bool = True
 ) -> list[tuple[int, int]]:
     """Retorna os intervalos (start, end) de cada ocorrencia da regra no texto."""
-    if not rule.find:
-        return []
-    pattern = compile_rule(rule.find, rule.mode, case_sensitive)
-    return [(m.start(), m.end()) for m in pattern.finditer(text)]
+    return find_spans(text, rule.find, rule.mode, case_sensitive)
 
 
 def suggest_leading_zero_variant(text: str, find: str) -> str | None:

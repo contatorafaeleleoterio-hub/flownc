@@ -129,3 +129,46 @@ class EncodingInfo:
     has_bom: bool
     eol: str          # "\r\n", "\n" ou "\r"
     confidence: str   # "alta" | "media" | "baixa"
+
+
+@dataclass(frozen=True)
+class ScanResult:
+    """Resultado da varredura de um codigo de origem por arquivo.
+
+    `counts` mapeia cada arquivo -> numero de ocorrencias (com boundary CNC).
+    Zero ocorrencias e sinal util (nao erro): arquivo entra com contagem 0.
+    """
+
+    find: str
+    counts: dict[str, int] = field(default_factory=dict)
+
+    @property
+    def files_with_matches(self) -> list[str]:
+        return [name for name, n in self.counts.items() if n > 0]
+
+    @property
+    def files_without_matches(self) -> list[str]:
+        """Arquivos com 0 ocorrencias (insumo para o ambar/desmarcar na UI)."""
+        return [name for name, n in self.counts.items() if n == 0]
+
+    @property
+    def total_files(self) -> int:
+        return len(self.counts)
+
+    @property
+    def coverage_summary(self) -> str:
+        """Agregado 'X de Y arquivos contem <codigo>'."""
+        return f"{len(self.files_with_matches)} de {self.total_files} arquivos contem {self.find}"
+
+
+@dataclass(frozen=True)
+class Issue:
+    """Problema detectado na validacao de um lote (validate_batch).
+
+    Severidade WARNING (ambar) nao bloqueia; CRITICAL bloqueia. `rule_ids`
+    referencia a(s) regra(s) envolvidas no problema.
+    """
+
+    severity: Severity
+    message: str
+    rule_ids: tuple[str, ...] = ()

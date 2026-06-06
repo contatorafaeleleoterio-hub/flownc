@@ -34,6 +34,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QRadioButton,
     QSplitter,
+    QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
     QTabWidget,
@@ -66,7 +67,6 @@ from core.models import (
 )
 from core.preset_store import (
     PresetError,
-    backup_before_write,
     create_preset,
     delete_preset,
     duplicate_preset,
@@ -77,7 +77,8 @@ from core.preset_store import (
 from core.replacement_plan import build_plan
 from core.replacer import apply_edits
 from core.session_log import SessionLog
-from core.verifier import is_blocking, run_configurable, run_structural
+from core.verifier import run_configurable, run_structural
+from ui.editor_panel import EditorPanel
 from ui.library_dialog import LibraryDialog, LibraryPickerDialog
 from ui.preview_dialog import PreviewDialog
 
@@ -216,7 +217,11 @@ class MainWindow(QMainWindow):
         lv.addWidget(QLabel("PROGRAMAS  (marque os que vao receber as trocas)"))
         self.lst_prog = QListWidget()
         self.lst_prog.currentRowChanged.connect(self._on_program_selected)
+        self.lst_prog.itemDoubleClicked.connect(lambda _it: self._on_edit_program())
         lv.addWidget(self.lst_prog)
+        self.btn_edit_prog = QPushButton("✎ Editar programa selecionado")
+        self.btn_edit_prog.clicked.connect(self._on_edit_program)
+        lv.addWidget(self.btn_edit_prog)
         split.addWidget(left)
 
         right = QWidget()
@@ -269,7 +274,14 @@ class MainWindow(QMainWindow):
         run.addStretch(1)
         rv.addLayout(run)
 
-        split.addWidget(right)
+        # Pilha na area da direita: pagina 0 = tabelas de trocas (Lote);
+        # pagina 1 = editor por arquivo. "Editar" mostra o editor; "Voltar" retorna.
+        self._right_stack = QStackedWidget()
+        self._right_stack.addWidget(right)
+        self._editor = EditorPanel(self._library, parent=self)
+        self._editor.closeRequested.connect(self._close_editor)
+        self._right_stack.addWidget(self._editor)
+        split.addWidget(self._right_stack)
         split.setSizes([280, 900])
         lay.addWidget(split)
         return w
@@ -906,6 +918,49 @@ class MainWindow(QMainWindow):
         dlg = LibraryDialog(self._library, app_paths.library_path(), self)
         dlg.exec()
         self._library = dlg.current_entries()
+
+    # ============ editor por arquivo ============
+    def _guard_unsaved(self) -> bool:
+        """Se o editor tem alteracao pendente, pergunta salvar/descartar/cancelar.
+
+        Retorna True se pode prosseguir (salvou ou descartou), False se cancelou.
+        """
+        if not self._editor.tem_alteracao():
+            return True
+        resp = QMessageBox.question(
+            self, "Alteracoes nao salvas",
+            "Ha alteracoes nao salvas no editor. Salvar antes de trocar?",
+            QMessageBox.StandardButton.Save
+            | QMessageBox.StandardButton.Discard
+            | QMessageBox.StandardButton.Cancel,
+        )
+        if resp == QMessageBox.StandardButton.Save:
+            return self._editor.salvar()
+        if resp == QMessageBox.StandardButton.Discard:
+            return True
+        return False  # Cancel: preserva a edicao
+
+    def _on_edit_program(self) -> None:
+        row = self.lst_prog.currentRow()
+        if row < 0:
+            QMessageBox.information(self, "Sem programa", "Selecione um programa na lista.")
+            return
+        if not self._guard_unsaved():
+            return
+        path = Path(self.lst_prog.item(row).data(Qt.ItemDataRole.UserRole))
+        self._editor.set_library(self._library)
+        self._editor.set_case_sensitive(self._preset.case_sensitive if self._preset else True)
+        try:
+            self._editor.abrir(path)
+        except Exception as exc:  # noqa: BLE001
+            QMessageBox.critical(self, "Erro ao abrir", f"Nao foi possivel abrir o arquivo:\n{exc}")
+            return
+        self._right_stack.setCurrentWidget(self._editor)
+
+    def _close_editor(self) -> None:
+        if not self._guard_unsaved():
+            return
+        self._right_stack.setCurrentIndex(0)
 
     def _set_status(self, text: str, warn: bool = False) -> None:
         self.lbl_status.setText(text)
