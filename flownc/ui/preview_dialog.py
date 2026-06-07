@@ -17,7 +17,6 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSplitter,
     QVBoxLayout,
-    QWidget,
 )
 
 _GREEN = QColor(225, 245, 225)
@@ -35,7 +34,7 @@ class PreviewDialog(QDialog):
     ) -> None:
         super().__init__(parent)
         self.confirmed = False
-        self.setWindowTitle("Preview — revise antes de salvar")
+        self.setWindowTitle("Resumo do lote — confira antes de publicar")
         self.resize(900, 600)
 
         root = QVBoxLayout(self)
@@ -63,11 +62,11 @@ class PreviewDialog(QDialog):
 
         btns = QHBoxLayout()
         if blocked:
-            lbl = QLabel("SALVAR BLOQUEADO: ha erro estrutural critico (vermelho).")
+            lbl = QLabel("PUBLICAÇÃO BLOQUEADA: ha erro estrutural critico (vermelho).")
             lbl.setStyleSheet("color:#a00; font-weight:bold;")
             btns.addWidget(lbl)
         btns.addStretch(1)
-        self.btn_save = QPushButton("Confirmar e salvar")
+        self.btn_save = QPushButton("Publicar na máquina")
         self.btn_save.setEnabled(not blocked)
         self.btn_save.clicked.connect(self._confirm)
         btn_cancel = QPushButton("Cancelar")

@@ -1,0 +1,20 @@
+[
+  {
+    "find": "M3",
+    "replace": "M03",
+    "label": "Liga eixo-arvore",
+    "tags": []
+  },
+  {
+    "find": "M8",
+    "replace": "M08",
+    "label": "Liga refrigeracao",
+    "tags": []
+  },
+  {
+    "find": "G54",
+    "replace": "G55",
+    "label": "Origem 1",
+    "tags": []
+  }
+]

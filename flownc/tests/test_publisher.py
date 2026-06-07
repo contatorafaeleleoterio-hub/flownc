@@ -4,8 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from flownc.core.conference import integrity_hash
-from flownc.core.publisher import PublishItem, publish_batch
+from core.conference import integrity_hash
+from core.publisher import PublishItem, publish_batch
 
 
 def test_publica_apenas_arquivos_que_mudaram(tmp_path: Path) -> None:
@@ -54,7 +54,7 @@ def test_backup_versionado_por_execucao(tmp_path: Path) -> None:
     (working_dir / "a.g").write_bytes(b"v1")
 
     # Primeira execucao (mockar tempo T1)
-    with patch("flownc.core.publisher.datetime") as mock_dt:
+    with patch("core.publisher.datetime") as mock_dt:
         mock_dt.now.return_value.strftime.return_value = "20260606_100000"
         result1 = publish_batch(
             working_dir,
@@ -71,7 +71,7 @@ def test_backup_versionado_por_execucao(tmp_path: Path) -> None:
     (working_dir / "a.g").write_bytes(b"v3")
 
     # Segunda execucao (mockar tempo T2, diferente de T1)
-    with patch("flownc.core.publisher.datetime") as mock_dt:
+    with patch("core.publisher.datetime") as mock_dt:
         mock_dt.now.return_value.strftime.return_value = "20260606_100001"
         result2 = publish_batch(
             working_dir,

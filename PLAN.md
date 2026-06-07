@@ -158,7 +158,42 @@ Forma de execução livre (criar documentos, escrever código novo, reprogramar 
 - **Arquitetura:** componentes separados em `flownc/ui/components/` (novos: `header.py`, `compositor.py`, `program_list.py`, `resumo.py`); `flownc/ui/main_window.py` vira o "maestro" (instancia componentes, conecta sinais/slots, gerencia o `QStackedWidget` Resumo ↔ Editor e o `QSplitter` de proporção dinâmica).
 - **Editor:** `flownc/ui/editor_panel.py` (já existe, será estilizado na Mudança C) + `core/inplace_save.py` (já existe, não muda).
 - **Build:** PyInstaller (`flownc/FlowNC.spec`) → `flownc/dist/FlowNC/FlowNC.exe`.
-- **Verificação:** `pytest flownc/tests/` (121+ testes) + `mypy flownc/ --ignore-missing-imports` + `ruff check flownc/`; todos devem passar antes de arquivar cada mudança.
+- **Verificação:** `pytest flownc/tests/` (146 testes verdes em 2026-06-07; usar o venv `flownc/.venv` que tem PySide6 6.11.1) + `mypy flownc/ --ignore-missing-imports` + `ruff check flownc/`; todos devem passar antes de arquivar cada mudança.
 - **Processo:** OpenSpec (propose → apply → archive), 3 mudanças sequenciais (`redesign-fundacao-visual` → `redesign-layout-paineis` → `redesign-editor-limpeza`).
 - **Referência de design:** `mockups/painel-final.v2.html` (único modelo válido; design antigo descartado).
-- **Plano detalhado (companheiro):** `docs/PLANO-REDESIGN-VISUAL-V2.md`.
+
+> **Plano único.** Este `PLAN.md` é o único plano vivo. Os planos antigos/superados (`PLANO.md`, `PLANO-MOCKUP-V2-EDITOR.md`, `PLANO-REDESIGN-VISUAL-V2.md`, `PLANO-DESIGN-SYSTEM.md`) e o relatório item-a-item de conformidade (`PLANO-CONFORMIDADE-MOCKUP-V2.md`) foram arquivados em `_descarte/` (recuperáveis, fora do caminho). A seção abaixo consolidou o estado real auditado.
+
+## Estado real auditado (2026-06-07)
+
+> Auditoria independente cruzando o app real, o mockup `mockups/painel-final.v2.html` e a execução de verdade (venv `flownc/.venv` com PySide6 6.11.1; **146 testes verdes**; smoke manual com screenshots). Consolida o antigo `docs/PLANO-CONFORMIDADE-MOCKUP-V2.md` (agora em `_descarte/`, onde está o detalhe item-a-item).
+
+### Entregue e verificado em execução
+- Mudanças A (fundação visual) e B (layout 2 colunas + 4 componentes + `QStackedWidget` Resumo↔Editor) entregues e **verificadas em execução** — `test_ui_smoke.py` instancia `MainWindow` + componentes e passa.
+- Resumo recalcula de verdade: chip de estado (`validate_batch`), contadores, cards `De→Para`, selo `✓ Validado`, meta de ocorrências (`count_occurrences`).
+- Editor por arquivo: varredura com borda CNC (`M8`≠`M80`), substituir todos/um a um, **salvar in-place atômico com conferência SHA** (CRLF preservado). Botão `✎ Editar` e duplo-clique abrem o editor correto.
+- Preview com nomenclatura de publicação; QSS com tokens/hex do mockup.
+
+### Divergências de fidelidade abertas (a fechar)
+- **Header:** marca `⚙ FlowNC`/`LOCAL · OFFLINE` (vs `FlowNC`/`Editor de Lotes`); 2 botões fora do mockup (`Abrir pasta`/`Abrir programa(s)`); `Salvar perfil` à direita (mockup: à esquerda) e só avisa (stub); `+ Adicionar código` azul-claro (mockup: azul sólido) e sem comportamento próprio (abre a Biblioteca).
+- **Compositor (painel 1):** título `Montar edição` sem número; `QComboBox` sem busca; lista plana sem rascunho/`✕` por linha; o botão adicionar **comete a regra na hora**; tem seletor `Escopo` **inexistente no mockup**; falta o CTA `Adicionar edição ao lote →` do painel 2.
+- **Lista de programas:** **dois checkboxes por linha** (confirmado em render); título `Programas` (vs `Seleção de Programas`); metadados absolutos (vs relativos); sem `.file.off` na linha desmarcada.
+- **Resumo:** escopo `todos/sel.` (vs `N programas`); ações `✎ ⧉ 🗑` decorativas (QLabel sem clique); selo de backup em 1 linha (vs escudo + 2 linhas); contador `Alterações` **superestima sob conflito** (contagem bruta, sem descontar supressão — 10 vs ~6 reais).
+- **Editor:** glifos `🔎`/`◂▸` (vs `🔍`/`↑↓`); `Substituir por` único (vs `Substituir`+`por`); `Salvar` sem `💾`; **não realça todas as ocorrências**; `Um a um` por `QMessageBox` (vs stepbar inline).
+- **Preview/publicação:** cores hardcoded (fora dos tokens); fluxo de 4 overlays do mockup ausente; CTA ainda usa `_save()` legado em vez de `publish_batch` (backup versionado + SHA já prontos e testados, mas órfãos da UI).
+
+### Lacunas confirmadas (fora do mockup, mas bloqueiam a entrega)
+- **Biblioteca Fanuc não semeada:** `data/library.json` não existe → app inicia com biblioteca vazia.
+- **Sem perfil Fanuc padrão:** só `MAZAK_VTC530.json` (exemplo).
+- **`FlowNC.spec datas=[]`:** o EXE não inclui `ui/style.qss`, `data/` nem fontes → roda sem tema/perfil/biblioteca.
+- **Fontes IBM Plex não empacotadas** (`assets/fonts/` só tem `.gitkeep`) → fallback Segoe UI/Consolas.
+
+### Próximos passos para fechar 100%
+1. Reescrever `CompositorPanel` no formato `editlist`/rascunho do mockup (`1 Configurações`, lista `Edições montadas (N)`, linha `em edição`, `✕` por linha, `+ adicionar outra edição`) + CTA `Adicionar edição ao lote →` no painel 2.
+2. Fidelidade do header (marca/subtítulo, realocar/remover `Abrir pasta`/`Abrir programa`, `Salvar perfil`, `+ Adicionar código`) e do Resumo (escopo `N programas`, ações do card clicáveis, selo 2 linhas).
+3. Remover o checkbox duplicado da lista de programas; aplicar `.file.off`.
+4. Orquestrador de publicação com `build_plan`+`apply_edits`+`publish_batch` no lugar do `_save()` legado; corrigir o contador `Alterações` para descontar supressões.
+5. Editor: glifos/labels do mockup, realce de ocorrências, stepbar inline, `💾 Salvar`.
+6. Modais Qt equivalentes aos 4 overlays do mockup; dropdowns pesquisáveis (`.libdrop`).
+7. **Seed Fanuc** (`data/library.json` + `presets/FANUC_PADRAO.json` + `core/seed.py` com `ensure_seed`) e **corrigir `FlowNC.spec datas`** (empacotar QSS/data/fontes); empacotar IBM Plex ou assumir Segoe UI.
+8. Persistência completa do perfil; conferência visual final contra o mockup.

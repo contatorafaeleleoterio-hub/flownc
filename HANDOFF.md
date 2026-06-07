@@ -1,25 +1,19 @@
-# Handoff — redesign-layout-principal (2026-06-06)
-
-Status: 0/29 tarefas (pronto para implementar)
+# Handoff — FlowNC — 2026-06-07
+Status: redesign visual em andamento (Mudanças A e B implementadas; C a propor)
 
 Feito nesta sessão:
-- `/opsx:archive redesign-fundacao-visual` — Mudança A arquivada (delta spec sincronizado)
-- `/opsx:propose redesign-layout-principal` — Mudança B proposta + todos os artefatos criados
+- Atualizados os 6 docs (`docs/PRD, PRODUTO, CONTEXTO, DECISOES, CHANGELOG, README`) para refletir o mockup v2 aprovado; design antigo (3 colunas / `painel-final.html`) descartado.
+- Arquivadas 2 mudanças OpenSpec: `editor-integrado-por-arquivo` e `redesign-layout-principal` (em `openspec/changes/archive/2026-06-07-*`); delta specs sincronizados para `openspec/specs/` (editor-de-arquivo, localizador-no-editor, layout-principal).
+- Nenhuma mudança OpenSpec ativa restante.
 
-Onde parou:
-- Mudança B criada, aguardando `/opsx:apply`
-- Nenhuma linha de código escrita ainda
+Onde parou: redesign visual nas Mudanças A+B; falta propor a Mudança C (editor/limpeza/entrega).
 
-Próximo passo:
-- `/opsx:apply redesign-layout-principal` — iniciar implementação
-- Ordem recomendada: grupos 1→2→3→4→5→6→7→8 (pytest após cada grupo)
+Próximo passo: propor a Mudança C via `/opsx:propose` (editor com cara final, remoções do v2, EXE novo) — ver etapas 22+ do `PLAN.md`.
 
 Blockers:
-- Nenhum
+- Smoke manual da Mudança B (tarefa 8.4) NÃO foi feito antes de arquivar — confirmar visualmente as 2 colunas no app em algum momento.
+- Lacunas de empacotamento abertas (ver `PLAN.md`): `FlowNC.spec datas=[]`, fontes IBM Plex, seed Fanuc (`data/library.json` + perfil padrão).
 
-Arquivos tocados:
-- openspec/changes/redesign-layout-principal/ (proposal, design, specs, tasks — todos novos)
-- openspec/changes/archive/2026-06-06-redesign-fundacao-visual/ (arquivado)
-- openspec/specs/fundacao-visual/spec.md (sincronizado)
+Arquivos tocados: docs/* ; openspec/specs/{editor-de-arquivo,localizador-no-editor,layout-principal} ; openspec/changes/archive/2026-06-07-* ; memory (comunicação simples).
 
 Retomar com: "continuar"

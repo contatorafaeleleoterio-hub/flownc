@@ -288,3 +288,136 @@ QSplitter::handle:horizontal {
 QSplitter::handle:vertical {
     height: 4px;
 }
+
+/* -----------------------------------------------------------------------
+   HeaderBar — barra superior (gradiente metálico, tokens COLOR_HEAD_*)
+   ----------------------------------------------------------------------- */
+#HeaderBar {
+    min-height: 70px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #D3DAE1, stop:0.5 #c3cbd3, stop:1 #B9C2CB);
+    border-bottom: 1px solid #a7afb8;
+}
+
+#HeaderBar #Logo {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1B2128;
+}
+
+/* -----------------------------------------------------------------------
+   Painéis das colunas — fundo base, cantos arredondados, padding SP_16
+   ----------------------------------------------------------------------- */
+#CompositorPanel,
+#ProgramListPanel,
+#SummaryPanel {
+    background-color: #F8FAFB;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+QScrollArea {
+    border: none;
+    background: transparent;
+}
+
+#Counter {
+    background-color: #F8FAFB;
+    border: none;
+    color: #1B2128;
+    padding: 6px 4px;
+}
+
+#Counter b {
+    font-family: "IBM Plex Mono", "Consolas", monospace;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+#StateChip {
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#StateChip[state="ok"] {
+    background-color: #E1F1E8;
+    color: #1C8A4D;
+}
+
+#StateChip[state="warn"] {
+    background-color: #FAEED5;
+    color: #A86A07;
+}
+
+#RuleCard {
+    background-color: #ECEFF3;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+#RuleCard[conflict="true"] {
+    background-color: #FAEED5;
+    border-left: 4px solid #A86A07;
+}
+
+#RuleFormula {
+    color: #1F5F9E;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#ValidChip {
+    background-color: #E1F1E8;
+    color: #1C8A4D;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+#ConflictLine {
+    color: #A86A07;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#BackupSeal {
+    background-color: #E1F1E8;
+    color: #1C8A4D;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#CTA {
+    background-color: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3A434E,
+        stop:1 #232A33
+    );
+    color: #F4F7FA;
+    border: none;
+    border-radius: 12px;
+    min-height: 56px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#MatchBanner {
+    background-color: #E1F1E8;
+    color: #1C8A4D;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#ProgramName {
+    font-family: "IBM Plex Mono", "Consolas", monospace;
+    font-size: 14px;
+    font-weight: 600;
+}
