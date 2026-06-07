@@ -1,14 +1,13 @@
-# Handoff — FlowNC — 2026-06-07 (sessão 2)
-Status: PLAN.md finalizado (status: pronto) — auditoria do sênior conciliada com o código real e ambiguidades de UX resolvidas. Execução real ainda não iniciada — começa pela FASE 1 (protótipo HTML).
+# Handoff — FlowNC — 2026-06-07 (sessão 3)
+Status: PLAN.md pronto; gate FASE 1 NÃO cumprido — 3 faltas no protótipo detalhadas e validadas. Nenhum código tocado.
 
 Feito nesta sessão:
-- Varredura da auditoria (`auditoria_plano.md`) vs. código real: dos 3 "críticos", só `data_default/` fora do `.spec` era real; CRLF no `publisher.py` (byte-exato) e `scope-select` (não existe no v2) eram alarmes falsos; `verifier.py` existe.
-- PLAN.md corrigido (E1–E8): Passo 4 (CRLF/encoding via `encode_batch` + contador `sum(len(o.edits))`), 7b (`('data_default','data_default')`), 9b/9d (seed via `resource_dir`/`_MEIPASS`), bloco "Resposta à auditoria", overlays reais `.run/.res/.confirm/.saved`.
-- Decisões de UX gravadas: abrir arquivos via `+ Adicionar programas` + arrastar-e-soltar; retorno do editor com 3 caminhos (Voltar topo-esq. + botão contextual na linha + Esc) com guarda de não-salvo; FASE 1 cobre TODOS os componentes de feedback/transição (E8).
-- Certificado "arquivos suportados": qualquer texto + preserva o tipo de entrada (já no motor); requisito NOVO "Salvar como…" (extensão + codificação) registrado (Objetivo + FASE 1 + Passo 10).
+- Verificação de prontidão p/ execução: o plano (status: pronto) está bom como documento, mas o GATE da FASE 1 (protótipo completo + offline + aprovado) ainda NÃO está cumprido.
+- Auditoria do `mockups/painel-final.v2.html`: faltam 3 itens do inventário → (1) **offline** (ainda usa Google Fonts CDN, sem @font-face local; `assets/fonts/` só tem `.gitkeep`); (2) **"Salvar como…"** (0 ocorrências); (3) **"+ Adicionar programas" + arrastar-soltar + estado vazio** (os 40 "drop" do HTML são dropdown, não drag-drop).
+- Workflow (9 agentes: mapear→especificar→verificar) detalhou e VALIDOU as 3 specs, com correções já incorporadas. Achado-chave: armadilha de caminho — HTML mora em `mockups/`, então `@font-face` relativo resolve em `mockups/assets/fonts/` (inexistente) → cai no fallback e o critério de aprovação falha. 6 pesos reais: Sans 400/600/700 + Mono 500/600/700.
 
-Onde parou: PLAN.md pronto e commitado; nenhum código de app tocado.
-Próximo passo: FASE 1 — completar o protótipo `mockups/painel-final.v2.html` com TODO o inventário (telas + componentes de sistema/feedback + "Salvar como…" + navegação de retorno) e obter aprovação do Mestre.
-Blockers: nenhum para iniciar a FASE 1.
-Arquivos tocados: PLAN.md, HANDOFF.md, LESSONS.md.
+Onde parou: detalhamento das 3 faltas pronto/validado; protótipo ainda não alterado (estava em modo explorar).
+Próximo passo: ao "pode seguir", editar `mockups/painel-final.v2.html`: (1) `@font-face` local + remover os 3 `<link>` CDN + corrigir o hint do rodapé; (2) botão "Salvar como…" + modal `#ovSaveAs` (extensão/codificação/EOL, default=preservar); (3) "+ Adicionar programas" + `.filezone` (drag-drop) + estado vazio com CTA. Depois revisar o inventário FASE 1 inteiro e pedir aprovação ("é esse").
+Blockers: baixar os `.ttf` IBM Plex (OFL — Google Fonts/GitHub IBM/plex) p/ `flownc/assets/fonts/` + cópia em `mockups/assets/fonts/`.
+Arquivos tocados: nenhum de código; só HANDOFF/LESSONS/memória no encerramento.
 Retomar com: "continuar"
