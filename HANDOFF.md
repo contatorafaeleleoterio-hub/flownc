@@ -11,7 +11,7 @@ Onde parou: redesign visual nas Mudanças A+B; falta propor a Mudança C (editor
 Próximo passo: propor a Mudança C via `/opsx:propose` (editor com cara final, remoções do v2, EXE novo) — ver etapas 22+ do `PLAN.md`.
 
 Blockers:
-- Smoke manual da Mudança B (tarefa 8.4) NÃO foi feito antes de arquivar — confirmar visualmente as 2 colunas no app em algum momento.
+- Sem conferência visual (decisão do Mestre — não fazer).
 - Lacunas de empacotamento abertas (ver `PLAN.md`): `FlowNC.spec datas=[]`, fontes IBM Plex, seed Fanuc (`data/library.json` + perfil padrão).
 
 Arquivos tocados: docs/* ; openspec/specs/{editor-de-arquivo,localizador-no-editor,layout-principal} ; openspec/changes/archive/2026-06-07-* ; memory (comunicação simples).
