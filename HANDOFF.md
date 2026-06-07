@@ -1,15 +1,13 @@
 # Handoff — FlowNC — 2026-06-07
-Status: PLAN.md pronto e auditado; dados de fábrica populados; execução ainda não iniciada (começa pela fidelidade — Próximo passo 1).
+Status: PLAN.md reorganizado em 3 fases com Regra de Ouro (protótipo HTML antes do código). Execução real ainda não iniciada — começa pela FASE 1 (protótipo HTML completo, interativo, offline e aprovado).
 
 Feito nesta sessão:
-- Auditoria completa do PLAN.md (cruzando com código/mockup/OpenSpec): achadas contradições estruturais.
-- Reescrita do PLAN.md: A/B marcadas concluídas/arquivadas; nome da B corrigido (`redesign-layout-principal`); `summary.py` (não `resumo.py`); removido `/opsx:validate` inexistente; fatos atualizados; "Próximos passos" 1–9 viraram etapas acionáveis; nova seção de ordem de execução; decisão do modelo da biblioteca registrada.
-- Biblioteca populada: 89 códigos (G/M/eixos/parâmetros/variáveis/fluxo) em `data/library.json` e `data_default/library.json`; validada via `app_paths`.
-- Perfis criados: `MAQ01/MAQ02/MAQ03` em `data/presets` e `data_default/presets`; removido o exemplo `MAZAK_VTC530.json`.
-- Documentada a diretriz do `replace` vazio (não preencher) no PLAN.md e no LESSONS.md.
+- Decisão do Mestre: o design vira contrato. Fase 1 = protótipo HTML completo e interativo (todas as telas e popups), aprovado pelo Mestre, ANTES de qualquer código. Só depois o app nativo (PySide6) é construído seguindo o protótipo à risca; backend por último.
+- Adicionada a REGRA DE OURO ao topo do PLAN.md + seção "Reestruturação em 3 fases" (Fase 1 protótipo/gate → Fase 2 app nativo fiel → Fase 3 backend), mapeando o trabalho já detalhado (Próximos passos 1–6 → Fase 2; 4/7/8/9 + Mudanças C/D → Fase 3). Conteúdo antigo preservado como detalhamento.
+- Plano de execução salvo em C:\Users\USUARIO\.claude\plans\sim-mas-primeiro-crie-dapper-aho.md (aprovado).
 
-Onde parou: plano consistente, dados de fábrica prontos e diretrizes documentadas; nada de código de UI alterado ainda.
-Próximo passo: iniciar a fidelidade — Próximo passo 1 (reescrever o Compositor com dois campos origem/destino). Opcional antes: smoke visual conferindo biblioteca/perfis no app.
-Blockers: `ensure_seed` runtime (9b/9c) + empacotamento (7/9d) pendentes; fontes IBM Plex `.ttf` faltando (7d).
-Arquivos tocados: PLAN.md, LESSONS.md, HANDOFF.md, flownc/data/library.json, flownc/data/presets/MAQ01-03.json, flownc/data_default/ (novo), removidos flownc/data/presets/MAZAK_VTC530.json e mockups/painel-final.html.
+Onde parou: governança gravada (PLAN.md + HANDOFF + LESSONS) e commitada. Nenhum código de UI tocado. Sessão encerrada antes de iniciar a Fase 1.
+Próximo passo: FASE 1, passo 1 — auditar a completude do mockup `mockups/painel-final.v2.html` contra o inventário do PLAN.md (telas/popups presentes vs. faltantes).
+Blockers: nenhum para iniciar a Fase 1. Pendências de build/seed (7/9) e fontes IBM Plex `.ttf` (7d) só entram na Fase 3.
+Arquivos tocados: PLAN.md, HANDOFF.md.
 Retomar com: "continuar"

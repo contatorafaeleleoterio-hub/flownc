@@ -2,7 +2,42 @@
 
 status: pronto
 
+## ⛳ REGRA DE OURO — protótipo HTML antes do código (2026-06-07)
+
+> **Nenhuma tela, popup, estado ou interação é implementada no app antes de existir e estar aprovada no protótipo HTML.** O protótipo HTML (`mockups/painel-final.v2.html`) é o **contrato visual único** do projeto. O código deve segui-lo rigorosamente: cores, fontes, espaçamentos, textos, estados e comportamento. Qualquer mudança visual exige **primeiro** alterar o protótipo e obter aprovação do Mestre — só depois o código acompanha.
+>
+> **Por quê:** até aqui o design era improvisado durante a programação e o app entregue saía diferente do proposto (ver "Divergências de fidelidade abertas"). Congelar o visual num protótipo aprovado **antes** de codar elimina o improviso — o que o Mestre aprova é o que o sistema entrega.
+
+## Reestruturação em 3 fases (2026-06-07) — manda sobre a ordem antiga
+
+> Esta seção **reorganiza a execução** em 3 fases sequenciais com **gate de aprovação**. As seções detalhadas mais abaixo (Mudanças C/D, "Próximos passos 1–9", "Estado real auditado") continuam válidas como **detalhamento** das Fases 2 e 3 — esta seção fixa a **ordem** e o **gate**. A "Ordem recomendada (2026-06-07)" antiga fica **subordinada** a esta.
+>
+> **Tecnologia:** protótipo = HTML/CSS/JS autocontido (roda no navegador, fácil de revisar); produção = **PySide6 nativo** (mantém a stack atual; app rápido e EXE pequeno, sem embutir navegador, reaproveita o `core/` e os testes). O HTML **não** roda dentro do app — é a **referência** que o Qt reproduz fielmente.
+
+### FASE 1 — Protótipo HTML completo e interativo ⛳ GATE (antes de qualquer código)
+
+Criar/concluir **um único** HTML interativo cobrindo **100%** das telas, popups e estados (inventário abaixo); torná-lo **offline** (fontes IBM Plex locais, sem CDN); revisar textos/estados reais; e **obter aprovação explícita do Mestre** ("é esse"). **A Fase 2 não começa sem esse "ok".** Entregável: `mockups/painel-final.v2.html` completo, offline e **congelado** = contrato visual.
+
+**Inventário que o protótipo DEVE cobrir (checklist de completude):**
+- **Telas principais:** normal (Resumo à direita); "regra em edição" (banner verde + linha draft); "editando arquivo" (colunas ~40/60, Editor no lugar do Resumo).
+- **Compositor:** campo origem; campo destino; lista de edições montadas; linha normal; linha em edição/draft; tag de status; botão remover ✕; "+ adicionar outra edição".
+- **Programas:** linha marcada; linha desmarcada (`.off`); botão Editar; banner "regra em edição"; "+ adicionar programas"; "Adicionar edição ao lote →" (normal e desabilitado).
+- **Resumo:** chip ok; chip aviso/conflito; contadores; card de regra normal; card com conflito; selo de backup; CTA "Executar Lote".
+- **Editor:** toolbar; dropdown biblioteca `libdrop` (fechado/aberto/busca/lista/item vazio); realce de ocorrência normal e atual; barra "um a um"; botão Salvar (ativo/desabilitado); aviso "sem cópia"; voltar ao resumo.
+- **Popups/modais:** Processando lote; Resumo do lote (+ preview antes/depois); Confirmação; Sucesso; Biblioteca de Códigos; Adicionar/editar código; Salvar perfil; mensagem de erro.
+- **Exceções OS-nativas (placeholder, não prototipáveis em HTML):** seleção de pasta; seleção de arquivos.
+
+### FASE 2 — App nativo seguindo o protótipo à risca (só após o GATE)
+
+Reproduzir o contrato visual em PySide6, **tela por tela**, conferindo **lado a lado** com o protótipo (mesmo tamanho). Botões existem e respondem visualmente, mas **sem lógica de negócio** ainda (dados de exemplo fixos). Absorve os **Próximos passos 1, 2, 3, 5 e 6** (fidelidade de Compositor, header, lista, editor, modais/dropdowns) + sincronizar tokens `theme.py`/`style.qss` 1:1 com o protótipo. **Regra: só se mexe em arquivos de layout/estilo.**
+
+### FASE 3 — Ligar backend + empacotamento (só após app aprovado visualmente)
+
+Dar vida aos botões já aprovados **sem alterar o layout congelado**. Absorve o **Próximo passo 4** (`publish_batch` + contador), **7** (empacotamento do EXE), **8** (persistência de perfil), **9** (Seed) e as **Mudanças C e D**. **Regra: só se mexe em arquivos de lógica.**
+
 ## Estado de execução e ordem recomendada (2026-06-07)
+
+> ⚠️ **Subordinado à "Reestruturação em 3 fases" acima.** A ordem abaixo só vale **dentro das Fases 2 e 3**, e somente **após** a Fase 1 (protótipo HTML aprovado).
 
 > **Leia primeiro — o ponto de partida.** As Mudanças **A e B já estão IMPLEMENTADAS e ARQUIVADAS** no OpenSpec:
 > - A → `openspec/changes/archive/2026-06-06-redesign-fundacao-visual`

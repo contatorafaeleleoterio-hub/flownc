@@ -8,3 +8,9 @@ A biblioteca (`data/library.json` e `data_default/library.json`, 89 códigos) us
 - **Risco transitório:** enquanto o Compositor não for reescrito (Próximo passo 1), a tela antiga espera um par "de → para" e pode tratar um código da biblioteca como "trocar por nada" (apagar). Até a reescrita, não usar os códigos da biblioteca direto na tela antiga.
 - **NÃO "consertar" preenchendo o `replace`** — isso volta ao modelo de pares prontos, que foi **descartado**. A correção certa é a tela nova com **dois campos** (código que sai / código que entra).
 - **3 perfis iniciais:** `MAQ01`/`MAQ02`/`MAQ03` (só esses; sem regras nem verificações). Exemplo `MAZAK_VTC530.json` removido (git preserva).
+
+## 2026-06-07 — Design é contrato: protótipo HTML antes do código (Regra de Ouro)
+Causa raiz das entregas que saíam visualmente diferentes do proposto: o design era improvisado durante a programação. Decisão do Mestre: **separar a decisão visual da construção**. Fase 1 = protótipo HTML completo e interativo (TODAS as telas e popups do inventário), offline, aprovado pelo Mestre ("é esse") — vira o **contrato visual congelado**. Só depois: Fase 2 = app nativo (PySide6) reproduzindo o protótipo à risca, tela por tela com conferência lado a lado; Fase 3 = ligar backend sem tocar no layout aprovado.
+- **Regra prática:** nenhuma tela/popup nasce no código sem antes existir e estar aprovada no protótipo. Mudança visual = primeiro o protótipo + nova aprovação, depois o código.
+- **Tecnologia:** protótipo em HTML/CSS/JS; produção em PySide6 nativo (o HTML NÃO roda dentro do app — é só referência). Mantém EXE pequeno, sem navegador embutido.
+- Registrado no topo do `PLAN.md` (Regra de Ouro + Reestruturação em 3 fases). Próximos passos 1–6 → Fase 2; 4/7/8/9 + Mudanças C/D → Fase 3.
