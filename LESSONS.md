@@ -14,3 +14,7 @@ Causa raiz das entregas que saíam visualmente diferentes do proposto: o design 
 - **Regra prática:** nenhuma tela/popup nasce no código sem antes existir e estar aprovada no protótipo. Mudança visual = primeiro o protótipo + nova aprovação, depois o código.
 - **Tecnologia:** protótipo em HTML/CSS/JS; produção em PySide6 nativo (o HTML NÃO roda dentro do app — é só referência). Mantém EXE pequeno, sem navegador embutido.
 - Registrado no topo do `PLAN.md` (Regra de Ouro + Reestruturação em 3 fases). Próximos passos 1–6 → Fase 2; 4/7/8/9 + Mudanças C/D → Fase 3.
+
+## 2026-06-07 — Auditoria de terceiro também erra: verificar cada afirmação no código real
+Uma auditoria do "sênior" (`auditoria_plano.md`) apontou 3 "erros críticos"; só 1 era real. Conferindo arquivo por arquivo: **CRLF no `publisher.py`** = alarme falso (ele é **byte-exato**, `read_bytes`/`_write_bytes_atomic`, não usa `read_text`/`write_text`); **`scope-select` faltando** = alarme falso (não existe no mockup v2, 0 ocorrências); **`verifier.py` não existe** = errado (existe). Real mesmo: só `data_default/` fora do `datas` do `.spec`. As classes de overlay citadas (`diff-line`/`summary-grid`/…) eram fictícias — as reais são `.run`/`.res`/`.confirm`/`.saved`.
+- **Regra prática:** antes de agir sobre qualquer auditoria/relatório externo, validar cada item lendo o código real (nome de função > número de linha, que sofre drift). Registrar o veredito por escrito no `PLAN.md` ("Resposta à auditoria") para não reabrir a discussão.
