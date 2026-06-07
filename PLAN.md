@@ -146,12 +146,61 @@ Forma de execução livre (criar documentos, escrever código novo, reprogramar 
 36. **Arquivar a Mudança C** — rodar `/opsx:archive redesign-editor-limpeza`. _Concluído quando: a change vai para o histórico de arquivadas._
    ↳ Se falhar: reportar o erro do comando; não mover pastas à mão.
 
+### Mudança D — Segurança e polimento (`redesign-seguranca-polimento`)
+
+> Origem: relatório de revisão técnica (2026-06-07). Cobre as camadas de **segurança de dados** e **polimento de UX** não detalhadas nas Mudanças A–C. É **aditiva**: não altera nenhuma etapa anterior (1–36) nem renumera nada. Onde um item dialoga com os "Próximos passos para fechar 100%" (modais dos 4 overlays, dropdowns pesquisáveis `.libdrop`, publicação real via `publish_batch`), esta mudança **estende** o que já estiver feito — não duplica.
+
+37. **Propor a Mudança D** — rodar `/opsx:propose` com o nome `redesign-seguranca-polimento`, descrevendo as etapas 39–47 (confirmação de save, robustez de gravação, bloqueio de UI na publicação, atalhos, estados vazios, diff colorido, modais estilizados, tooltips, polimentos opcionais). _Concluído quando: a pasta `openspec/changes/redesign-seguranca-polimento/` existe com `proposal.md`, `design.md`, `tasks.md` e `specs/`._
+   ↳ Se falhar: revisar a descrição e repropor; não criar a pasta à mão.
+
+38. **Validar a proposta da Mudança D** — conferir que o `/opsx:propose` terminou sem erros e que `proposal.md`, `design.md`, `tasks.md` e `specs/` existem e estão coerentes (reforço opcional: `openspec validate redesign-seguranca-polimento`). _Concluído quando: os quatro artefatos existem e nenhuma validação aponta erro._
+   ↳ Se falhar: ajustar o artefato apontado e revalidar antes de codar (Etapa 39).
+
+> **Etapas 39–47 (implementação) são as tarefas do `tasks.md` desta mudança e são executadas dentro de `/opsx:apply redesign-seguranca-polimento`.**
+
+39. **Adicionar confirmação ao primeiro salvamento do editor** — em `editor_panel.py`, antes do save in-place, exibir um modal "Tem certeza? Esta ação sobrescreve o arquivo original, sem cópia." na primeira vez de cada sessão, com opção "não perguntar de novo nesta sessão". _Concluído quando: o primeiro `Salvar` da sessão abre o modal e, confirmado, grava normalmente; o segundo save não repergunta._
+   ↳ Se falhar: não tocar na lógica de `inplace_save.py` — o modal é só uma porta antes da chamada de save. Em dúvida, manter o modal sempre (mais seguro que nunca perguntar).
+
+40. **[CRÍTICO] Tratar erros de gravação (arquivo em uso / rede)** — capturar `PermissionError`/`OSError` no save do editor e na publicação do lote; mostrar mensagem clara ("arquivo aberto em outro programa" / "falha de gravação na rede") e, no lote, **parar com segurança preservando o backup já criado** e informando o caminho dele. _Concluído quando: simular um arquivo bloqueado/sem permissão exibe a mensagem (sem travar o app) e, no lote, o backup permanece e o caminho é mostrado._
+   ↳ Se falhar: como o save do editor é atômico (temp + rename), um erro não corrompe o original — garantir ao menos a mensagem; o rollback do lote é o ponto crítico, não pode deixar arquivos pela metade sem avisar.
+
+41. **Bloquear a UI durante a publicação** — enquanto o lote grava, desabilitar a janela principal (`setEnabled(False)`) com overlay/spinner de "Processando", reabilitando ao terminar (sucesso ou erro). _Concluído quando: durante a publicação a janela fica inerte a cliques e volta ao normal ao fim._
+   ↳ Se falhar: no mínimo desabilitar o botão "Executar Lote" durante a operação para evitar duplo-clique. Complementa (não duplica) os overlays previstos nos "Próximos passos".
+
+42. **Implementar atalhos de teclado** — registrar `QShortcut` para `Ctrl+S` (salvar no editor), `Ctrl+F` (focar busca), `Ctrl+H` (substituir), `Esc` (fechar modal/editor) e `F3` (próxima ocorrência). _Concluído quando: cada atalho dispara a ação correspondente com o editor aberto._
+   ↳ Se falhar: priorizar `Ctrl+S` e `Esc` (os mais usados) e anotar os demais.
+
+43. **Tratar estados vazios** — exibir mensagem de orientação quando não há programas carregados (área da lista), a biblioteca está vazia (dropdowns) e a busca do editor não retorna ocorrências (toolbar). _Concluído quando: cada um dos três casos mostra um texto de orientação em vez de área em branco._
+   ↳ Se falhar: cobrir ao menos "nenhum programa carregado" (o mais visível ao abrir o app). A biblioteca vazia é mitigada pela Seed Fanuc (item 9), mas a mensagem vale como rede de segurança.
+
+44. **Destacar diferenças no preview do lote** — na pré-visualização, realçar em verde o conteúdo adicionado e em vermelho o removido na linha (tokens `--color-success`/`--color-danger`), em vez de só exibir a linha nova. _Concluído quando: o preview mostra a diferença colorida por linha alterada._
+   ↳ Se falhar (diff por caractere pesado): cair para realce da linha inteira (verde = nova, vermelho = antiga); o objetivo é a conferência rápida.
+
+45. **Padronizar avisos e erros no estilo do app** — substituir os `QMessageBox` padrão do Windows remanescentes por modais estilizados com o QSS/tokens do mockup (mesma linguagem visual dos overlays). _Concluído quando: os diálogos de erro/aviso seguem o visual do app, sem caixas cinza padrão do sistema._
+   ↳ Se falhar: estilizar via QSS o próprio `QMessageBox` como meio-termo; o essencial é a consistência visual.
+
+46. **Adicionar tooltips na biblioteca** — exibir a descrição do código ao passar o mouse nos itens dos dropdowns origem/destino e nos cartões de regra. _Concluído quando: o tooltip aparece com a descrição cadastrada do código._
+   ↳ Se falhar: item de menor prioridade; anotar e seguir.
+
+47. **(Opcional / baixa prioridade) Polimentos finos** — avaliar e, se couber, aplicar: bloqueio de caracteres inválidos nos campos do compositor que possam corromper o `.NC`; revisão de contraste dos tokens para fábrica com alta luminosidade; micro-animações de `hover/active` nos botões via QSS. _Concluído quando: os três foram avaliados e aplicados ou registrados como dispensáveis._
+   ↳ Se falhar/sem tempo: pular sem bloquear a entrega; nenhum é essencial.
+
+48. **[CRÍTICO] Verificar a Mudança D** — rodar `pytest flownc/tests/`, `mypy flownc/ --ignore-missing-imports` e `ruff check flownc/`. _Concluído quando: os três comandos terminam sem falhas._
+   ↳ Se falhar: corrigir antes de buildar; gate obrigatório. Não gerar EXE com testes vermelhos.
+
+49. **[CRÍTICO] Rebuildar e entregar o EXE final** — rodar `pyinstaller flownc/FlowNC.spec`, conferir que o `.exe` abre e copiá-lo para a Área de Trabalho substituindo o anterior. **O EXE antigo `CNC_BatchEditor` já foi preservado na Etapa 34 — não repetir.** **Pré-requisito:** empacotamento (itens 7a–7e) e Seed Fanuc (item 9) já aplicados, senão o EXE sai "pelado" (sem tema/dados). _Concluído quando: o novo `FlowNC.exe` (com segurança e polimento) abre a partir da Área de Trabalho._
+   ↳ Se falhar (arquivo em uso): fechar o app antes de copiar. Se C e D forem executadas em sequência, pode-se buildar só uma vez aqui, no fim da D.
+
+50. **Arquivar a Mudança D** — rodar `/opsx:archive redesign-seguranca-polimento`. _Concluído quando: a change vai para o histórico de arquivadas._
+   ↳ Se falhar: reportar o erro do comando; não mover pastas à mão.
+
 ## Dependências
 
 - **Mudança A (Etapas 1–9):** Etapa 1 não depende de nada. Etapas 3–7 dependem da proposta validada (Etapas 1–2). A Etapa 3 (`theme.py`) é a base de **todo** o visual: as Etapas 6–7 e todas as etapas das Mudanças B e C consomem os tokens criados nela. As fontes (Etapa 4) precisam existir antes de registrá-las (Etapa 5). O QSS (Etapa 6) precisa de `theme.py` (Etapa 3). Verificação (8) e arquivamento (9) fecham a mudança.
 - **Mudança B (Etapas 10–21):** depende da Mudança A arquivada (Etapa 9). O esqueleto de colunas (Etapa 13) é pré-requisito da proporção dinâmica (14), dos componentes de coluna (16–18) e do stacked widget (19). O header (12), o compositor (16), a lista (17) e o resumo (18) podem ser feitos em sequência. Verificação (20) e arquivamento (21) fecham a mudança.
 - **Mudança C (Etapas 22–36):** depende da Mudança B arquivada (Etapa 21). A estilização do editor (24–27) depende da alternância Resumo ↔ Editor já existir (Etapa 19). A limpeza (28–30) depende das telas já montadas (Etapas 16–18, 24–27). O build/entrega (33–35) depende de todas as anteriores; preservar o EXE antigo (34) precede entregar o novo (35).
-- **Regra OpenSpec:** cada mudança (A → B → C) é **proposta + validada** (`/opsx:propose` → `/opsx:validate`) antes de implementar e **arquivada** (`/opsx:archive`) antes de começar a próxima. Uma mudança por vez.
+- **Mudança D (Etapas 37–50):** depende da Mudança C arquivada (Etapa 36). Aditiva e de baixo acoplamento: confirmação de save (39) e atalhos (42) dependem do editor estilizado (24–27); robustez e bloqueio da publicação (40–41) assumem o fluxo de lote da Mudança C; o diff (44) depende do preview existente. As etapas opcionais (47) não bloqueiam ninguém. O rebuild/entrega final (49) reaproveita a preservação do EXE antigo já feita na Etapa 34 (não repetir) e **pressupõe o empacotamento (itens 7a–7e) e a Seed Fanuc (item 9) já aplicados**, senão o EXE sai sem tema/dados.
+- **Regra OpenSpec:** cada mudança (A → B → C → D) é **proposta + validada** (`/opsx:propose` → `/opsx:validate`) antes de implementar e **arquivada** (`/opsx:archive`) antes de começar a próxima. Uma mudança por vez.
 
 ## Tecnologias
 
@@ -161,7 +210,7 @@ Forma de execução livre (criar documentos, escrever código novo, reprogramar 
 - **Editor:** `flownc/ui/editor_panel.py` (já existe, será estilizado na Mudança C) + `core/inplace_save.py` (já existe, não muda).
 - **Build:** PyInstaller (`flownc/FlowNC.spec`) → `flownc/dist/FlowNC/FlowNC.exe`.
 - **Verificação:** `pytest flownc/tests/` (146 testes verdes em 2026-06-07; usar o venv `flownc/.venv` que tem PySide6 6.11.1) + `mypy flownc/ --ignore-missing-imports` + `ruff check flownc/`; todos devem passar antes de arquivar cada mudança.
-- **Processo:** OpenSpec (propose → apply → archive), 3 mudanças sequenciais (`redesign-fundacao-visual` → `redesign-layout-paineis` → `redesign-editor-limpeza`).
+- **Processo:** OpenSpec (propose → apply → archive), 4 mudanças sequenciais (`redesign-fundacao-visual` → `redesign-layout-paineis` → `redesign-editor-limpeza` → `redesign-seguranca-polimento`).
 - **Referência de design:** `mockups/painel-final.v2.html` (único modelo válido; design antigo descartado).
 
 > **Plano único.** Este `PLAN.md` é o único plano vivo. Os planos antigos/superados (`PLANO.md`, `PLANO-MOCKUP-V2-EDITOR.md`, `PLANO-REDESIGN-VISUAL-V2.md`, `PLANO-DESIGN-SYSTEM.md`) e o relatório item-a-item de conformidade (`PLANO-CONFORMIDADE-MOCKUP-V2.md`) foram arquivados em `_descarte/` (recuperáveis, fora do caminho). A seção abaixo consolidou o estado real auditado.
