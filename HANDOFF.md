@@ -2,18 +2,18 @@
 Status: redesign visual em andamento (Mudanças A e B implementadas; C a propor)
 
 Feito nesta sessão:
-- Atualizados os 6 docs (`docs/PRD, PRODUTO, CONTEXTO, DECISOES, CHANGELOG, README`) para refletir o mockup v2 aprovado; design antigo (3 colunas / `painel-final.html`) descartado.
-- Arquivadas 2 mudanças OpenSpec: `editor-integrado-por-arquivo` e `redesign-layout-principal` (em `openspec/changes/archive/2026-06-07-*`); delta specs sincronizados para `openspec/specs/` (editor-de-arquivo, localizador-no-editor, layout-principal).
-- Nenhuma mudança OpenSpec ativa restante.
+- Investigado o problema "app abre pelado": confirmado NÃO resolvido — sem `core/seed.py`/`ensure_seed`, sem biblioteca Fanuc, sem perfil `FANUC_PADRAO` (só `MAZAK_VTC530` exemplo).
+- `PLAN.md`: adicionado item 9 (Seed Fanuc) atômico — 9a defaults em `flownc/data_default/`, 9b `ensure_seed` idempotente, 9c chamar no boot, 9d empacotar no EXE, 9e lista de códigos (Mestre fornece).
+- Direção corrigida: verificações automáticas de perfil (`must_exist`/`must_not_exist`) e regras automáticas SAEM do escopo. Biblioteca = código + descrição curta, editável; fluxo origem→destino. Adicionado bloco "Como fica na nova atualização" no Objetivo, Glossário (Lógica atual) e Estado auditado.
 
-Onde parou: redesign visual nas Mudanças A+B; falta propor a Mudança C (editor/limpeza/entrega).
+Onde parou: `PLAN.md` atualizado com Seed Fanuc + escopo de verificações descartado.
 
-Próximo passo: propor a Mudança C via `/opsx:propose` (editor com cara final, remoções do v2, EXE novo) — ver etapas 22+ do `PLAN.md`.
+Próximo passo: Mestre vai fornecer a lista de códigos da biblioteca Fanuc → preencher item 9e. Depois, propor a Mudança C via `/opsx:propose` (etapas 22+).
 
 Blockers:
-- Sem conferência visual (decisão do Mestre — não fazer).
-- Lacunas de empacotamento abertas (ver `PLAN.md`): `FlowNC.spec datas=[]`, fontes IBM Plex, seed Fanuc (`data/library.json` + perfil padrão).
+- Aguardando lista de códigos Fanuc do Mestre (item 9e).
+- Lacunas de empacotamento abertas: `FlowNC.spec datas=[]`, fontes IBM Plex, seed (item 9).
 
-Arquivos tocados: docs/* ; openspec/specs/{editor-de-arquivo,localizador-no-editor,layout-principal} ; openspec/changes/archive/2026-06-07-* ; memory (comunicação simples).
+Arquivos tocados: PLAN.md.
 
 Retomar com: "continuar"
