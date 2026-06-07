@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "machine": "MAQ03",
+  "description": "Máquina 3 - perfil inicial",
+  "extensions": [
+    "*"
+  ],
+  "case_sensitive": false,
+  "global_rules": [],
+  "file_rules": [],
+  "verifications": []
+}

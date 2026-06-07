@@ -1,18 +1,15 @@
 # Handoff — FlowNC — 2026-06-07
-Status: PLAN.md pronto — 4 mudanças (A,B implementadas; C,D pendentes)
+Status: PLAN.md pronto e auditado; dados de fábrica populados; execução ainda não iniciada (começa pela fidelidade — Próximo passo 1).
 
 Feito nesta sessão:
-- Relatório de revisão técnica (v2) cruzado com o PLAN.md: ~metade dos apontamentos já estava coberta; ~8 melhorias reais identificadas.
-- Adicionada Mudança D — Segurança e polimento (etapas 37–50): confirmação de save no editor, robustez de gravação (arquivo em uso/rede), bloqueio de UI na publicação, atalhos de teclado, estados vazios, diff verde/vermelho, modais estilizados, tooltips, polimentos opcionais. Aditiva — não toca em A/B/C nem renumera.
-- Atualizadas as seções Dependências e Processo (3→4 mudanças).
+- Auditoria completa do PLAN.md (cruzando com código/mockup/OpenSpec): achadas contradições estruturais.
+- Reescrita do PLAN.md: A/B marcadas concluídas/arquivadas; nome da B corrigido (`redesign-layout-principal`); `summary.py` (não `resumo.py`); removido `/opsx:validate` inexistente; fatos atualizados; "Próximos passos" 1–9 viraram etapas acionáveis; nova seção de ordem de execução; decisão do modelo da biblioteca registrada.
+- Biblioteca populada: 89 códigos (G/M/eixos/parâmetros/variáveis/fluxo) em `data/library.json` e `data_default/library.json`; validada via `app_paths`.
+- Perfis criados: `MAQ01/MAQ02/MAQ03` em `data/presets` e `data_default/presets`; removido o exemplo `MAZAK_VTC530.json`.
+- Documentada a diretriz do `replace` vazio (não preencher) no PLAN.md e no LESSONS.md.
 
-Onde parou: PLAN.md atualizado com a Mudança D e commitado.
-
-Próximo passo: Mestre define o próximo bloco a executar. Item 9e (lista de códigos Fanuc) segue pendente.
-
-Blockers:
-- Lacunas de empacotamento/seed abertas (itens 7 e 9 dos "Próximos passos").
-- Deleção preexistente de `mockups/painel-final.html` (mockup v1) ficou fora do commit.
-
-Arquivos tocados: PLAN.md, HANDOFF.md, LESSONS.md.
+Onde parou: plano consistente, dados de fábrica prontos e diretrizes documentadas; nada de código de UI alterado ainda.
+Próximo passo: iniciar a fidelidade — Próximo passo 1 (reescrever o Compositor com dois campos origem/destino). Opcional antes: smoke visual conferindo biblioteca/perfis no app.
+Blockers: `ensure_seed` runtime (9b/9c) + empacotamento (7/9d) pendentes; fontes IBM Plex `.ttf` faltando (7d).
+Arquivos tocados: PLAN.md, LESSONS.md, HANDOFF.md, flownc/data/library.json, flownc/data/presets/MAQ01-03.json, flownc/data_default/ (novo), removidos flownc/data/presets/MAZAK_VTC530.json e mockups/painel-final.html.
 Retomar com: "continuar"
