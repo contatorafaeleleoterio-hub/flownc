@@ -1,7 +1,7 @@
-"""SummaryPanel: painel 3 do mockup aprovado.
+"""SummaryPanel: painel 3 do mockup aprovado (FASE 2 — fidelidade visual).
 
-O painel apenas renderiza o estado do lote. O `MainWindow` calcula contadores,
-conflitos e ocorrencias usando o core e injeta tudo por `set_summary()`.
+Renderiza o estado do lote. O MainWindow calcula contadores, conflitos e
+ocorrencias usando o core e injeta tudo por set_summary().
 """
 from __future__ import annotations
 
@@ -29,9 +29,12 @@ def _replace_label(rule: Rule) -> str:
 
 
 class SummaryPanel(QWidget):
-    """Resumo rico do lote conforme `mockups/painel-final.v2.html`."""
+    """Resumo rico do lote conforme mockup aprovado."""
 
     publicar_solicitado = Signal()
+    regra_editar = Signal(int)
+    regra_duplicar = Signal(int)
+    regra_excluir = Signal(int)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -41,10 +44,12 @@ class SummaryPanel(QWidget):
 
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
+        root.setSpacing(8)
+        root.setContentsMargins(12, 12, 12, 12)
 
         head = QHBoxLayout()
         self.lbl_title = QLabel("3  Resumo")
-        self.lbl_title.setProperty("heading", True)
+        self.lbl_title.setObjectName("ZTitle")
         head.addWidget(self.lbl_title)
         head.addStretch(1)
         self.lbl_state = QLabel("✓ Pronto")
@@ -54,8 +59,9 @@ class SummaryPanel(QWidget):
         root.addLayout(head)
 
         counters = QHBoxLayout()
+        counters.setSpacing(8)
         self.lbl_rules_n = self._make_counter("0", "Regras")
-        self.lbl_programs_n = self._make_counter("0", "Programas")
+        self.lbl_programs_n = self._make_counter("0 programas", "Escopo")
         self.lbl_changes_n = self._make_counter("0", "Alterações")
         counters.addWidget(self.lbl_rules_n)
         counters.addWidget(self.lbl_programs_n)
@@ -66,13 +72,14 @@ class SummaryPanel(QWidget):
         self._scroll.setWidgetResizable(True)
         self._cards_host = QWidget()
         self._cards_layout = QVBoxLayout(self._cards_host)
+        self._cards_layout.setSpacing(6)
         self._cards_layout.addStretch(1)
         self._scroll.setWidget(self._cards_host)
         root.addWidget(self._scroll, stretch=1)
 
-        self.lbl_backup = QLabel("🛡 Originais preservados → backup será criado ao publicar")
-        self.lbl_backup.setObjectName("BackupSeal")
-        root.addWidget(self.lbl_backup)
+        # Selo de backup: escudo + 2 linhas
+        self._backup_widget = self._make_backup_seal()
+        root.addWidget(self._backup_widget)
 
         self.btn_aplicar = QPushButton("Executar Lote\nPré-visualizar antes de publicar")
         self.btn_aplicar.setObjectName("CTA")
@@ -86,6 +93,28 @@ class SummaryPanel(QWidget):
         widget.setObjectName("Counter")
         widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
         return widget
+
+    def _make_backup_seal(self) -> QWidget:
+        w = QWidget()
+        w.setObjectName("BackupSeal")
+        lay = QHBoxLayout(w)
+        lay.setContentsMargins(12, 8, 12, 8)
+        lay.setSpacing(10)
+        shield = QLabel("🛡")
+        shield.setObjectName("BackupShield")
+        lay.addWidget(shield)
+        text_col = QVBoxLayout()
+        text_col.setSpacing(1)
+        self.lbl_backup_line1 = QLabel("Originais preservados")
+        self.lbl_backup_line1.setObjectName("BackupLine1")
+        text_col.addWidget(self.lbl_backup_line1)
+        self.lbl_backup_line2 = QLabel("backup será criado ao publicar")
+        self.lbl_backup_line2.setObjectName("BackupLine2")
+        self.lbl_backup_line2.setProperty("tertiary", True)
+        text_col.addWidget(self.lbl_backup_line2)
+        lay.addLayout(text_col)
+        lay.addStretch(1)
+        return w
 
     def set_rules(self, rules: list[Rule]) -> None:
         self.set_summary(rules)
@@ -108,12 +137,15 @@ class SummaryPanel(QWidget):
         self.lbl_state.style().polish(self.lbl_state)
 
         self.lbl_rules_n.setText(f"<b>{len(rules)}</b><br><span>Regras</span>")
-        self.lbl_programs_n.setText(f"<b>{program_count}</b><br><span>Programas</span>")
-        self.lbl_changes_n.setText(f"<b>{change_count}</b><br><span>Alterações</span>")
-        self.lbl_backup.setText(
-            "🛡 Originais preservados → "
-            + (backup_path if backup_path else "backup será criado ao publicar")
+        self.lbl_programs_n.setText(
+            f"<b>{program_count} programas</b><br><span>Escopo</span>"
         )
+        self.lbl_changes_n.setText(f"<b>{change_count}</b><br><span>Alterações</span>")
+
+        if backup_path:
+            self.lbl_backup_line2.setText(backup_path)
+        else:
+            self.lbl_backup_line2.setText("backup será criado ao publicar")
 
         while self._cards_layout.count() > 1:
             item = self._cards_layout.takeAt(0)
@@ -140,6 +172,7 @@ class SummaryPanel(QWidget):
         card.setObjectName("RuleCard")
         card.setProperty("conflict", conflict)
         lay = QVBoxLayout(card)
+        lay.setSpacing(4)
 
         row = QHBoxLayout()
         index = QLabel(f"{idx:02d}")
@@ -154,9 +187,30 @@ class SummaryPanel(QWidget):
             chip = QLabel("✓ Validado")
             chip.setObjectName("ValidChip")
             row.addWidget(chip)
-        actions = QLabel("✎  ⧉  🗑")
-        actions.setProperty("tertiary", True)
-        row.addWidget(actions)
+
+        # Acoes: botoes clicaveis (stubs)
+        rule_idx = idx - 1
+        btn_edit = QPushButton("✎")
+        btn_edit.setObjectName("CardAction")
+        btn_edit.setFixedSize(28, 28)
+        btn_edit.setToolTip("Editar regra")
+        btn_edit.clicked.connect(lambda checked=False, i=rule_idx: self.regra_editar.emit(i))
+        row.addWidget(btn_edit)
+
+        btn_dup = QPushButton("⧉")
+        btn_dup.setObjectName("CardAction")
+        btn_dup.setFixedSize(28, 28)
+        btn_dup.setToolTip("Duplicar regra")
+        btn_dup.clicked.connect(lambda checked=False, i=rule_idx: self.regra_duplicar.emit(i))
+        row.addWidget(btn_dup)
+
+        btn_del = QPushButton("🗑")
+        btn_del.setObjectName("CardAction")
+        btn_del.setFixedSize(28, 28)
+        btn_del.setToolTip("Excluir regra")
+        btn_del.clicked.connect(lambda checked=False, i=rule_idx: self.regra_excluir.emit(i))
+        row.addWidget(btn_del)
+
         lay.addLayout(row)
 
         occurrence_count, file_count = counts

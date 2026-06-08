@@ -160,14 +160,13 @@ class MainWindow(QMainWindow):
 
     def _connect_signals(self) -> None:
         self._header.perfil_alterado.connect(self._on_preset_changed_by_name)
-        self._header.abrir_pasta_solicitado.connect(self._open_folder)
-        self._header.abrir_arquivos_solicitado.connect(self._open_files)
         self._header.biblioteca_solicitada.connect(self._open_library_dialog)
         self._header.adicionar_codigo_solicitado.connect(self._open_library_dialog)
         self._header.salvar_perfil_solicitado.connect(self._save_profile_stub)
         self._compositor.regra_adicionada.connect(self._on_regra_adicionada)
         self._compositor.regra_removida.connect(self._on_regra_removida)
         self._program_list.editar_arquivo.connect(self._abrir_editor)
+        self._program_list.fechar_editor_solicitado.connect(self._fechar_editor)
         self._program_list.adicionar_programas_solicitado.connect(self._open_files)
         self._program_list.lst_prog.currentRowChanged.connect(self._on_program_selected)
         self._summary.publicar_solicitado.connect(self._on_aplicar)
@@ -589,12 +588,14 @@ class MainWindow(QMainWindow):
             return
         self._stack.setCurrentIndex(1)
         self._splitter.setSizes([400, 600])
+        self._program_list.set_editing_path(path)
 
     def _fechar_editor(self) -> None:
         if not self._guard_unsaved():
             return
         self._stack.setCurrentIndex(0)
         self._splitter.setSizes([600, 400])
+        self._program_list.set_editing_path(None)
 
     def _set_status(self, text: str, warn: bool = False) -> None:
         self.lbl_status.setText(text)

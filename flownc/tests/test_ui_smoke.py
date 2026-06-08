@@ -68,8 +68,8 @@ def test_maestro_monta_layout(win: MainWindow) -> None:
 def test_compositor_monta_edicao_e_emite(win: MainWindow) -> None:
     capt: list = []
     win._compositor.regra_adicionada.connect(capt.append)
-    win._compositor.cb_de.setCurrentText("M08")
-    win._compositor.cb_para.setCurrentText("M07")
+    win._compositor.cb_origem.setCurrentText("M08")
+    win._compositor.cb_destino.setCurrentText("M07")
     win._compositor._on_add()
     regras = win._compositor.get_regras()
     assert len(regras) == 1
@@ -80,16 +80,15 @@ def test_compositor_monta_edicao_e_emite(win: MainWindow) -> None:
 
 
 def test_compositor_de_vazio_nao_adiciona(win: MainWindow) -> None:
-    win._compositor.cb_de.setCurrentText("")
+    win._compositor.cb_origem.setCurrentText("")
     win._compositor._on_add()
     assert win._compositor.get_regras() == []
 
 
 def test_compositor_remove_edicao(win: MainWindow) -> None:
-    win._compositor.cb_de.setCurrentText("G54")
+    win._compositor.cb_origem.setCurrentText("G54")
     win._compositor._on_add()
-    win._compositor.lst_edicoes.setCurrentRow(0)
-    win._compositor._on_remove()
+    win._compositor._on_remove(0)
     assert win._compositor.get_regras() == []
 
 
@@ -191,7 +190,7 @@ def test_editor_varredura_conta_como_o_lote(win: MainWindow, tmp_path) -> None:
     p.write_text("M8\nM80\nM8\n", encoding="utf-8")  # M80 nao deve contar
     _abrir_editor(win, p)
     win._editor_panel.cb_find.setCurrentText("M8")
-    win._editor_panel._on_scan()
+    win._editor_panel._on_find_text_changed()
     assert win._editor_panel.lbl_count.text() == "2 encontrado(s)"
 
 
