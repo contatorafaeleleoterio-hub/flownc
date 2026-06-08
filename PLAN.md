@@ -21,6 +21,8 @@ status: pronto
 Criar/concluir **um único** HTML interativo cobrindo **100%** das telas, popups e estados (inventário abaixo); torná-lo **offline** (fontes IBM Plex locais, sem CDN); revisar textos/estados reais; e **obter aprovação explícita do Mestre** ("é esse"). **A Fase 2 não começa sem esse "ok".** Entregável: `mockups/painel-final.v2.html` completo, offline e **congelado** = contrato visual.
 
 > **Inclui nesta FASE 1 (2026-06-08):** (a) **responsividade/dimensionamento** — `docs/RESPONSIVIDADE.md` (largura fluida 1180–1800, altura preenchendo a janela, scroll interno nos painéis); (b) **Catálogo Técnico** (Passo 11) e **dropdowns code-only + tooltip** (Passo 12). Tudo entra no mesmo protótipo antes do gate.
+>
+> **⚠️ REVISÃO 2026-06-08 (sessão 6) — Catálogo Técnico DESCARTADO pelo Mestre.** O Passo 11 (Catálogo Técnico / modelo LIGADO) foi **removido do protótipo e do escopo**; volta-se ao modelo **anterior: biblioteca simples código + descrição** (`data/library.json` continua a fonte; **nada de catálogo-mestre nem `active_catalog`**). O **Passo 12** (dropdowns só-código + descrição no hover) **permanece aplicado**. A "Decisão LIGADO" abaixo e o Passo 11 ficam **históricos/inválidos** — não reimplementar.
 
 **Inventário que o protótipo DEVE cobrir (checklist de completude):**
 - **Telas principais:** normal (Resumo à direita); "regra em edição" (banner verde + linha draft); "editando arquivo" (colunas ~40/60, Editor no lugar do Resumo).

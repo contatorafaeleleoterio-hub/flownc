@@ -1,13 +1,17 @@
-# Handoff — FlowNC — 2026-06-08 (sessão 5)
-Status: FASE 1 (protótipo) — planejamento. Nenhum código de app tocado.
+# Handoff — FlowNC — 2026-06-08 (sessão 6)
+Status: FASE 1 (protótipo) — em refino visual; aguardando GATE ("é esse").
 
 Feito nesta sessão:
-- Auditoria do relatório técnico: 2 dos 3 pontos já estavam no plano (7a caminhos, 10 Salvar como); o ponto real (seed com JSON corrompido) foi fechado no Passo 9b do PLAN.md (valida JSON, renomeia `.corrompido`, repõe).
-- Estudo de responsividade → `docs/RESPONSIVIDADE.md`: largura fluida (mín 1180 / máx 1800), altura preenchendo a janela, scroll interno; piso 1280×768, alvo 1920. Decisões do Mestre registradas.
-- Nova feature **Catálogo Técnico (LIGADO)** planejada e incorporada ao PLAN.md: Passo 11 (catálogo mestre + janela não-modal + `+ Adicionar Catálogo`), Passo 12 (dropdowns code-only + tooltip), decisão LIGADO, itens no inventário da FASE 1. Plano detalhado em `~/.claude/plans/c-users-usuario-downloads-guia-r-pido-d-vast-hopcroft.md`.
+- Protótipo `mockups/painel-final.v2.html`: aplicada **responsividade** (largura fluida 1180–1800, altura preenchendo a janela, scroll interno, 3 @media) conforme `docs/RESPONSIVIDADE.md`.
+- Dropdowns **só-código + descrição no hover** (Passo 12) no Compositor e no Editor.
+- Removida a **barra de andaime** (menu "Ver estado" + parágrafo) — não fazia parte do sistema.
+- Mais espaço na seção 2: banner verde virou nota inline no cabeçalho; "Edições montadas" com altura máx + scroll.
+- "+ adicionar outra edição" movido pra **ao lado dos campos** origem/destino.
+- Botões **✕ remover** em todas as listas: edições montadas, linha "em edição" (limpa), e cada programa da seção 2.
+- **Catálogo Técnico DESCARTADO** pelo Mestre: removido do protótipo (botão/janela/CSS/JS); volta ao modelo biblioteca **código + descrição**. PLAN.md anotado (Passo 11 inválido; Passo 12 mantido).
 
-Onde parou: PLAN.md e docs atualizados; tudo é trabalho de FASE 1, sem código ainda.
-Próximo passo: aplicar no protótipo `mockups/painel-final.v2.html` — responsividade + Catálogo Técnico + dropdowns code-only/tooltip; depois GATE de aprovação do Mestre ("é esse").
+Onde parou: protótipo ajustado e aberto no navegador para conferência.
+Próximo passo: Mestre conferir e aprovar o GATE da FASE 1 ("é esse"); então iniciar FASE 2 (código nativo).
 Blockers: nenhum.
-Arquivos tocados: PLAN.md; docs/RESPONSIVIDADE.md (novo); LESSONS.md; HANDOFF.md.
+Arquivos tocados: mockups/painel-final.v2.html; PLAN.md; HANDOFF.md; LESSONS.md.
 Retomar com: "continuar"
