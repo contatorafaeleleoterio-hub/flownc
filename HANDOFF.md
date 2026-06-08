@@ -1,13 +1,13 @@
-# Handoff — FlowNC — 2026-06-07 (sessão 4)
-Status: FASE 1 em andamento. As 3 faltas do protótipo foram CORRIGIDAS e **commitadas localmente** (`06d24da`). **Sem push** (não há remoto configurado; criação de remoto descartada pelo Mestre). PLAN.md ainda em ajuste. Nenhum código de app tocado.
+# Handoff — FlowNC — 2026-06-08 (sessão 5)
+Status: FASE 1 (protótipo) — planejamento. Nenhum código de app tocado.
 
 Feito nesta sessão:
-- Implementei as 3 correções em `mockups/painel-final.v2.html`: (1) **offline** — removi os 3 `<link>` do Google Fonts e adicionei 6 `@font-face` locais + corrigi o texto do rodapé; (2) **"Salvar como…"** — botão no editor + modal `#ovSaveAs` (extensão/codificação/EOL, default=preservar), reusando o padrão de modal existente; (3) **arrastar-soltar + estado vazio** no painel de programas (zona `.filezone`/`.is-dragover` + `.files-empty` com CTA + botão demo tecla 4).
-- Baixei 6 `.ttf` IBM Plex (OFL): Sans 400/600/700 do repo `IBM/plex` (Google Fonts só tem variável); Mono 500/600/700 do `google/fonts`. Gravados em `flownc/assets/fonts/` e `mockups/assets/fonts/`.
-- Verifiquei: `node --check` (sintaxe JS OK), 0 CDN, 6 `@font-face`, e harness **jsdom 28/28 PASS** (editor→Salvar como→defaults→troca→confirma; estado vazio→repopular→drag→restaurar). Chrome MCP não roda no Windows (Mac-only) → render visual da fonte fica pro Mestre conferir.
+- Auditoria do relatório técnico: 2 dos 3 pontos já estavam no plano (7a caminhos, 10 Salvar como); o ponto real (seed com JSON corrompido) foi fechado no Passo 9b do PLAN.md (valida JSON, renomeia `.corrompido`, repõe).
+- Estudo de responsividade → `docs/RESPONSIVIDADE.md`: largura fluida (mín 1180 / máx 1800), altura preenchendo a janela, scroll interno; piso 1280×768, alvo 1920. Decisões do Mestre registradas.
+- Nova feature **Catálogo Técnico (LIGADO)** planejada e incorporada ao PLAN.md: Passo 11 (catálogo mestre + janela não-modal + `+ Adicionar Catálogo`), Passo 12 (dropdowns code-only + tooltip), decisão LIGADO, itens no inventário da FASE 1. Plano detalhado em `~/.claude/plans/c-users-usuario-downloads-guia-r-pido-d-vast-hopcroft.md`.
 
-Onde parou: mudanças do protótipo + fontes prontas, validadas e **commitadas (`06d24da`)**; repositório é local-only (sem remoto/push).
-Próximo passo: Mestre confere o visual (abrir o HTML; testar offline desligando o Wi-Fi) e aprova ("é esse"). Só então FASE 2 (código PySide6). Push só quando houver remoto e o Mestre pedir.
-Blockers: nenhum técnico.
-Arquivos tocados: `mockups/painel-final.v2.html`; `flownc/assets/fonts/*.ttf` (6); `mockups/assets/fonts/*.ttf` (6); HANDOFF/LESSONS no encerramento.
+Onde parou: PLAN.md e docs atualizados; tudo é trabalho de FASE 1, sem código ainda.
+Próximo passo: aplicar no protótipo `mockups/painel-final.v2.html` — responsividade + Catálogo Técnico + dropdowns code-only/tooltip; depois GATE de aprovação do Mestre ("é esse").
+Blockers: nenhum.
+Arquivos tocados: PLAN.md; docs/RESPONSIVIDADE.md (novo); LESSONS.md; HANDOFF.md.
 Retomar com: "continuar"
