@@ -15,10 +15,18 @@
       botão "Editar" por arquivo, localizador (dropdown biblioteca + varredura + contador + setas),
       substituir todos / um a um, salvar SEM backup. Nada é gravado (é mockup).
 -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* ===== FONTES IBM Plex — embutidas localmente (OFFLINE, sem CDN) ===== */
+  /* .ttf em assets/fonts/ (caminho relativo a este HTML, que mora em mockups/).
+     Cópia canônica do app em flownc/assets/fonts/ (insumo do EXE). OFL — github.com/IBM/plex + google/fonts.
+     Pesos realmente usados no CSS: Sans 400/600/700 · Mono 500/600/700. */
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:400;font-display:swap;src:url("assets/fonts/IBMPlexSans-Regular.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/IBMPlexSans-SemiBold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:700;font-display:swap;src:url("assets/fonts/IBMPlexSans-Bold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url("assets/fonts/IBMPlexMono-Medium.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/IBMPlexMono-SemiBold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:700;font-display:swap;src:url("assets/fonts/IBMPlexMono-Bold.ttf") format("truetype");}
+
   :root{
     /* ===== ESPAÇAMENTO — grade única (IBM Carbon 2x) ===== */
     --sp-2:2px; --sp-4:4px; --sp-8:8px; --sp-12:12px; --sp-16:16px;
@@ -251,6 +259,19 @@
   .addrule{margin-top:var(--sp-12);height:var(--h-btn);border:none;border-radius:var(--radius-sm);
     background:var(--color-interactive);color:var(--color-white);font:var(--t-body-strong);cursor:pointer;box-shadow:var(--metal)}
   .addrule:disabled{background:var(--color-disabled-bg);cursor:not-allowed;opacity:.8}
+  /* arrastar-e-soltar + estado vazio (classes próprias — não colidem com drop-*/dropdown) */
+  .files.is-dragover{outline:var(--border-width) dashed var(--color-interactive);outline-offset:-4px;
+    background:var(--color-interactive-bg);border-radius:var(--radius-sm)}
+  .files:focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+  .files-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-12);
+    text-align:center;border:var(--border-width) dashed var(--color-border-strong);border-radius:var(--radius-sm);
+    padding:var(--sp-32) var(--sp-16);color:var(--color-text-secondary)}
+  .files-empty .fe-ic{font-size:32px}
+  .files-empty .fe-t1{font:var(--t-body-strong);color:var(--color-text-primary)}
+  .files-empty .fe-t2{font:var(--t-caption);color:var(--color-text-tertiary)}
+  .files-empty .fe-cta{height:var(--h-btn);padding:0 var(--sp-16);border:none;border-radius:var(--radius-sm);
+    background:var(--color-interactive);color:var(--color-white);font:var(--t-body-strong);cursor:pointer;box-shadow:var(--metal)}
+  .files-empty .fe-cta:hover{background:var(--color-interactive-hv)}
 
   /* ====== ③ RESUMO ====== */
   .c3head{display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-16)}
@@ -417,6 +438,11 @@
   .confirm-txt b{color:var(--color-text-primary);font-family:var(--mono)}
   .saved-ic{font-size:40px;margin:var(--sp-4) 0 var(--sp-8)}
   .saved-actions{margin-top:var(--sp-16)}
+  /* "Salvar como…" — grupos de opção (reusa .btn-soft) */
+  #ovSaveAs .mb > .label-caps{display:block;margin-top:var(--sp-16)}
+  #ovSaveAs .mb > .confirm-txt + .label-caps{margin-top:var(--sp-12)}
+  .sa-group{display:flex;flex-wrap:wrap;gap:var(--sp-8);margin-top:var(--sp-8)}
+  .btn-soft.sel{background:var(--color-interactive-bg);border-color:var(--color-interactive);color:var(--color-interactive);font-weight:700}
 </style>
 </head>
 <body>
@@ -426,13 +452,14 @@
   <button onclick="demo('sub')"><span class="k">1</span>Substituir (sem conflito)</button>
   <button onclick="demo('conf')"><span class="k">2</span>Conflito (resumo)</button>
   <button onclick="execLote()"><span class="k">3</span>Pop-up resumo / preview</button>
+  <button onclick="demo('vazio')"><span class="k">4</span>Estado vazio (programas)</button>
   <button onclick="openEditor('O1001_FLANGE.NC')"><span class="k">5</span>Abrir editor</button>
   <span class="sep"></span><span class="demo-note">2 colunas dinâmicas · tudo clicável · nada é gravado</span>
 </div>
 <div class="hint">
   Painel <b>v2</b>: design padronizado por tokens. À <b>esquerda</b>, ① Compositor + ② Programas (cada arquivo tem
   botão <b>Editar</b>). À <b>direita</b>, ③ Resumo — que dá lugar ao <b>Editor integrado</b> ao clicar em Editar (a coluna
-  expande). Sem contagem automática: a varredura agora é função do editor. Fontes IBM Plex carregam da web só no mockup.
+  expande). Sem contagem automática: a varredura agora é função do editor. Fontes IBM Plex embutidas localmente (offline).
 </div>
 
 <div class="screen">
@@ -474,10 +501,10 @@
       <!-- ② PROGRAMAS -->
       <div class="panel programas">
         <div class="c2head"><div class="ztitle"><span class="znum">2</span> Seleção de Programas</div>
-          <div class="c2head-actions"><button class="ghost">+ Adicionar programa(s)…</button></div>
+          <div class="c2head-actions"><button class="ghost" onclick="pickFiles()">+ Adicionar programa(s)…</button></div>
         </div>
         <div class="match" id="match"><span id="matchTxt">✓ Regra em edição — marque os programas que vão receber esta regra.</span></div>
-        <div class="files" id="files">
+        <div class="files" id="files" tabindex="0" ondragover="fzOver(event)" ondragleave="fzLeave(event)" ondrop="fzDrop(event)" onkeydown="fzKey(event)">
           <div class="file"><span class="chk">✓</span><span class="fname">O1001_FLANGE.NC</span><span class="fmeta">12,4 KB · hoje 08:14</span><button class="editbtn" onclick="openEditor('O1001_FLANGE.NC')">✎ Editar</button></div>
           <div class="file"><span class="chk">✓</span><span class="fname">O1002_EIXO_REV2.NC</span><span class="fmeta">8,1 KB · hoje 08:02</span><button class="editbtn" onclick="openEditor('O1002_EIXO_REV2.NC')">✎ Editar</button></div>
           <div class="file"><span class="chk">✓</span><span class="fname">O1003_TAMPA.NC</span><span class="fmeta">21,7 KB · ontem</span><button class="editbtn" onclick="openEditor('O1003_TAMPA.NC')">✎ Editar</button></div>
@@ -557,6 +584,7 @@
             <button class="btn-soft" onclick="replaceAll()">Substituir todos</button>
             <button class="btn-soft" onclick="startStep()">Um a um</button>
             <button class="ed-save" id="edSaveBtn" onclick="edSave()" disabled>💾 Salvar</button>
+            <button class="btn-soft" id="edSaveAsBtn" onclick="saveAsOpen()" disabled>Salvar como…</button>
           </div>
         </div>
 
@@ -616,6 +644,36 @@
       <div class="step mono">Sem cópia de backup — proposital (ajuste manual rápido).</div>
       <div class="saved-actions"><button class="mbtn save" onclick="hide('ovSaved')">OK</button></div>
     </div>
+  </div></div>
+
+  <!-- editor: Salvar como… (nova cópia com outro tipo/codificação; default = preservar o original) -->
+  <div class="overlay" id="ovSaveAs"><div class="modal confirm">
+    <div class="mh">Salvar como… <span class="x" onclick="saveAsCancel()">✕</span></div>
+    <div class="mb">
+      <p class="confirm-txt">Salvar uma nova cópia de <b id="saFrom">arquivo.NC</b>. O <b>💾 Salvar</b> normal preserva o tipo de entrada; aqui você escolhe outro.</p>
+      <span class="label-caps">Tipo / extensão</span>
+      <div class="sa-group" id="saExt">
+        <button class="btn-soft sel" onclick="saPick(this)">.nc</button>
+        <button class="btn-soft" onclick="saPick(this)">.txt</button>
+        <button class="btn-soft" onclick="saPick(this)">.tap</button>
+        <button class="btn-soft" onclick="saPick(this)">.iso</button>
+        <button class="btn-soft" onclick="saPick(this)">.min</button>
+        <button class="btn-soft" onclick="saPick(this)">.mpf</button>
+      </div>
+      <span class="label-caps">Codificação</span>
+      <div class="sa-group" id="saEnc">
+        <button class="btn-soft sel" onclick="saPick(this)">UTF-8</button>
+        <button class="btn-soft" onclick="saPick(this)">UTF-8 c/ BOM</button>
+        <button class="btn-soft" onclick="saPick(this)">ANSI (cp1252)</button>
+      </div>
+      <span class="label-caps">Quebra de linha</span>
+      <div class="sa-group" id="saEol">
+        <button class="btn-soft sel" onclick="saPick(this)">CRLF (Windows)</button>
+        <button class="btn-soft" onclick="saPick(this)">LF (Unix)</button>
+      </div>
+      <div class="resrow"><span class="label-caps">Prévia</span> <code id="saPreview">arquivo.nc · UTF-8 · CRLF</code></div>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="saveAsCancel()">Cancelar</button><button class="mbtn save" onclick="saveAsConfirm()">Salvar como…</button></div>
   </div></div>
 </div>
 
@@ -678,9 +736,40 @@
   }
   function demo(which){
     closeEditor();
+    if(which==='vazio'){ filesEmptyState(true); return; }
+    filesEmptyState(false);
     if(which==='sub'){ si=0; srcCode.textContent='M8'; srcTag.textContent='Liga refrigeração'; dstCode.textContent='M08'; syncBanner(); syncMatch(); setConflict(false); }
     if(which==='conf'){ setConflict(true); }
   }
+
+  /* ============ ② PROGRAMAS — adicionar / arrastar-soltar / estado vazio ============ */
+  /* A seleção real de pasta/arquivo é OS-nativa (não prototipável em HTML); aqui é placeholder. */
+  var FILES_HTML='';
+  function filesEmptyState(on){
+    var f=document.getElementById('files');
+    if(on){
+      f.innerHTML='<div class="files-empty">'
+        +'<div class="fe-ic">📂</div>'
+        +'<div><div class="fe-t1">Nenhum programa carregado</div>'
+        +'<div class="fe-t2">Arraste arquivos aqui ou use o botão abaixo.</div></div>'
+        +'<button class="fe-cta" onclick="pickFiles()">+ Adicionar programas</button>'
+        +'</div>';
+    } else if(FILES_HTML){
+      f.innerHTML=FILES_HTML;
+    }
+  }
+  /* placeholder: insere exemplos p/ demonstrar que o estado vazio some ao entrar o 1º programa */
+  function pickFiles(){
+    var f=document.getElementById('files');
+    if(f.querySelector('.files-empty')){
+      f.innerHTML='<div class="file"><span class="chk">✓</span><span class="fname">O2001_NOVO_A.NC</span><span class="fmeta">6,4 KB · agora</span><button class="editbtn" onclick="openEditor(\'O2001_NOVO_A.NC\')">✎ Editar</button></div>'
+        +'<div class="file"><span class="chk">✓</span><span class="fname">O2002_NOVO_B.NC</span><span class="fmeta">4,1 KB · agora</span><button class="editbtn" onclick="openEditor(\'O2002_NOVO_B.NC\')">✎ Editar</button></div>';
+    }
+  }
+  function fzOver(e){ e.preventDefault(); document.getElementById('files').classList.add('is-dragover'); }
+  function fzLeave(e){ document.getElementById('files').classList.remove('is-dragover'); }
+  function fzDrop(e){ e.preventDefault(); document.getElementById('files').classList.remove('is-dragover'); pickFiles(); }
+  function fzKey(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pickFiles(); } }
   function execLote(){
     show('ovRun'); rs1.innerHTML='Executando alterações…'; rs1.className='step act'; rs2.className='step';
     setTimeout(function(){ rs1.innerHTML='<span class="ok">✓</span> Alterações executadas'; rs1.className='step'; rs2.className='step act'; },900);
@@ -759,7 +848,7 @@
   }
   function syncScroll(){ edHl.scrollTop=edInput.scrollTop; edHl.scrollLeft=edInput.scrollLeft; edGutter.scrollTop=edInput.scrollTop; }
   function markDirty(){ if(!dirty){ dirty=true; updateSaveBtn(); } }
-  function updateSaveBtn(){ edSaveBtn.disabled=!dirty; }
+  function updateSaveBtn(){ edSaveBtn.disabled=!dirty; edSaveAsBtn.disabled=(currentFile===null); }
 
   /* ---- contador / varredura ---- */
   function resetCount(){ matches=[]; current=-1; edCount.textContent='— encontrados'; edCount.classList.add('stale'); edPos.textContent='0/0'; }
@@ -838,6 +927,28 @@
   /* ---- salvar (sem backup) ---- */
   function edSave(){ if(!dirty) return; FILES[currentFile]=edInput.value; dirty=false; updateSaveBtn(); show('ovSaved'); }
 
+  /* ---- "Salvar como…" (nova cópia; default = preservar o original) ---- */
+  function saPick(btn){
+    var g=btn.parentNode;
+    g.querySelectorAll('.btn-soft').forEach(function(b){ b.classList.remove('sel'); });
+    btn.classList.add('sel');
+    saPreviewUpdate();
+  }
+  function saSel(groupId){ var el=document.querySelector('#'+groupId+' .btn-soft.sel'); return el? el.textContent.trim() : ''; }
+  function saPreviewUpdate(){
+    var base = currentFile ? currentFile.replace(/\.[^.]+$/,'') : 'arquivo';
+    document.getElementById('saPreview').textContent = base + saSel('saExt') + ' · ' + saSel('saEnc') + ' · ' + saSel('saEol').replace(/ .*$/,'');
+  }
+  function saveAsOpen(){
+    if(currentFile===null) return;
+    document.getElementById('saFrom').textContent = currentFile;
+    /* default = preservar o original: .nc / UTF-8 / CRLF já vêm com .sel no HTML */
+    saPreviewUpdate();
+    show('ovSaveAs');
+  }
+  function saveAsCancel(){ hide('ovSaveAs'); }
+  function saveAsConfirm(){ hide('ovSaveAs'); show('ovSaved'); }
+
   /* ============ dropdown pesquisável da biblioteca ============ */
   function buildLibLists(){
     document.querySelectorAll('.libdrop-list').forEach(function(list){ renderLib(list,''); });
@@ -864,8 +975,22 @@
   document.addEventListener('click',function(e){
     if(!e.target.closest('.libdrop')) document.querySelectorAll('.libdrop').forEach(function(d){ d.classList.remove('open'); });
   });
+  /* teclado: Esc fecha o overlay aberto; Enter confirma o "Salvar como…" (fora dos botões de opção) */
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      if(document.getElementById('ovSaveAs').classList.contains('show')){ saveAsCancel(); return; }
+      if(document.getElementById('ovSwitch').classList.contains('show')){ cancelSwitch(); return; }
+      var open=document.querySelector('.overlay.show'); if(open){ open.classList.remove('show'); }
+      return;
+    }
+    if(e.key==='Enter' && document.getElementById('ovSaveAs').classList.contains('show')){
+      if(e.target && e.target.closest && e.target.closest('.sa-group')) return; /* Enter num botão de opção aciona o próprio botão */
+      e.preventDefault(); saveAsConfirm();
+    }
+  });
 
   /* ============ init ============ */
+  FILES_HTML=document.getElementById('files').innerHTML;   /* guarda a lista original p/ restaurar do estado vazio */
   buildLibLists();
   renderEditList();
   syncBanner(); setConflict(true);
