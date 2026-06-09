@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import (
     QCheckBox,
     QHBoxLayout,
@@ -12,6 +13,8 @@ from PySide6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QPushButton,
+    QStyle,
+    QStyleOptionButton,
     QVBoxLayout,
     QWidget,
 )
@@ -54,6 +57,29 @@ def _file_meta(path: Path) -> str:
     return f"{size_str} · {rel}"
 
 
+class _CheckBox(QCheckBox):
+    """Checkbox que desenha um ✓ branco quando marcado (em vez de caixa cheia)."""
+
+    def paintEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().paintEvent(event)  # caixa (borda/fundo) via QSS
+        if not self.isChecked():
+            return
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        rect = self.style().subElementRect(
+            QStyle.SubElement.SE_CheckBoxIndicator, opt, self)
+        if rect.isValid():
+            p = QPainter(self)
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            p.setPen(QColor("#FFFFFF"))
+            f = p.font()
+            f.setPixelSize(12)
+            f.setBold(True)
+            p.setFont(f)
+            p.drawText(rect, Qt.AlignmentFlag.AlignCenter, "✓")
+            p.end()
+
+
 class _ProgramRow(QWidget):
     """Linha de programa: [checkbox] nome + meta  [✎ Editar ou Voltar]  [✕]."""
 
@@ -73,9 +99,10 @@ class _ProgramRow(QWidget):
 
         # UN checkbox — o item do QListWidget tambem tem checkstate, por isso
         # bloqueamos o setCheckState do item para nao duplicar.
-        self.chk = QCheckBox()
-        self.chk.setChecked(True)
+        self.chk = _CheckBox()
+        self.chk.setChecked(False)  # inicia desmarcado: usuario opta por incluir
         self.chk.stateChanged.connect(self._on_check_changed)
+        self._set_off_style(True)   # visual "fora" coerente com o desmarcado
         lay.addWidget(self.chk)
 
         text_box = QVBoxLayout()

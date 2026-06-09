@@ -128,14 +128,20 @@ def test_compositor_remove_regra_publicada(win: MainWindow) -> None:
 # ============ program list ============
 
 
-def test_program_list_marca_todos_por_padrao(win: MainWindow, tmp_path) -> None:
+def test_program_list_inicia_desmarcado(win: MainWindow, tmp_path) -> None:
     a = tmp_path / "A.nc"
     b = tmp_path / "B.nc"
     a.write_text("M8\n", encoding="utf-8")
     b.write_text("G54\n", encoding="utf-8")
     win._set_programs([a, b], str(tmp_path))
+    # inicia tudo desmarcado: nada selecionado ate o usuario marcar
+    assert win._program_list.get_selecionados() == []
+    # ao marcar uma linha, ela passa a ser retornada
+    item = win._program_list.lst_prog.item(0)
+    row = win._program_list.lst_prog.itemWidget(item)
+    row.chk.setChecked(True)
     selecionados = win._program_list.get_selecionados()
-    assert {p.name for p in selecionados} == {"A.nc", "B.nc"}
+    assert {p.name for p in selecionados} == {"A.nc"}
 
 
 # ============ caminho de substituicao (core puro) ============

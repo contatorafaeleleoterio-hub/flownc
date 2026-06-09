@@ -49,60 +49,84 @@
     --t-mono-lg:600 16px/1 var(--mono);
     --t-mono-display:700 24px/1 var(--mono);
 
-    /* ===== COR — fundos em camadas ===== */
-    --color-bg-base:#F8FAFB;
-    --color-bg-subtle:#ECEFF3;
-    --color-bg-rail:#E1E6EC;
-    --color-bg-surface:#C2C9D1;
+    /* ===== COR — Paleta "Precisão Laranja" (fonte da verdade: docs/CORRECOES_MOCKUP) ===== */
+    /* fundos em camadas */
+    --color-bg-base:#FFFFFF;          /* superfície de cards/inputs */
+    --color-bg-subtle:#FFFFFF;        /* faixas/realces leves (cards brancos) */
+    --color-bg-rail:#DDE3EE;          /* fundo de botões auxiliares/ghost */
+    --color-bg-surface:#F7F9FC;       /* canvas atrás dos painéis */
     --color-white:#FFFFFF;
 
+    /* painéis por lado */
+    --color-panel-left:#EDF0F5;
+    --color-panel-right:#E5EAF2;
+
     /* texto */
-    --color-text-primary:#1B2128;
-    --color-text-secondary:#56616D;
-    --color-text-tertiary:#899099;
+    --color-text-primary:#1A2533;
+    --color-text-secondary:#4E6278;
+    --color-text-tertiary:#8FA5C2;    /* muted / placeholder / desabilitado */
 
     /* bordas */
-    --color-border:#CDD4DB;
-    --color-border-strong:#aeb6bf;
+    --color-border:#CCD4E0;
+    --color-border-strong:#B8C6D6;    /* borda de input / divisor forte */
 
-    /* interativo (azul) */
-    --color-interactive:#1F5F9E;
-    --color-interactive-hv:#2B76C0;
-    --color-interactive-bg:#E4EEF7;
+    /* AÇÃO NÍVEL 2 = slate (relevante, não destrutiva). Antes "interativo (azul)". */
+    --color-interactive:#2B3A4A;
+    --color-interactive-hv:#1F2C39;
+    --color-interactive-bg:#E5EAF2;   /* tint leve p/ hover/selecionado */
+    --color-slate-2:#3A4F63;          /* slate claro p/ realce sobre o header escuro */
 
-    /* sucesso (verde) */
-    --color-success:#1C8A4D;
-    --color-success-bg:#E1F1E8;
+    /* sucesso (publicado/confirmado) */
+    --color-success:#2D6B2D;
+    --color-success-bg:#EAF5EA;
+    --color-success-border:#8FC98F;
 
-    /* aviso (âmbar) */
-    --color-warning:#A86A07;
-    --color-warning-bg:#FAEED5;
+    /* aviso (atenção) */
+    --color-warning:#A16207;
+    --color-warning-bg:#FFF8E1;
+    --color-warning-border:#D4A840;
 
-    /* perigo (vermelho) */
-    --color-danger:#BB3324;
-    --color-danger-bg:#FAE4E1;
+    /* perigo (erro/falha) */
+    --color-danger:#D93025;
+    --color-danger-bg:#FEECEB;
+    --color-danger-border:#F0948D;
     --color-danger-deep:#8a2a2a;
     --color-danger-deep-bg:#efd6d6;
 
-    /* CTA (botão principal escuro) */
-    --color-cta-start:#3A434E;
-    --color-cta-end:#232A33;
-    --color-cta-text:#F4F7FA;
-    --color-cta-text-soft:#aeb8c2;
+    /* CTA PRINCIPAL = LARANJA — única ação executável por tela. Antes "botão escuro". */
+    --color-cta-start:#E85D04;
+    --color-cta-end:#E85D04;
+    --color-cta-text:#FFFFFF;
+    --color-cta-text-soft:#FFE3D1;
+
+    /* acento laranja — badge "em edição/ativo" + estados do CTA */
+    --color-accent:#E85D04;
+    --color-accent-hv:#C94E00;
+    --color-accent-active:#A83E00;
+    --color-accent-bg:#FFF3ED;
+    --color-accent-border:#F0A87A;
+
+    /* botões secundários (cinza, nível 3) e desabilitado */
+    --color-btn-secondary-bg:#DDE3EE;
+    --color-btn-secondary-border:#C0CEDF;
+    --color-btn-secondary-text:#2B3A4A;
+    --color-btn-secondary-hover:#CDD5E2;
+    --color-btn-disabled-bg:#EEF1F5;
+    --color-btn-disabled-text:#B0BFD0;
 
     /* utilitários */
     --color-overlay:rgba(15,20,25,.55);
-    --color-code-bg:#eef1f4;
-    --color-row-deleted:#fcf2f2;
-    --color-modal-footer:#e7ebee;
-    --color-disabled-bg:#9fb3c6;
-    --color-spinner-track:#d6dee4;
+    --color-code-bg:#EDF0F5;
+    --color-row-deleted:#FEECEB;
+    --color-modal-footer:#E5EAF2;
+    --color-disabled-bg:#EEF1F5;
+    --color-spinner-track:#DDE3EE;
 
-    /* gradiente do cabeçalho/modais (antes hardcoded) */
-    --color-head-top:#D3DAE1;
-    --color-head-mid:#c3cbd3;
-    --color-head-bot:#B9C2CB;
-    --color-head-border:#a7afb8;
+    /* HEADER / SIDEBAR / TOOLTIP = slate sólido (era gradiente claro) */
+    --color-head-top:#2B3A4A;
+    --color-head-mid:#2B3A4A;
+    --color-head-bot:#2B3A4A;
+    --color-head-border:#1F2C39;
 
     /* ===== NOVOS tokens do Editor ===== */
     --color-editor-gutter:#EEF1F4;        /* fundo da régua de números de linha */
@@ -118,7 +142,7 @@
     --demo-k-bg:#3a444d;
 
     /* ===== RAIO ===== */
-    --radius-xs:4px; --radius-sm:8px; --radius-md:12px; --radius-pill:20px;
+    --radius-xs:2px; --radius-sm:4px; --radius-md:6px; --radius-pill:20px;
 
     /* ===== ALTURAS de controle ===== */
     --h-cta:56px; --h-btn:44px; --h-ghost:32px; --h-field:44px;
@@ -131,14 +155,19 @@
 
     /* ===== DIVERSOS ===== */
     --border-width:1px;
-    --focus-ring:0 0 0 3px rgba(31,95,158,.35);
+    --focus-ring:0 0 0 3px rgba(43,58,74,.28);
     --conflict-bar:inset 3px 0 0 var(--color-warning);
-    --metal:inset 0 1px 0 rgba(255,255,255,.85), 0 1px 2px rgba(20,28,38,.10), 0 2px 6px rgba(20,28,38,.05);
-    --shadow-screen:0 18px 50px rgba(0,0,0,.30);
-    --shadow-modal:0 20px 60px rgba(0,0,0,.40);
+    --metal:inset 0 1px 0 rgba(255,255,255,.35), 0 1px 2px rgba(20,28,38,.08);
+    --shadow-screen:0 12px 32px rgba(0,0,0,.22);
+    --shadow-modal:0 16px 40px rgba(0,0,0,.30);
   }
 
   *{box-sizing:border-box}
+  /* scrollbar (Precisão Laranja) */
+  *::-webkit-scrollbar{width:6px;height:6px}
+  *::-webkit-scrollbar-track{background:var(--color-panel-left)}
+  *::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:var(--radius-xs)}
+  *::-webkit-scrollbar-thumb:hover{background:var(--color-border-strong)}
   /* página preenche a janela e NÃO rola; a rolagem mora dentro dos painéis */
   body{margin:0;background:var(--color-border-strong);color:var(--color-text-primary);
     font:var(--t-body);height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;
@@ -166,15 +195,15 @@
   /* ====== HEADER ====== */
   .head{height:var(--dim-header);flex-shrink:0;position:relative;display:flex;align-items:center;gap:var(--sp-16);
     padding:0 var(--sp-16);background:linear-gradient(180deg,var(--color-head-top) 0%,var(--color-head-mid) 52%,var(--color-head-bot) 100%);
-    border-bottom:var(--border-width) solid var(--color-head-border);box-shadow:inset 0 1px 0 #ffffffaa}
+    border-bottom:var(--border-width) solid var(--color-head-border);box-shadow:inset 0 1px 0 #ffffff22}
   .screw{position:absolute;width:7px;height:7px;border-radius:var(--radius-pill);
     background:radial-gradient(circle at 35% 30%,#fbfdff,#9aa3ad 70%,#6f7882);box-shadow:0 1px 1px #ffffffcc}
   .screw.tl{top:7px;left:7px}.screw.tr{top:7px;right:7px}.screw.bl{bottom:7px;left:7px}.screw.br{bottom:7px;right:7px}
   .brand{display:flex;align-items:center;gap:var(--sp-8)}
   .logo{width:38px;height:38px;border-radius:var(--radius-pill);display:grid;place-items:center;color:var(--color-white);
     font-size:18px;background:radial-gradient(circle at 35% 30%,#2f78bd,#143f63);box-shadow:var(--metal)}
-  .brand .nm{font:var(--t-heading)}
-  .brand .sub{font:var(--t-label);letter-spacing:2px;color:var(--color-text-secondary);text-transform:uppercase}
+  .brand .nm{font:var(--t-heading);color:var(--color-white)}
+  .brand .sub{font:var(--t-label);letter-spacing:2px;color:var(--color-text-tertiary);text-transform:uppercase}
   .vline{width:var(--border-width);height:40px;background:var(--color-border-strong)}
   .label-caps{font:var(--t-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-secondary)}
   .profile{display:flex;flex-direction:column;gap:var(--sp-4)}
@@ -185,7 +214,8 @@
   .spacer{margin-left:auto}
   .hbtn{height:var(--h-field);padding:0 var(--sp-16);border-radius:var(--radius-sm);border:none;
     font:var(--t-ui);cursor:pointer;background:var(--color-bg-base);box-shadow:var(--metal);color:var(--color-text-primary)}
-  .hbtn.blue{background:var(--color-interactive);color:var(--color-white)}
+  .hbtn.blue{background:var(--color-slate-2);color:var(--color-white)}
+  .hbtn.blue:hover{background:var(--color-interactive-hv)}
 
   /* ====== BODY — 2 COLUNAS DINÂMICAS ====== */
   .body{display:flex;gap:var(--sp-16);padding:var(--sp-16);align-items:stretch;flex:1 1 0;min-height:0;overflow:hidden}
@@ -196,6 +226,9 @@
 
   .panel{background:var(--color-bg-base);border-radius:var(--radius-md);box-shadow:var(--metal);
     padding:var(--sp-16);display:flex;flex-direction:column}
+  /* painéis por lado (Precisão Laranja): esquerda configurações, direita resumo/status */
+  .left .panel{background:var(--color-panel-left)}
+  .right .panel{background:var(--color-panel-right)}
   .compositor{flex:0 0 auto}
   .programas{flex:1;min-height:0}
   .right .resumo{flex:1;min-height:0}
@@ -236,12 +269,14 @@
   .el-pill{font:var(--t-mono-md);background:var(--color-white);border-radius:var(--radius-sm);
     padding:var(--sp-2) var(--sp-8);box-shadow:var(--metal)}
   .el-arr{color:var(--color-interactive);font-size:16px}
-  .el-row.draft{background:var(--color-interactive-bg);box-shadow:inset 3px 0 0 var(--color-interactive)}
+  .el-row.draft{background:var(--color-accent-bg);box-shadow:inset 3px 0 0 var(--color-accent)}
   .el-row.draft .el-pill{color:var(--color-text-primary)}
   .el-right{margin-left:auto;display:flex;align-items:center;gap:var(--sp-8)}
-  .el-tag{font:var(--t-label);letter-spacing:.6px;text-transform:uppercase;color:var(--color-interactive)}
-  .el-x{margin-left:auto;cursor:pointer;color:var(--color-danger);font-weight:700;font-family:var(--sans);
-    width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-xs)}
+  .el-tag{font:var(--t-label);letter-spacing:.6px;text-transform:uppercase;color:var(--color-accent)}
+  /* botão ✕ de excluir — padrão único (igual ao .filex da lista de programas) */
+  .el-x{margin-left:auto;width:var(--h-ghost);height:var(--h-ghost);flex-shrink:0;border:none;border-radius:var(--radius-sm);
+    background:var(--color-bg-rail);color:var(--color-danger);font:var(--t-ui);font-weight:700;cursor:pointer;box-shadow:var(--metal);
+    display:grid;place-items:center;font-family:var(--sans)}
   .el-x:hover{background:var(--color-danger-bg)}
   .el-add{width:100%;height:var(--h-ghost);border:none;border-top:var(--border-width) dashed var(--color-interactive);
     background:var(--color-interactive-bg);color:var(--color-interactive);font:var(--t-body-strong);cursor:pointer;
@@ -256,7 +291,7 @@
     background:var(--color-bg-rail);font:var(--t-caption);color:var(--color-text-secondary);cursor:pointer;box-shadow:var(--metal)}
   /* nota "regra em edição" — inline no cabeçalho da seção 2 (compacta, trunca se faltar espaço) */
   .match{display:inline-flex;align-items:center;min-width:0;background:var(--color-success-bg);
-    border-radius:var(--radius-pill);padding:var(--sp-4) var(--sp-12);font:var(--t-caption);color:var(--color-success);
+    border-radius:var(--radius-sm);padding:var(--sp-4) var(--sp-12);font:var(--t-caption);color:var(--color-success);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .match #matchTxt{overflow:hidden;text-overflow:ellipsis}
   .files{display:flex;flex-direction:column;gap:var(--sp-8);flex:1;overflow:auto}
@@ -278,7 +313,7 @@
   .filex:hover{background:var(--color-danger-bg)}
   .addrule{margin-top:var(--sp-12);height:var(--h-btn);border:none;border-radius:var(--radius-sm);
     background:var(--color-interactive);color:var(--color-white);font:var(--t-body-strong);cursor:pointer;box-shadow:var(--metal)}
-  .addrule:disabled{background:var(--color-disabled-bg);cursor:not-allowed;opacity:.8}
+  .addrule:disabled{background:var(--color-disabled-bg);color:var(--color-btn-disabled-text);cursor:not-allowed;opacity:.8}
   /* arrastar-e-soltar + estado vazio (classes próprias — não colidem com drop-*/dropdown) */
   .files.is-dragover{outline:var(--border-width) dashed var(--color-interactive);outline-offset:-4px;
     background:var(--color-interactive-bg);border-radius:var(--radius-sm)}
@@ -297,7 +332,7 @@
   .c3head{display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-16)}
   .c3head .ztitle{margin:0;flex:1}
   .chip-state{display:flex;align-items:center;gap:var(--sp-4);font:var(--t-caption);padding:var(--sp-4) var(--sp-12);
-    border-radius:var(--radius-pill);box-shadow:var(--metal)}
+    border-radius:var(--radius-sm);box-shadow:var(--metal)}
   .chip-state.ok{color:var(--color-success);background:var(--color-success-bg)}
   .chip-state.warn{color:var(--color-warning);background:var(--color-warning-bg)}
   .counters{display:flex;gap:var(--sp-8);flex:0 0 auto;margin-bottom:var(--sp-16)}
@@ -315,9 +350,15 @@
   .rformula .a{color:var(--color-interactive)}
   .rscope{font:var(--t-caption);color:var(--color-text-tertiary)}
   .rchip{font:var(--t-label);color:var(--color-success);background:var(--color-success-bg);
-    padding:var(--sp-2) var(--sp-8);border-radius:var(--radius-pill);white-space:nowrap}
-  .racts{display:flex;gap:var(--sp-8);color:var(--color-text-tertiary);font:var(--t-heading)}
-  .racts span{cursor:pointer}.racts .del{color:var(--color-danger)}
+    padding:var(--sp-2) var(--sp-8);border-radius:var(--radius-sm);white-space:nowrap}
+  /* ações do resumo — grupo de botões-ícone uniforme; excluir = botão ✕ padrão */
+  .racts{display:flex;gap:var(--sp-8)}
+  .racts span{width:var(--h-ghost);height:var(--h-ghost);flex-shrink:0;display:grid;place-items:center;
+    border-radius:var(--radius-sm);background:var(--color-bg-rail);color:var(--color-text-secondary);
+    font:var(--t-ui);cursor:pointer;box-shadow:var(--metal)}
+  .racts span:hover{background:var(--color-interactive-bg)}
+  .racts .del{color:var(--color-danger);font-weight:700}
+  .racts .del:hover{background:var(--color-danger-bg)}
   .rc-conflict{display:flex;align-items:center;gap:var(--sp-8);font:var(--t-caption);color:var(--color-warning);padding-left:var(--sp-2)}
   .seal-big{display:flex;align-items:center;gap:var(--sp-12);background:var(--color-success-bg);border-radius:var(--radius-sm);
     padding:var(--sp-12);margin-top:var(--sp-16);box-shadow:var(--metal)}
@@ -330,6 +371,8 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-2);box-shadow:var(--metal)}
   .cta .big{font:var(--t-display);letter-spacing:1px;text-transform:uppercase}
   .cta .small{font:var(--t-caption);color:var(--color-cta-text-soft);letter-spacing:.5px}
+  .cta:hover{background:var(--color-accent-hv)}
+  .cta:active{background:var(--color-accent-active)}
 
   /* ====== EDITOR INTEGRADO (coluna direita) ====== */
   .editor{flex-direction:column;min-height:0}
@@ -337,7 +380,7 @@
   .ed-title{font:var(--t-body-strong);color:var(--color-text-primary);display:flex;align-items:center;gap:var(--sp-8)}
   .ed-fname{font:var(--t-mono-md);color:var(--color-interactive)}
   .ed-nobackup{margin-left:auto;display:flex;align-items:center;gap:var(--sp-4);font:var(--t-caption);
-    color:var(--color-warning);background:var(--color-warning-bg);padding:var(--sp-2) var(--sp-8);border-radius:var(--radius-pill)}
+    color:var(--color-warning);background:var(--color-warning-bg);padding:var(--sp-2) var(--sp-8);border-radius:var(--radius-sm)}
   .ed-back{height:var(--h-ghost);padding:0 var(--sp-12);border:none;border-radius:var(--radius-sm);
     background:var(--color-bg-rail);color:var(--color-text-secondary);font:var(--t-caption);cursor:pointer;box-shadow:var(--metal)}
   .ed-back:hover{background:var(--color-border)}
@@ -416,9 +459,9 @@
   .overlay{position:absolute;inset:0;background:var(--color-overlay);display:none;place-items:center;z-index:40}
   .overlay.show{display:grid}
   .modal{background:var(--color-bg-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-modal);overflow:hidden;max-width:94%}
-  .mh{padding:var(--sp-16);font:var(--t-heading);display:flex;justify-content:space-between;align-items:center;gap:var(--sp-16);
+  .mh{padding:var(--sp-16);font:var(--t-heading);color:var(--color-white);display:flex;justify-content:space-between;align-items:center;gap:var(--sp-16);
     background:linear-gradient(180deg,var(--color-head-top),var(--color-head-mid));border-bottom:var(--border-width) solid var(--color-head-border)}
-  .mh .x{cursor:pointer;color:var(--color-text-secondary)}
+  .mh .x{cursor:pointer;color:var(--color-text-tertiary)}
   .mb{padding:var(--sp-16);background:var(--color-bg-base)}
   .run{width:460px;text-align:center}
   .run .bigspin{width:44px;height:44px;border:5px solid var(--color-spinner-track);border-top-color:var(--color-interactive);
@@ -458,7 +501,7 @@
   .confirm{width:440px}
   .confirm-txt{font:var(--t-body);color:var(--color-text-secondary);margin:0;line-height:1.5}
   .confirm-txt b{color:var(--color-text-primary);font-family:var(--mono)}
-  .saved-ic{font-size:40px;margin:var(--sp-4) 0 var(--sp-8)}
+  .saved-ic{font-size:40px;margin:var(--sp-4) 0 var(--sp-8);color:var(--color-success)}
   .saved-actions{margin-top:var(--sp-16)}
   /* "Salvar como…" — grupos de opção (reusa .btn-soft) */
   #ovSaveAs .mb > .label-caps{display:block;margin-top:var(--sp-16)}
@@ -552,13 +595,13 @@
         </div>
         <div class="divider"></div>
         <div class="rules" id="rules">
-          <div class="rcard"><div class="rc-row"><span class="ridx">01</span><span class="rformula"><span class="a">M8 → M08</span></span><span class="rscope">10 programas</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">🗑</span></span></div></div>
-          <div class="rcard"><div class="rc-row"><span class="ridx">02</span><span class="rformula"><span class="a">G54 → G55</span></span><span class="rscope">12 programas</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">🗑</span></span></div></div>
-          <div class="rcard is-warn" id="cardC1"><div class="rc-row"><span class="ridx">03</span><span class="rformula"><span class="a">T1 → T01</span></span><span class="rscope">6 programas</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">🗑</span></span></div><div class="rc-conflict"><span>▲</span> Conflito: <b>T1</b> também é alterado pela Regra 04.</div></div>
-          <div class="rcard is-warn" id="cardC2"><div class="rc-row"><span class="ridx">04</span><span class="rformula"><span class="a">T1 → T1.0</span></span><span class="rscope">6 programas</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">🗑</span></span></div><div class="rc-conflict"><span>▲</span> Conflito: mesmo código de origem da Regra 03.</div></div>
+          <div class="rcard"><div class="rc-row"><span class="ridx">01</span><span class="rformula"><span class="a">M8 → M08</span></span><span class="rscope">10 programas</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div></div>
+          <div class="rcard"><div class="rc-row"><span class="ridx">02</span><span class="rformula"><span class="a">G54 → G55</span></span><span class="rscope">12 programas</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div></div>
+          <div class="rcard is-warn" id="cardC1"><div class="rc-row"><span class="ridx">03</span><span class="rformula"><span class="a">T1 → T01</span></span><span class="rscope">6 programas</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div><div class="rc-conflict"><span>▲</span> Conflito: <b>T1</b> também é alterado pela Regra 04.</div></div>
+          <div class="rcard is-warn" id="cardC2"><div class="rc-row"><span class="ridx">04</span><span class="rformula"><span class="a">T1 → T1.0</span></span><span class="rscope">6 programas</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div><div class="rc-conflict"><span>▲</span> Conflito: mesmo código de origem da Regra 03.</div></div>
         </div>
         <div class="seal-big">
-          <div class="shield">🛡</div>
+          <div class="shield">✓</div>
           <div><div class="t1">Editados → pasta da máquina · originais → backup</div><div class="t2">backup: …\backup\_backup_orig_2026-06-04_14-30\</div></div>
         </div>
         <button class="cta" onclick="execLote()"><span class="big">Executar Lote</span><span class="small">Pré-visualizar antes de publicar</span></button>
@@ -604,7 +647,7 @@
             </div>
             <button class="btn-soft" onclick="replaceAll()">Substituir todos</button>
             <button class="btn-soft" onclick="startStep()">Um a um</button>
-            <button class="ed-save" id="edSaveBtn" onclick="edSave()" disabled>💾 Salvar</button>
+            <button class="ed-save" id="edSaveBtn" onclick="edSave()" disabled>Salvar</button>
             <button class="btn-soft" id="edSaveAsBtn" onclick="saveAsOpen()" disabled>Salvar como…</button>
           </div>
         </div>
@@ -644,7 +687,7 @@
         <div class="pvrow"><span class="pvtag sub">substituir</span><span class="old">N60 G54</span> <span>→</span> <span class="new">N60 G55</span></div>
       </div>
     </div>
-    <div class="mf"><button class="mbtn ghost" onclick="hide('ovRes')">Voltar</button><button class="mbtn save" onclick="runSave()">📤 Publicar na máquina</button></div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovRes')">Voltar</button><button class="mbtn save" onclick="runSave()">Publicar na máquina</button></div>
   </div></div>
 
   <div class="overlay" id="ovSave"><div class="modal run"><div class="mh" id="saveH">Publicando…</div>
@@ -660,7 +703,7 @@
   <!-- editor: confirmação de salvamento -->
   <div class="overlay" id="ovSaved"><div class="modal run">
     <div class="mh">Salvo</div>
-    <div class="mb"><div class="saved-ic">✅</div>
+    <div class="mb"><div class="saved-ic">✓</div>
       <div class="step act">Gravado direto na pasta de origem.</div>
       <div class="step mono">Sem cópia de backup — proposital (ajuste manual rápido).</div>
       <div class="saved-actions"><button class="mbtn save" onclick="hide('ovSaved')">OK</button></div>
@@ -671,7 +714,7 @@
   <div class="overlay" id="ovSaveAs"><div class="modal confirm">
     <div class="mh">Salvar como… <span class="x" onclick="saveAsCancel()">✕</span></div>
     <div class="mb">
-      <p class="confirm-txt">Salvar uma nova cópia de <b id="saFrom">arquivo.NC</b>. O <b>💾 Salvar</b> normal preserva o tipo de entrada; aqui você escolhe outro.</p>
+      <p class="confirm-txt">Salvar uma nova cópia de <b id="saFrom">arquivo.NC</b>. O <b>Salvar</b> normal preserva o tipo de entrada; aqui você escolhe outro.</p>
       <span class="label-caps">Tipo / extensão</span>
       <div class="sa-group" id="saExt">
         <button class="btn-soft sel" onclick="saPick(this)">.nc</button>
@@ -755,7 +798,7 @@
     var idx=('0'+(nextIdx++)).slice(-2);
     var div=document.createElement('div'); div.className='rcard';
     var f='<span class="rformula"><span class="a">'+esc(e.code)+' → '+esc(e.dst)+'</span></span>';
-    div.innerHTML='<div class="rc-row"><span class="ridx">'+idx+'</span>'+f+'<span class="rscope">sel.</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">🗑</span></span></div>';
+    div.innerHTML='<div class="rc-row"><span class="ridx">'+idx+'</span>'+f+'<span class="rscope">sel.</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div>';
     rules.appendChild(div);
   }
   /* "Adicionar ao lote" — manda todas as edições montadas + a "em edição" para o Resumo */
@@ -817,7 +860,7 @@
     hide('ovRes'); show('ovSave'); saveH.textContent='Publicando…';
     saveBody.innerHTML='<div class="bigspin"></div><div class="step act">Backup dos originais → troca na pasta da máquina → conferência SHA-256…</div>';
     setTimeout(function(){ saveH.textContent='Publicado ✓';
-      saveBody.innerHTML='<div class="saved-ic">✅</div><div class="step act">Editados na pasta da máquina · originais no backup · conferência dupla OK · pasta aberta</div>'
+      saveBody.innerHTML='<div class="saved-ic">✓</div><div class="step act">Editados na pasta da máquina · originais no backup · conferência dupla OK · pasta aberta</div>'
         +'<div class="step mono">backup: …\\_backup_orig_2026-06-04_14-30\\</div>'
         +'<div class="saved-actions"><button class="mbtn save" onclick="hide(\'ovSave\')">OK — novo lote</button></div>';
     },1500);
