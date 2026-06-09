@@ -1,17 +1,20 @@
-# Handoff — FlowNC — 2026-06-08 (sessão 6)
-Status: FASE 1 (protótipo) — em refino visual; aguardando GATE ("é esse").
+# Handoff — FlowNC — 2026-06-08 (sessão 8)
+Status: EXE entregue na Área de Trabalho (pasta FlowNC/ no Desktop).
 
 Feito nesta sessão:
-- Protótipo `mockups/painel-final.v2.html`: aplicada **responsividade** (largura fluida 1180–1800, altura preenchendo a janela, scroll interno, 3 @media) conforme `docs/RESPONSIVIDADE.md`.
-- Dropdowns **só-código + descrição no hover** (Passo 12) no Compositor e no Editor.
-- Removida a **barra de andaime** (menu "Ver estado" + parágrafo) — não fazia parte do sistema.
-- Mais espaço na seção 2: banner verde virou nota inline no cabeçalho; "Edições montadas" com altura máx + scroll.
-- "+ adicionar outra edição" movido pra **ao lado dos campos** origem/destino.
-- Botões **✕ remover** em todas as listas: edições montadas, linha "em edição" (limpa), e cada programa da seção 2.
-- **Catálogo Técnico DESCARTADO** pelo Mestre: removido do protótipo (botão/janela/CSS/JS); volta ao modelo biblioteca **código + descrição**. PLAN.md anotado (Passo 11 inválido; Passo 12 mantido).
+- app_paths.py: resource_dir() via sys._MEIPASS (EXE) ou pasta do projeto (dev).
+- core/seed.py: ensure_seed() — semeia data/ na 1ª execução, preserva corrompidos.
+- main.py: ensure_seed() chamado antes de _load_library/_load_presets.
+- FlowNC.spec: datas preenchidos (ui/style.qss, assets/fonts, data_default).
+- dist/FlowNC/data/ copiado ao lado do EXE (editável pelo operador).
+- EXE buildado: FlowNC.exe 1.8 MB, _internal/ com data_default/ui/assets.
+- Pasta FlowNC/ entregue no Desktop; 146 testes verdes.
 
-Onde parou: protótipo ajustado e aberto no navegador para conferência.
-Próximo passo: Mestre conferir e aprovar o GATE da FASE 1 ("é esse"); então iniciar FASE 2 (código nativo).
+Onde parou: EXE funcional pronto para pen drive.
+Próximos passos (opcionais — FASE 3 ainda incompleta):
+  - Mudança C (editor: glifos, realce, stepbar) — Etapas 22–36.
+  - Mudança D (modais, atalhos, confirmações) — Etapas 37–50.
+  - Passo 8: persistência real de perfil (hoje é stub).
+  - Passo 4: trocar _save() legado por publish_batch.
 Blockers: nenhum.
-Arquivos tocados: mockups/painel-final.v2.html; PLAN.md; HANDOFF.md; LESSONS.md.
-Retomar com: "continuar"
+Retomar com: "continuar mudança C" ou "entregar EXE com polimento".

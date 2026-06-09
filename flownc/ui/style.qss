@@ -7,11 +7,19 @@
    QMainWindow — janela principal
    ----------------------------------------------------------------------- */
 QMainWindow {
-    background-color: #F8FAFB;
+    background-color: #C2C9D1;
     color: #1B2128;
     font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     font-size: 14px;
     font-weight: 400;
+}
+
+/* Container central (atras dos paineis): tom "superficie" do mockup,
+   para os paineis claros (#F8FAFB) destacarem como cartoes flutuantes. */
+QStackedWidget,
+#LeftColumn,
+#RightColumn {
+    background-color: #C2C9D1;
 }
 
 /* -----------------------------------------------------------------------
@@ -245,14 +253,14 @@ QCheckBox::indicator:hover {
 }
 
 QCheckBox::indicator:checked {
-    background-color: #1F5F9E;
-    border-color: #1F5F9E;
+    background-color: #1C8A4D;
+    border-color: #1C8A4D;
     image: none;
 }
 
 QCheckBox::indicator:checked:hover {
-    background-color: #2B76C0;
-    border-color: #2B76C0;
+    background-color: #24A65E;
+    border-color: #24A65E;
 }
 
 QCheckBox:disabled {
@@ -268,17 +276,17 @@ QCheckBox::indicator:disabled {
    QSplitter — divisor de painéis
    ----------------------------------------------------------------------- */
 QSplitter {
-    background-color: #F8FAFB;
+    background-color: #C2C9D1;
 }
 
 QSplitter::handle {
-    background-color: #E1E6EC;
-    width: 4px;
-    height: 4px;
+    background-color: #C2C9D1;
+    width: 8px;
+    height: 8px;
 }
 
 QSplitter::handle:hover {
-    background-color: #CDD4DB;
+    background-color: #aeb6bf;
 }
 
 QSplitter::handle:horizontal {
@@ -303,6 +311,13 @@ QSplitter::handle:vertical {
     font-weight: 700;
     font-size: 16px;
     color: #1B2128;
+}
+
+#LogoBadge {
+    background-color: #1F5F9E;
+    color: #FFFFFF;
+    border-radius: 19px;
+    font-size: 18px;
 }
 
 /* -----------------------------------------------------------------------
@@ -420,4 +435,326 @@ QPushButton#CTA {
     font-family: "IBM Plex Mono", "Consolas", monospace;
     font-size: 14px;
     font-weight: 600;
+}
+
+/* =======================================================================
+   ACABAMENTO — elementos que faltavam (fidelidade ao mockup v2)
+   ======================================================================= */
+
+/* ---- Titulos de secao: badge numerado + texto em maiusculas ---- */
+#ZNum {
+    background-color: #E1E6EC;
+    color: #56616D;
+    border: 1px solid #CDD4DB;
+    border-radius: 4px;
+    min-width: 20px;
+    max-width: 20px;
+    min-height: 20px;
+    max-height: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    qproperty-alignment: AlignCenter;
+}
+
+#ZTitle {
+    color: #56616D;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* ---- Rotulo em caixa-alta (CODIGO DE ORIGEM, TROCAR POR, Perfil) ---- */
+#LabelCaps {
+    color: #56616D;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* ---- Cabecalho: subtitulo da marca + separador vertical ---- */
+#BrandSub {
+    color: #56616D;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+#VLine {
+    background-color: #aeb6bf;
+}
+
+/* ---- Botao azul solido "+ Adicionar codigo" (header) ---- */
+QPushButton#BtnInteractive {
+    background-color: #1F5F9E;
+    color: #FFFFFF;
+    border: none;
+}
+
+QPushButton#BtnInteractive:hover {
+    background-color: #2B76C0;
+}
+
+QPushButton#BtnInteractive:pressed {
+    background-color: #1A527E;
+}
+
+/* ---- Combos de codigo (origem / destino) em fonte mono ---- */
+#CodeCombo {
+    font-family: "IBM Plex Mono", "Consolas", monospace;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+QComboBox#CodeCombo::down-arrow {
+    image: none;
+}
+
+/* ---- Botao tracejado "+ adicionar outra edicao" ---- */
+QPushButton#CompAddBtn {
+    background-color: #E4EEF7;
+    color: #1F5F9E;
+    border: 1px dashed #1F5F9E;
+    border-radius: 8px;
+    min-height: 44px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+QPushButton#CompAddBtn:hover {
+    background-color: #1F5F9E;
+    color: #FFFFFF;
+}
+
+/* ---- Lista "Edicoes montadas" (mata a caixa preta) ---- */
+#EditList {
+    background-color: #FFFFFF;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+}
+
+#EditListHead {
+    background-color: #ECEFF3;
+    color: #56616D;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+}
+
+#EditListBody {
+    background-color: #FFFFFF;
+}
+
+#EditListSep {
+    background-color: #CDD4DB;
+    max-height: 1px;
+    border: none;
+}
+
+/* "selinhos" de codigo (M8 -> M08) e a seta */
+#ElPill {
+    background-color: #FFFFFF;
+    color: #1B2128;
+    border: 1px solid #CDD4DB;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-family: "IBM Plex Mono", "Consolas", monospace;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#ElArr {
+    color: #1F5F9E;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* linha "em edicao" (rascunho) com realce azul a esquerda */
+#DraftRow {
+    background-color: #E4EEF7;
+    border-left: 3px solid #1F5F9E;
+}
+
+#DraftBadge {
+    color: #1F5F9E;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* botao ✕ de remover edicao da lista */
+QPushButton#ElRemove {
+    background-color: transparent;
+    color: #BB3324;
+    border: none;
+    border-radius: 4px;
+    font-weight: 700;
+    padding: 0px;
+}
+
+QPushButton#ElRemove:hover {
+    background-color: #FAE4E1;
+}
+
+/* ---- Botao azul grande "Adicionar edicao ao lote ->" (rodape secao 2) ---- */
+QPushButton#AddRuleBtn {
+    background-color: #1F5F9E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    min-height: 44px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+QPushButton#AddRuleBtn:hover {
+    background-color: #2B76C0;
+}
+
+QPushButton#AddRuleBtn:disabled {
+    background-color: #9fb3c6;
+    color: #ECEFF3;
+}
+
+/* ---- Botao "ghost" cinza "+ Adicionar programa(s)..." ---- */
+QPushButton#GhostBtn {
+    background-color: #E1E6EC;
+    color: #56616D;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    min-height: 32px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#GhostBtn:hover {
+    background-color: #CDD4DB;
+}
+
+/* ---- Cada programa como cartao cinza-claro ---- */
+#ProgramListPanel QListWidget {
+    background-color: transparent;
+    border: none;
+}
+
+#ProgramListPanel QListWidget::item {
+    border-radius: 8px;
+    margin-bottom: 2px;
+}
+
+#ProgramListPanel QListWidget::item:selected {
+    background-color: transparent;
+}
+
+#ProgramRow {
+    background-color: #ECEFF3;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+}
+
+#ProgramRow[fileOff="true"] {
+    background-color: #F2F4F7;
+}
+
+/* botao "✎ Editar" (azul claro) e "Voltar" (cinza) */
+QPushButton#EditBtn {
+    background-color: #E4EEF7;
+    color: #1F5F9E;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    min-height: 32px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#EditBtn:hover {
+    background-color: #1F5F9E;
+    color: #FFFFFF;
+}
+
+QPushButton#BackBtn {
+    background-color: #E1E6EC;
+    color: #56616D;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    min-height: 32px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#BackBtn:hover {
+    background-color: #CDD4DB;
+}
+
+/* botao ✕ de remover programa da lista */
+QPushButton#FileRemoveBtn {
+    background-color: #E1E6EC;
+    color: #BB3324;
+    border: 1px solid #CDD4DB;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 0px;
+}
+
+QPushButton#FileRemoveBtn:hover {
+    background-color: #FAE4E1;
+}
+
+/* CTA do estado vazio */
+QPushButton#EmptyCTA {
+    background-color: #1F5F9E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    min-height: 44px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+QPushButton#EmptyCTA:hover {
+    background-color: #2B76C0;
+}
+
+/* ---- Resumo: area dos cartoes (mata a 2a caixa preta) ---- */
+#CardsHost {
+    background-color: #F8FAFB;
+}
+
+/* botoes de acao dos cartoes (editar / duplicar / excluir) */
+QPushButton#CardAction {
+    background-color: transparent;
+    color: #56616D;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 0px;
+}
+
+QPushButton#CardAction:hover {
+    background-color: #E1E6EC;
+}
+
+/* ---- Selo de backup: escudo + duas linhas ---- */
+#BackupShield {
+    font-size: 17px;
+}
+
+#BackupLine1 {
+    color: #1C8A4D;
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+}
+
+#BackupLine2 {
+    color: #56616D;
+    font-family: "IBM Plex Mono", "Consolas", monospace;
+    font-size: 11px;
+    background: transparent;
 }

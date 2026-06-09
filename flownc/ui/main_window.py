@@ -137,20 +137,27 @@ class MainWindow(QMainWindow):
         self._splitter = QSplitter(Qt.Orientation.Horizontal)
 
         left = QWidget()
+        left.setObjectName("LeftColumn")
         lv = QVBoxLayout(left)
         lv.setContentsMargins(8, 8, 8, 8)
+        lv.setSpacing(8)
         self._compositor = CompositorPanel()
         lv.addWidget(self._compositor, stretch=0)
         self._program_list = ProgramListPanel()
         lv.addWidget(self._program_list, stretch=1)
         self._splitter.addWidget(left)
 
+        right = QWidget()
+        right.setObjectName("RightColumn")
+        rv = QVBoxLayout(right)
+        rv.setContentsMargins(8, 8, 8, 8)
         self._stack = QStackedWidget()
         self._summary = SummaryPanel()
         self._stack.addWidget(self._summary)               # indice 0
         self._editor_panel = EditorPanel(self._library, parent=self)
         self._stack.addWidget(self._editor_panel)          # indice 1
-        self._splitter.addWidget(self._stack)
+        rv.addWidget(self._stack)
+        self._splitter.addWidget(right)
         self._splitter.setSizes([600, 400])
         root.addWidget(self._splitter, stretch=1)
 
@@ -165,12 +172,16 @@ class MainWindow(QMainWindow):
         self._header.salvar_perfil_solicitado.connect(self._save_profile_stub)
         self._compositor.regra_adicionada.connect(self._on_regra_adicionada)
         self._compositor.regra_removida.connect(self._on_regra_removida)
+        self._compositor.estado_alterado.connect(self._update_add_rule_state)
         self._program_list.editar_arquivo.connect(self._abrir_editor)
         self._program_list.fechar_editor_solicitado.connect(self._fechar_editor)
         self._program_list.adicionar_programas_solicitado.connect(self._open_files)
+        self._program_list.adicionar_ao_lote_solicitado.connect(self._on_adicionar_ao_lote)
         self._program_list.lst_prog.currentRowChanged.connect(self._on_program_selected)
         self._summary.publicar_solicitado.connect(self._on_aplicar)
+        self._summary.regra_excluir.connect(self._on_regra_excluir)
         self._editor_panel.closeRequested.connect(self._fechar_editor)
+        self._update_add_rule_state()
 
     # ============ presets ============
     def _load_presets(self) -> None:
@@ -206,6 +217,16 @@ class MainWindow(QMainWindow):
 
     def _on_regra_removida(self, _idx: int) -> None:
         self._refresh_summary()
+
+    def _on_regra_excluir(self, idx: int) -> None:
+        self._compositor.remove_committed(idx)
+
+    def _on_adicionar_ao_lote(self) -> None:
+        """CTA 'Adicionar edicao ao lote ->' (rodape secao 2): publica no Resumo."""
+        self._compositor.commit_to_batch()
+
+    def _update_add_rule_state(self) -> None:
+        self._program_list.set_add_enabled(self._compositor.tem_para_commitar())
 
     # ============ abrir programas ============
     def _open_folder(self) -> None:

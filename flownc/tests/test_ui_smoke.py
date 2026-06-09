@@ -65,12 +65,19 @@ def test_maestro_monta_layout(win: MainWindow) -> None:
 # ============ compositor -> summary ============
 
 
-def test_compositor_monta_edicao_e_emite(win: MainWindow) -> None:
+def test_compositor_empilha_e_publica_no_lote(win: MainWindow) -> None:
+    """Fluxo do mockup: '+ adicionar' empilha; 'Adicionar ao lote' publica."""
     capt: list = []
     win._compositor.regra_adicionada.connect(capt.append)
     win._compositor.cb_origem.setCurrentText("M08")
     win._compositor.cb_destino.setCurrentText("M07")
+    # "+ adicionar outra edicao": so empilha, ainda nao publica
     win._compositor._on_add()
+    assert win._compositor.get_regras() == []
+    assert capt == []
+    assert win._compositor.tem_para_commitar()
+    # "Adicionar edicao ao lote ->": publica no Resumo
+    win._compositor.commit_to_batch()
     regras = win._compositor.get_regras()
     assert len(regras) == 1
     assert regras[0].find == "M08"
@@ -79,16 +86,31 @@ def test_compositor_monta_edicao_e_emite(win: MainWindow) -> None:
     assert len(capt) == 1  # sinal emitido uma vez
 
 
-def test_compositor_de_vazio_nao_adiciona(win: MainWindow) -> None:
+def test_compositor_commit_inclui_rascunho(win: MainWindow) -> None:
+    """Commit sem '+ adicionar' publica a propria linha 'em edicao'."""
+    win._compositor.cb_origem.setCurrentText("G54")
+    win._compositor.cb_destino.setCurrentText("G55")
+    win._compositor.commit_to_batch()
+    regras = win._compositor.get_regras()
+    assert len(regras) == 1
+    assert regras[0].find == "G54"
+    assert regras[0].replace == "G55"
+    # apos publicar, a lista de montagem fica vazia
+    assert not win._compositor.tem_para_commitar()
+
+
+def test_compositor_de_vazio_nao_publica(win: MainWindow) -> None:
     win._compositor.cb_origem.setCurrentText("")
     win._compositor._on_add()
+    win._compositor.commit_to_batch()
     assert win._compositor.get_regras() == []
 
 
-def test_compositor_remove_edicao(win: MainWindow) -> None:
+def test_compositor_remove_regra_publicada(win: MainWindow) -> None:
     win._compositor.cb_origem.setCurrentText("G54")
-    win._compositor._on_add()
-    win._compositor._on_remove(0)
+    win._compositor.commit_to_batch()
+    assert len(win._compositor.get_regras()) == 1
+    win._compositor.remove_committed(0)
     assert win._compositor.get_regras() == []
 
 

@@ -48,7 +48,11 @@ class SummaryPanel(QWidget):
         root.setContentsMargins(12, 12, 12, 12)
 
         head = QHBoxLayout()
-        self.lbl_title = QLabel("3  Resumo")
+        head.setSpacing(8)
+        znum = QLabel("3")
+        znum.setObjectName("ZNum")
+        head.addWidget(znum)
+        self.lbl_title = QLabel("Resumo")
         self.lbl_title.setObjectName("ZTitle")
         head.addWidget(self.lbl_title)
         head.addStretch(1)
@@ -61,7 +65,7 @@ class SummaryPanel(QWidget):
         counters = QHBoxLayout()
         counters.setSpacing(8)
         self.lbl_rules_n = self._make_counter("0", "Regras")
-        self.lbl_programs_n = self._make_counter("0 programas", "Escopo")
+        self.lbl_programs_n = self._make_counter("0", "Programas")
         self.lbl_changes_n = self._make_counter("0", "Alterações")
         counters.addWidget(self.lbl_rules_n)
         counters.addWidget(self.lbl_programs_n)
@@ -71,6 +75,8 @@ class SummaryPanel(QWidget):
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
         self._cards_host = QWidget()
+        self._cards_host.setObjectName("CardsHost")
+        self._cards_host.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self._cards_layout = QVBoxLayout(self._cards_host)
         self._cards_layout.setSpacing(6)
         self._cards_layout.addStretch(1)
@@ -138,7 +144,7 @@ class SummaryPanel(QWidget):
 
         self.lbl_rules_n.setText(f"<b>{len(rules)}</b><br><span>Regras</span>")
         self.lbl_programs_n.setText(
-            f"<b>{program_count} programas</b><br><span>Escopo</span>"
+            f"<b>{program_count}</b><br><span>Programas</span>"
         )
         self.lbl_changes_n.setText(f"<b>{change_count}</b><br><span>Alterações</span>")
 

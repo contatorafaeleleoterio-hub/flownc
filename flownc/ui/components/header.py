@@ -31,15 +31,23 @@ class HeaderBar(QWidget):
         lay.setContentsMargins(16, 0, 16, 0)
         lay.setSpacing(16)
 
-        # Logo + marca
-        brand = QVBoxLayout()
-        brand.setSpacing(2)
+        # Logo (badge redondo) + marca
+        brand = QHBoxLayout()
+        brand.setSpacing(8)
+        logo_badge = QLabel("◉")
+        logo_badge.setObjectName("LogoBadge")
+        logo_badge.setFixedSize(38, 38)
+        logo_badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        brand.addWidget(logo_badge)
+        brand_text = QVBoxLayout()
+        brand_text.setSpacing(2)
         self.lbl_logo = QLabel("FlowNC")
         self.lbl_logo.setObjectName("Logo")
-        brand.addWidget(self.lbl_logo)
+        brand_text.addWidget(self.lbl_logo)
         sub = QLabel("EDITOR DE LOTES")
         sub.setObjectName("BrandSub")
-        brand.addWidget(sub)
+        brand_text.addWidget(sub)
+        brand.addLayout(brand_text)
         lay.addLayout(brand)
 
         # separador visual
@@ -48,25 +56,15 @@ class HeaderBar(QWidget):
         vline.setFixedWidth(1)
         lay.addWidget(vline)
 
-        # Perfil + Salvar perfil (esquerda, juntos)
-        profile_area = QHBoxLayout()
-        profile_area.setSpacing(8)
-
-        profile_col = QVBoxLayout()
-        profile_col.setSpacing(2)
-        lbl_perfil = QLabel("Perfil")
-        lbl_perfil.setObjectName("LabelCaps")
-        profile_col.addWidget(lbl_perfil)
+        # Seletor de maquina (pilula com nome + caret) + Salvar perfil
         self.cb_preset = QComboBox()
-        self.cb_preset.setMinimumWidth(180)
+        self.cb_preset.setMinimumWidth(200)
         self.cb_preset.currentTextChanged.connect(self._on_preset_text_changed)
-        profile_col.addWidget(self.cb_preset)
-        profile_area.addLayout(profile_col)
+        lay.addWidget(self.cb_preset)
 
         self.btn_save_profile = QPushButton("Salvar perfil")
         self.btn_save_profile.clicked.connect(self.salvar_perfil_solicitado.emit)
-        profile_area.addWidget(self.btn_save_profile)
-        lay.addLayout(profile_area)
+        lay.addWidget(self.btn_save_profile)
 
         lay.addStretch(1)
 

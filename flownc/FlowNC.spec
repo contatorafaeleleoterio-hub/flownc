@@ -5,7 +5,11 @@ a = Analysis(
     ['C:\\Users\\USUARIO\\Desktop\\Projetos\\Sistema_verificador_codigos_cnc\\flownc\\main.py'],
     pathex=['C:\\Users\\USUARIO\\Desktop\\Projetos\\Sistema_verificador_codigos_cnc\\flownc'],
     binaries=[],
-    datas=[],
+    datas=[
+        ('ui/style.qss', 'ui'),
+        ('assets/fonts', 'assets/fonts'),
+        ('data_default', 'data_default'),
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

@@ -37,8 +37,10 @@ def _install_excepthook() -> None:
 def main() -> int:
     from PySide6.QtWidgets import QApplication
 
+    from core.seed import ensure_seed
     from ui.main_window import MainWindow
 
+    ensure_seed()  # garante data/ ao lado do .exe antes de carregar biblioteca/presets
     app = QApplication(sys.argv)
     app.setApplicationName("FlowNC")
     _install_excepthook()

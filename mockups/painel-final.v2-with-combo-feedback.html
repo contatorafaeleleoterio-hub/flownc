@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowNC — Painel v2 + Code Combo com Placeholder e Seta</title>
+<!--
+  Versão atualizada do painel-final.v2.html com a feature implementada:
+  - Placeholder "Selecione o código" em cinza (#56616D) quando campos vazios
+  - Seta unicode ▾/▴ que inverte ao abrir/fechar o dropdown
+  - Comportamento identidade ao implementado na classe CodeCombo (PySide6)
+-->
+<style>
+  /* ===== FONTES IBM Plex — embutidas localmente (OFFLINE, sem CDN) ===== */
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:400;font-display:swap;src:url("assets/fonts/IBMPlexSans-Regular.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/IBMPlexSans-SemiBold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:700;font-display:swap;src:url("assets/fonts/IBMPlexSans-Bold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url("assets/fonts/IBMPlexMono-Medium.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/IBMPlexMono-SemiBold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:700;font-display:swap;src:url("assets/fonts/IBMPlexMono-Bold.ttf") format("truetype");}
+
+  :root{
+    --sp-2:2px; --sp-4:4px; --sp-8:8px; --sp-12:12px; --sp-16:16px;
+    --sp-24:24px; --sp-32:32px; --sp-40:40px; --sp-48:48px;
+
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+
+    --t-label:700 10px/1.4 var(--sans);
+    --t-caption:600 12px/1.4 var(--sans);
+    --t-ui:600 13px/1 var(--sans);
+    --t-body:400 14px/1.5 var(--sans);
+    --t-body-strong:600 14px/1.5 var(--sans);
+    --t-heading:700 15px/1.2 var(--sans);
+    --t-display:600 16px/1 var(--sans);
+    --t-mono-sm:600 12px/1.4 var(--mono);
+    --t-mono-md:600 14px/1 var(--mono);
+    --t-mono-lg:600 16px/1 var(--mono);
+    --t-mono-display:700 24px/1 var(--mono);
+
+    --color-bg-base:#F8FAFB;
+    --color-bg-subtle:#ECEFF3;
+    --color-bg-rail:#E1E6EC;
+    --color-bg-surface:#C2C9D1;
+    --color-white:#FFFFFF;
+
+    --color-text-primary:#1B2128;
+    --color-text-secondary:#56616D;
+    --color-text-tertiary:#899099;
+
+    --color-border:#CDD4DB;
+    --color-border-strong:#aeb6bf;
+
+    --color-interactive:#1F5F9E;
+    --color-interactive-hv:#2B76C0;
+    --color-interactive-bg:#E4EEF7;
+
+    --color-success:#1C8A4D;
+    --color-success-bg:#E1F1E8;
+
+    --color-warning:#A86A07;
+    --color-warning-bg:#FAEED5;
+
+    --color-danger:#BB3324;
+    --color-danger-bg:#FAE4E1;
+
+    --color-cta-start:#3A434E;
+    --color-cta-end:#232A33;
+    --color-cta-text:#F4F7FA;
+    --color-cta-text-soft:#aeb8c2;
+
+    --color-overlay:rgba(15,20,25,.55);
+    --color-code-bg:#eef1f4;
+    --color-row-deleted:#fcf2f2;
+    --color-modal-footer:#e7ebee;
+    --color-disabled-bg:#9fb3c6;
+    --color-spinner-track:#d6dee4;
+
+    --color-head-top:#D3DAE1;
+    --color-head-mid:#c3cbd3;
+    --color-head-bot:#B9C2CB;
+    --color-head-border:#a7afb8;
+
+    --radius-xs:4px; --radius-sm:8px; --radius-md:12px; --radius-pill:20px;
+
+    --h-cta:56px; --h-btn:44px; --h-ghost:32px; --h-field:44px;
+
+    --dim-screen:1340px; --dim-header:70px; --dim-gutter:48px;
+    --app-min:1180px; --app-max:1800px;
+    --col-left-min:620px; --col-right-min:420px;
+
+    --border-width:1px;
+    --focus-ring:0 0 0 3px rgba(31,95,158,.35);
+    --conflict-bar:inset 3px 0 0 var(--color-warning);
+    --metal:inset 0 1px 0 rgba(255,255,255,.85), 0 1px 2px rgba(20,28,38,.10), 0 2px 6px rgba(20,28,38,.05);
+    --shadow-screen:0 18px 50px rgba(0,0,0,.30);
+    --shadow-modal:0 20px 60px rgba(0,0,0,.40);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--color-border-strong);color:var(--color-text-primary);
+    font:var(--t-body);height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;
+    padding:var(--sp-16) var(--sp-12) var(--sp-16)}
+
+  .screen{width:clamp(var(--app-min),100%,var(--app-max));flex:1 1 0;min-height:0;background:var(--color-bg-surface);border-radius:var(--radius-md);
+    box-shadow:var(--shadow-screen);overflow:hidden;position:relative;display:flex;flex-direction:column}
+
+  .head{height:var(--dim-header);flex-shrink:0;position:relative;display:flex;align-items:center;gap:var(--sp-16);
+    padding:0 var(--sp-16);background:linear-gradient(180deg,var(--color-head-top) 0%,var(--color-head-mid) 52%,var(--color-head-bot) 100%);
+    border-bottom:var(--border-width) solid var(--color-head-border);box-shadow:inset 0 1px 0 #ffffffaa}
+  .screw{position:absolute;width:7px;height:7px;border-radius:var(--radius-pill);
+    background:radial-gradient(circle at 35% 30%,#fbfdff,#9aa3ad 70%,#6f7882);box-shadow:0 1px 1px #ffffffcc}
+  .screw.tl{top:7px;left:7px}.screw.tr{top:7px;right:7px}.screw.bl{bottom:7px;left:7px}.screw.br{bottom:7px;right:7px}
+  .brand{display:flex;align-items:center;gap:var(--sp-8)}
+  .logo{width:38px;height:38px;border-radius:var(--radius-pill);display:grid;place-items:center;color:var(--color-white);
+    font-size:18px;background:radial-gradient(circle at 35% 30%,#2f78bd,#143f63);box-shadow:var(--metal)}
+  .brand .nm{font:var(--t-heading)}
+  .brand .sub{font:var(--t-label);letter-spacing:2px;color:var(--color-text-secondary);text-transform:uppercase}
+  .vline{width:var(--border-width);height:40px;background:var(--color-border-strong)}
+  .label-caps{font:var(--t-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-secondary)}
+  .profile{display:flex;flex-direction:column;gap:var(--sp-4)}
+  .profile .ctl{height:var(--h-field);min-width:200px;display:flex;align-items:center;gap:var(--sp-8);
+    padding:0 var(--sp-12);border-radius:var(--radius-sm);background:var(--color-bg-base);box-shadow:var(--metal);cursor:pointer}
+  .profile .ctl .mname{font:var(--t-body-strong)}
+  .profile .ctl .caret{margin-left:auto;color:var(--color-text-secondary)}
+  .spacer{margin-left:auto}
+  .hbtn{height:var(--h-field);padding:0 var(--sp-16);border-radius:var(--radius-sm);border:none;
+    font:var(--t-ui);cursor:pointer;background:var(--color-bg-base);box-shadow:var(--metal);color:var(--color-text-primary)}
+  .hbtn.blue{background:var(--color-interactive);color:var(--color-white)}
+
+  .body{display:flex;gap:var(--sp-16);padding:var(--sp-16);align-items:stretch;flex:1 1 0;min-height:0;overflow:hidden}
+  .left{flex:6 1 0;min-width:var(--col-left-min);min-height:0;display:flex;flex-direction:column;gap:var(--sp-16);transition:flex-grow .35s ease}
+  .right{flex:4 1 0;min-width:var(--col-right-min);min-height:0;display:flex;flex-direction:column;transition:flex-grow .35s ease}
+  .body.editing .left{flex-grow:4}
+  .body.editing .right{flex-grow:6}
+
+  .panel{background:var(--color-bg-base);border-radius:var(--radius-md);box-shadow:var(--metal);
+    padding:var(--sp-16);display:flex;flex-direction:column}
+  .compositor{flex:0 0 auto}
+  .programas{flex:1;min-height:0}
+  .right .resumo{flex:1;min-height:0}
+
+  .ztitle{font:var(--t-caption);letter-spacing:1.4px;text-transform:uppercase;color:var(--color-text-secondary);
+    display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-16)}
+  .znum{width:20px;height:20px;border-radius:var(--radius-xs);display:grid;place-items:center;
+    background:var(--color-bg-rail);color:var(--color-text-secondary);font:var(--t-caption);box-shadow:var(--metal)}
+
+  /* ====== ① COMPOSITOR — COM PLACEHOLDER E SETA INVERTIDA ====== */
+  .comp-row{display:flex;align-items:flex-start;gap:var(--sp-16);flex-wrap:wrap}
+  .comp-field{display:flex;flex-direction:column;gap:var(--sp-8)}
+
+  /* CodeCombo: dropdown com placeholder + seta dinâmica ▾/▴ */
+  .drop{height:var(--h-field);display:flex;align-items:center;gap:var(--sp-8);padding:0 var(--sp-12);
+    border-radius:var(--radius-sm);background:var(--color-white);box-shadow:var(--metal);cursor:pointer;
+    position:relative;border:1px solid var(--color-border);transition:border-color .15s}
+  .drop:hover{border-color:var(--color-border-strong)}
+  .drop.focus{border-color:var(--color-interactive);border-width:2px;padding:0 11px}
+
+  /* Placeholder: aparece quando .drop.empty e desaparece ao ter valor */
+  .drop.empty .placeholder{display:block;color:var(--color-text-secondary);font:var(--t-mono-lg);flex:1}
+  .drop:not(.empty) .placeholder{display:none}
+
+  /* Código: oculto quando .empty, visível quando há valor */
+  .drop.empty .code{display:none}
+  .drop:not(.empty) .code{display:block;font:var(--t-mono-lg);flex:1}
+
+  /* Seta: ▾ por padrão, ▴ quando .open */
+  .drop .caret{margin-left:auto;color:var(--color-text-secondary);font-size:16px;transition:transform .15s}
+  .drop.open .caret{transform:scaleY(-1)}
+
+  .comp-field .drop{min-width:200px}
+  .comp-add{justify-content:flex-end}
+  .comp-addbtn{height:var(--h-field);padding:0 var(--sp-16);border:var(--border-width) dashed var(--color-interactive);
+    border-radius:var(--radius-sm);background:var(--color-interactive-bg);color:var(--color-interactive);
+    font:var(--t-body-strong);cursor:pointer;white-space:nowrap}
+  .comp-addbtn:hover{background:var(--color-interactive);color:var(--color-white)}
+
+  .editlist{margin-top:var(--sp-12);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    background:var(--color-white);box-shadow:var(--metal);overflow:hidden}
+  .editlist-head{font:var(--t-label);letter-spacing:1.4px;text-transform:uppercase;color:var(--color-text-secondary);
+    padding:var(--sp-8) var(--sp-12);background:var(--color-bg-subtle)}
+  #elRows{max-height:132px;overflow:auto}
+  .el-row{display:flex;align-items:center;gap:var(--sp-12);padding:var(--sp-8) var(--sp-12);
+    border-top:var(--border-width) solid var(--color-border)}
+  .el-formula{display:flex;align-items:center;gap:var(--sp-8)}
+  .el-pill{font:var(--t-mono-md);background:var(--color-white);border-radius:var(--radius-sm);
+    padding:var(--sp-2) var(--sp-8);box-shadow:var(--metal)}
+  .el-arr{color:var(--color-interactive);font-size:16px}
+  .el-row.draft{background:var(--color-interactive-bg);box-shadow:inset 3px 0 0 var(--color-interactive)}
+  .el-row.draft .el-pill{color:var(--color-text-primary)}
+  .el-right{margin-left:auto;display:flex;align-items:center;gap:var(--sp-8)}
+  .el-tag{font:var(--t-label);letter-spacing:.6px;text-transform:uppercase;color:var(--color-interactive)}
+  .el-x{margin-left:auto;cursor:pointer;color:var(--color-danger);font-weight:700;font-family:var(--sans);
+    width:22px;height:22px;display:grid;place-items:center;border-radius:var(--radius-xs)}
+  .el-x:hover{background:var(--color-danger-bg)}
+
+  /* Nota de implementação */
+  .note-impl{margin-top:var(--sp-16);padding:var(--sp-12);border-radius:var(--radius-sm);
+    background:var(--color-interactive-bg);border-left:3px solid var(--color-interactive);font:var(--t-caption);
+    color:var(--color-text-primary)}
+  .note-impl b{font:var(--t-body-strong);color:var(--color-interactive)}
+
+  @media (max-width:1440px){
+    .body{gap:var(--sp-12);padding:var(--sp-12)}
+    .left{gap:var(--sp-12)}
+    .panel{padding:var(--sp-12)}
+  }
+</style>
+</head>
+<body>
+
+<div class="screen">
+  <!-- HEADER -->
+  <div class="head">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <div class="brand"><div class="logo">◉</div><div><div class="nm">FlowNC</div><div class="sub">Editor de Lotes</div></div></div>
+    <div class="profile">
+      <div class="ctl"><div class="mname">Máquina 01</div><span class="caret">▾</span></div>
+    </div>
+    <button class="hbtn">Salvar perfil</button>
+    <span class="spacer"></span>
+    <button class="hbtn">Biblioteca de Códigos</button>
+    <button class="hbtn blue">+ Adicionar código</button>
+  </div>
+
+  <!-- BODY: 2 colunas -->
+  <div class="body" id="body">
+    <!-- ESQUERDA -->
+    <div class="left">
+      <!-- ① COMPOSITOR COM FEATURE PLACEHOLDER + SETA -->
+      <div class="panel compositor">
+        <div class="ztitle"><span class="znum">1</span> Configurações</div>
+        <div class="comp-row">
+          <!-- Código de origem: placeholder visível quando vazio -->
+          <div class="comp-field">
+            <span class="label-caps">Código de origem</span>
+            <div class="drop empty" id="srcDrop" onclick="toggleSrc()" title="Selecione um código">
+              <span class="placeholder">Selecione o código</span>
+              <span class="code" id="srcCode">M8</span>
+              <span class="caret">▾</span>
+            </div>
+          </div>
+          <!-- Trocar por: placeholder visível quando vazio -->
+          <div class="comp-field">
+            <span class="label-caps">Trocar por</span>
+            <div class="drop empty" id="dstDrop" onclick="toggleDst()" title="Selecione um código">
+              <span class="placeholder">Selecione o código</span>
+              <span class="code" id="dstCode">M08</span>
+              <span class="caret">▾</span>
+            </div>
+          </div>
+          <div class="comp-field comp-add">
+            <span class="label-caps">&nbsp;</span>
+            <button class="comp-addbtn" onclick="fillCombos()" title="Preencher combos com valores de exemplo">+ demo: preencher combos</button>
+          </div>
+        </div>
+
+        <div class="editlist" id="editlist">
+          <div class="editlist-head">Edições montadas (1)</div>
+          <div id="elRows">
+            <div class="el-row draft">
+              <span class="el-formula">
+                <span class="el-pill" id="demoSrc">—</span>
+                <span class="el-arr">→</span>
+                <span class="el-pill" id="demoDst">—</span>
+              </span>
+              <span class="el-right">
+                <span class="el-tag">em edição</span>
+                <span class="el-x" onclick="clearDraft()">✕</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="note-impl">
+          <b>✓ Implementado:</b> Placeholder "Selecione o código" aparece em cinza quando campos vazios. Seta <b>▾</b> inverte para <b>▴</b> ao abrir dropdown (clique para testar). Sem assets novos — caractere unicode nativo.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var srcOpen = false, dstOpen = false;
+
+  function toggleSrc() {
+    srcOpen = !srcOpen;
+    document.getElementById('srcDrop').classList.toggle('open', srcOpen);
+    // Simula clique: preenche com valor e fecha
+    if (srcOpen) {
+      setTimeout(() => selectSrc(), 1200);
+    }
+  }
+
+  function toggleDst() {
+    dstOpen = !dstOpen;
+    document.getElementById('dstDrop').classList.toggle('open', dstOpen);
+    if (dstOpen) {
+      setTimeout(() => selectDst(), 1200);
+    }
+  }
+
+  function selectSrc() {
+    var drop = document.getElementById('srcDrop');
+    drop.classList.remove('empty', 'open');
+    srcOpen = false;
+    updateDemo();
+  }
+
+  function selectDst() {
+    var drop = document.getElementById('dstDrop');
+    drop.classList.remove('empty', 'open');
+    dstOpen = false;
+    updateDemo();
+  }
+
+  function fillCombos() {
+    var src = document.getElementById('srcDrop');
+    var dst = document.getElementById('dstDrop');
+    src.classList.remove('empty');
+    dst.classList.remove('empty');
+    document.getElementById('srcCode').textContent = 'M8';
+    document.getElementById('dstCode').textContent = 'M08';
+    updateDemo();
+  }
+
+  function clearDraft() {
+    document.getElementById('srcDrop').classList.add('empty');
+    document.getElementById('dstDrop').classList.add('empty');
+    document.getElementById('srcCode').textContent = '';
+    document.getElementById('dstCode').textContent = '';
+    document.getElementById('demoSrc').textContent = '—';
+    document.getElementById('demoDst').textContent = '—';
+  }
+
+  function updateDemo() {
+    var src = document.getElementById('srcCode').textContent || '—';
+    var dst = document.getElementById('dstCode').textContent || '—';
+    document.getElementById('demoSrc').textContent = src;
+    document.getElementById('demoDst').textContent = dst;
+  }
+
+  // Init
+  updateDemo();
+</script>
+
+</body>
+</html>

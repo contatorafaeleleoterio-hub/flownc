@@ -63,6 +63,8 @@ class _ProgramRow(QWidget):
 
     def __init__(self, path: Path, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        self.setObjectName("ProgramRow")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.path = path
         self._editing = False
         lay = QHBoxLayout(self)
@@ -140,6 +142,7 @@ class ProgramListPanel(QWidget):
     editar_arquivo = Signal(str)
     fechar_editor_solicitado = Signal()
     adicionar_programas_solicitado = Signal()
+    adicionar_ao_lote_solicitado = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -155,11 +158,16 @@ class ProgramListPanel(QWidget):
 
         # cabecalho
         head = QHBoxLayout()
-        title = QLabel("2  Seleção de Programas")
+        head.setSpacing(8)
+        znum = QLabel("2")
+        znum.setObjectName("ZNum")
+        head.addWidget(znum)
+        title = QLabel("Seleção de Programas")
         title.setObjectName("ZTitle")
         head.addWidget(title)
         head.addStretch(1)
         self.btn_add = QPushButton("+ Adicionar programa(s)…")
+        self.btn_add.setObjectName("GhostBtn")
         self.btn_add.clicked.connect(self.adicionar_programas_solicitado.emit)
         head.addWidget(self.btn_add)
         root.addLayout(head)
@@ -188,6 +196,17 @@ class ProgramListPanel(QWidget):
         empty_lay.addWidget(btn_cta, alignment=Qt.AlignmentFlag.AlignCenter)
         root.addWidget(self.empty_state)
         self.empty_state.hide()
+
+        # CTA azul grande "Adicionar edicao ao lote ->" (rodape da secao 2)
+        self.btn_add_rule = QPushButton("Adicionar edição ao lote →")
+        self.btn_add_rule.setObjectName("AddRuleBtn")
+        self.btn_add_rule.setEnabled(False)
+        self.btn_add_rule.clicked.connect(self.adicionar_ao_lote_solicitado.emit)
+        root.addWidget(self.btn_add_rule)
+
+    def set_add_enabled(self, enabled: bool) -> None:
+        """Habilita o CTA quando ha edicoes prontas para enviar ao lote."""
+        self.btn_add_rule.setEnabled(enabled)
 
     # ---------- emissores ----------
 
