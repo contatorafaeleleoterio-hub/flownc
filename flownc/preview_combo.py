@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Teste visual: CodeCombo com placeholder + seta"""
-import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QComboBox
-from PySide6.QtCore import Qt
+"""Preview manual (não-pytest) do CodeCombo: placeholder + seta unicode.
 
-from ui.components.compositor import CodeCombo
-from core.library_store import CodeEntry
+Rode a partir da pasta flownc/:  python preview_combo.py
+"""
+import sys
+
+from PySide6.QtWidgets import QApplication, QLabel, QMainWindow, QVBoxLayout, QWidget
+
+from ui.components.code_combo import CodeCombo
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

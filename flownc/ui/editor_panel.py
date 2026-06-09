@@ -38,6 +38,7 @@ from core.inplace_save import salvar_no_lugar
 from core.library_store import CodeEntry
 from core.matcher import find_matches
 from core.models import EncodingInfo, Mode, Rule
+from ui.components.code_combo import CodeCombo
 
 _MAX_LINES_HIGHLIGHT = 5000
 
@@ -353,9 +354,7 @@ class EditorPanel(QWidget):
         self._highlighter = OccurrenceHighlighter(self.editor.document())
 
     def _make_code_combo(self) -> QComboBox:
-        cb = QComboBox()
-        cb.setEditable(True)
-        cb.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        cb = CodeCombo()
         self._fill_combo(cb)
         return cb
 

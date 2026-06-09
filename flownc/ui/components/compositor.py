@@ -17,7 +17,6 @@ from __future__ import annotations
 import uuid
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import (
     QComboBox,
     QFrame,
@@ -25,54 +24,13 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QScrollArea,
-    QStyle,
-    QStyleOptionComboBox,
     QVBoxLayout,
     QWidget,
 )
 
 from core.library_store import CodeEntry
 from core.models import Mode, Rule, Scope
-
-
-class CodeCombo(QComboBox):
-    """Combo editável: placeholder + seta unicode que inverte ao abrir."""
-
-    def __init__(self, parent: QWidget | None = None) -> None:
-        super().__init__(parent)
-        self.setObjectName("CodeCombo")
-        self.setEditable(True)
-        self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.lineEdit().setPlaceholderText("Selecione o código")
-        self._popup_open = False
-
-    def showPopup(self) -> None:
-        self._popup_open = True
-        self.update()
-        super().showPopup()
-
-    def hidePopup(self) -> None:
-        super().hidePopup()
-        self._popup_open = False
-        self.update()
-
-    def paintEvent(self, event) -> None:  # type: ignore[no-untyped-def]
-        super().paintEvent(event)
-        opt = QStyleOptionComboBox()
-        self.initStyleOption(opt)
-        rect = self.style().subControlRect(
-            QStyle.ComplexControl.CC_ComboBox, opt,
-            QStyle.SubControl.SC_ComboBoxArrow, self)
-        if rect.isValid():
-            p = QPainter(self)
-            p.setRenderHint(QPainter.RenderHint.Antialiasing)
-            p.setPen(QColor("#56616D"))
-            f = p.font()
-            f.setPixelSize(12)
-            p.setFont(f)
-            p.drawText(rect, Qt.AlignmentFlag.AlignCenter,
-                       "▴" if self._popup_open else "▾")
-            p.end()
+from ui.components.code_combo import CodeCombo
 
 
 class _EditRow(QWidget):

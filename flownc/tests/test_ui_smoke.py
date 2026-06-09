@@ -65,6 +65,17 @@ def test_maestro_monta_layout(win: MainWindow) -> None:
 # ============ compositor -> summary ============
 
 
+def test_compositor_combo_guia_e_seta(win: MainWindow) -> None:
+    """CodeCombo: texto-guia 'Selecione o código' e flag da seta que inverte."""
+    cb = win._compositor.cb_origem
+    assert cb.lineEdit().placeholderText() == "Selecione o código"
+    assert cb._popup_open is False
+    cb.showPopup()
+    assert cb._popup_open is True
+    cb.hidePopup()
+    assert cb._popup_open is False
+
+
 def test_compositor_empilha_e_publica_no_lote(win: MainWindow) -> None:
     """Fluxo do mockup: '+ adicionar' empilha; 'Adicionar ao lote' publica."""
     capt: list = []

@@ -512,6 +512,11 @@ QComboBox#CodeCombo::down-arrow {
     image: none;
 }
 
+/* sem divisória antes da seta (fidelidade ao mockup: só padding) */
+QComboBox#CodeCombo::drop-down {
+    border-left: none;
+}
+
 /* ---- Botao tracejado "+ adicionar outra edicao" ---- */
 QPushButton#CompAddBtn {
     background-color: #E4EEF7;
