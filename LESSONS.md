@@ -49,3 +49,11 @@ O mockup é 100% por tokens no `:root` ("zero cor solta"). Para aplicar a paleta
 No Q&A o Mestre escolheu "🗑 exclui / ✕ só fecha"; ao ver na tela, aprovou o **botão ✕** da lista de programas como padrão único de exclusão (nas 3 seções) — revertendo a escolha anterior. Mesmo padrão da lição da FASE 1: a aprovação **no componente em tela** vence a decisão no papel.
 - **Regra prática:** quando uma decisão é superada, **atualizar o documento fonte da verdade na hora** (anotar "substitui X") para o próximo agente não reabrir. Aqui: `docs/CORRECOES_MOCKUP.md` item 5 + seção de decisões.
 - **Polimento ≠ redesign:** o que mais transmite "fofo/infantil" é o **arredondamento excessivo (pílulas)**, o **brilho glossy** e **emojis coloridos decorativos** — reduzir esses três (raios menores, sombras sóbrias, glifos neutros) profissionaliza sem tocar em layout/fluxo/contraste.
+
+## 2026-06-10 (sessão 10) — Protótipo precisa REAGIR: estado vivo + feedback, não só telas
+Após implementar os 17 itens, o Mestre revisou clicando e cobrou comportamento, não aparência: "ao selecionar, tem que tomar cor e os números subirem". Lições da rodada de revisão:
+- **Contadores/estados orientados a dados e ao vivo:** marcar um programa deve mudar cor da linha + "Programas"/"Alterações"/escopo dos cards + nota "X de Y marcados" + travar "Executar" se 0 marcados. Guardar valor fixo no card (`prog` no add) quebra isso — calcular ao vivo (`selectedCount()` no `renderSummary`).
+- **Alvo de clique generoso:** selecionar pela **linha inteira** (delegação no `#files`), não só no quadradinho. Quadrado desmarcado **precisa de borda** (branco sobre card branco some).
+- **Feedback visível (toast)** em cada ação simulada — o Mestre não-técnico precisa ver que "funcionou".
+- **Não deixar clique morto:** todo botão faz algo (Biblioteca de Códigos não abria nada; "+ Adicionar programa(s)" só com lista vazia). Modal: abrir limpo+focado, fechar por ✕/Esc/fundo, anti-duplicado.
+- **Agrupar por tema, sem redundância:** controles de "configuração" (seletor ativo + salvar + adicionar código) moram no **bloco Configurações**, não no header; seletor ao lado do título dispensa rótulo "Config." repetido. Rótulo solto em cima de **um só** controle numa fileira desalinha.

@@ -208,11 +208,6 @@
   .brand .sub{font:var(--t-label);letter-spacing:2px;color:var(--color-text-tertiary);text-transform:uppercase}
   .vline{width:var(--border-width);height:40px;background:var(--color-border-strong)}
   .label-caps{font:var(--t-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-secondary)}
-  .profile{display:flex;flex-direction:column;gap:var(--sp-4)}
-  .profile .ctl{height:var(--h-field);min-width:200px;display:flex;align-items:center;gap:var(--sp-8);
-    padding:0 var(--sp-12);border-radius:var(--radius-sm);background:var(--color-bg-base);box-shadow:var(--metal);cursor:pointer}
-  .profile .ctl .mname{font:var(--t-body-strong)}
-  .profile .ctl .caret{margin-left:auto;color:var(--color-text-secondary)}
   .spacer{margin-left:auto}
   .hbtn{height:var(--h-field);padding:0 var(--sp-16);border-radius:var(--radius-sm);border:none;
     font:var(--t-ui);cursor:pointer;background:var(--color-bg-base);box-shadow:var(--metal);color:var(--color-text-primary)}
@@ -242,10 +237,16 @@
     display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-16)}
   .znum{width:20px;height:20px;border-radius:var(--radius-xs);display:grid;place-items:center;
     background:var(--color-bg-rail);color:var(--color-text-secondary);font:var(--t-caption);box-shadow:var(--metal)}
-  /* Passo 4: cabeçalho da Seção 1 com o botão "+ Adicionar código" à direita */
-  .c1head{display:flex;align-items:center;gap:var(--sp-12);margin-bottom:var(--sp-16)}
+  /* Passo 4/13: cabeçalho da Seção 1 com a barra de ferramentas do bloco (config + salvar + add código) */
+  .c1head{display:flex;align-items:center;gap:var(--sp-12);margin-bottom:var(--sp-16);flex-wrap:wrap}
   .c1head .ztitle{margin:0}
-  .c1head .ghost{margin-left:auto}
+  .c1tools{margin-left:auto;display:flex;align-items:center;gap:var(--sp-8);flex-wrap:wrap}
+  .cfgsel{position:relative;height:var(--h-ghost);display:flex;align-items:center;gap:var(--sp-8);padding:0 var(--sp-12);
+    border-radius:var(--radius-sm);background:var(--color-white);box-shadow:var(--metal);cursor:pointer;
+    border:var(--border-width) solid var(--color-border)}
+  .cfgsel:hover{background:var(--color-interactive-bg)}
+  .cfgsel .mname{font:var(--t-ui);color:var(--color-text-primary)}
+  .cfgsel .caret{color:var(--color-text-secondary)}
   /* Passo 6: anel de foco único em todos os botões das Seções 1/2/3 (acessibilidade consistente) */
   .ghost:focus-visible,.editbtn:focus-visible,.filex:focus-visible,.el-x:focus-visible,
   .racts span:focus-visible,.addrule:focus-visible,.iconbtn:focus-visible,.btn-soft:focus-visible,
@@ -275,6 +276,9 @@
     border-radius:var(--radius-sm);background:var(--color-interactive-bg);color:var(--color-interactive);
     font:var(--t-body-strong);cursor:pointer;white-space:nowrap}
   .comp-addbtn:hover{background:var(--color-interactive);color:var(--color-white)}
+  .comp-addbtn:disabled{border-color:var(--color-border);background:var(--color-disabled-bg);
+    color:var(--color-text-tertiary);cursor:not-allowed}
+  .comp-addbtn:disabled:hover{background:var(--color-disabled-bg);color:var(--color-text-tertiary)}
   /* ② edições montadas — lista única empilhada (substitui "Configuração montada" + a antiga fila) */
   .editlist{margin-top:var(--sp-12);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
     background:var(--color-white);box-shadow:var(--metal);overflow:hidden}
@@ -319,12 +323,16 @@
     padding:var(--sp-4) calc(var(--sp-12) + 6px) var(--sp-4) var(--sp-12);margin-bottom:var(--sp-8);
     font:var(--t-label);letter-spacing:.6px;text-transform:uppercase;color:var(--color-text-tertiary);
     border-bottom:var(--border-width) solid var(--color-border)}
-  .file{display:grid;grid-template-columns:var(--file-cols);align-items:center;gap:var(--sp-12);height:50px;
+  .file{display:grid;grid-template-columns:var(--file-cols);align-items:center;gap:var(--sp-12);height:50px;cursor:pointer;
     background:var(--color-bg-subtle);border-radius:var(--radius-sm);padding:0 var(--sp-12);box-shadow:var(--metal)}
   .file.off{opacity:.72}
+  /* Passo 7: programa SELECIONADO toma cor (verde) — eco do ✓; clicar a linha alterna */
+  .file:not(.off){background:var(--color-success-bg);box-shadow:inset 3px 0 0 var(--color-success), var(--metal)}
+  .file:hover{outline:var(--border-width) solid var(--color-border-strong);outline-offset:-1px}
   .chk{width:20px;height:20px;border-radius:var(--radius-xs);flex-shrink:0;display:grid;place-items:center;cursor:pointer;
     background:var(--color-success);color:var(--color-white);font:var(--t-caption);font-weight:700;box-shadow:var(--metal)}
-  .chk.off{background:var(--color-white);color:transparent}
+  .chk.off{background:var(--color-white);color:transparent;border:var(--border-width) solid var(--color-border-strong)}
+  .chk.off:hover{border-color:var(--color-interactive);background:var(--color-interactive-bg)}
   .fname{font:var(--t-mono-md);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   /* colunas de metadados (Data | Tipo | Tamanho) — alinhadas sob o cabeçalho */
   .fcol{font:var(--t-caption);color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -332,6 +340,11 @@
     border:none;border-radius:var(--radius-sm);background:var(--color-interactive-bg);color:var(--color-interactive);
     font:var(--t-caption);cursor:pointer;box-shadow:var(--metal);white-space:nowrap}
   .editbtn:hover{background:var(--color-interactive);color:var(--color-white)}
+  /* linha em edição: o "Editar" vira "Voltar" (preenchido) e a linha ganha realce à esquerda */
+  .editbtn.is-editing{background:var(--color-interactive);color:var(--color-white)}
+  .editbtn.is-editing:hover{background:var(--color-interactive-hv)}
+  .file.editing-row{box-shadow:inset 3px 0 0 var(--color-interactive), var(--metal)}
+  .file.editing-row.off{opacity:1}
   /* ✕ remover programa da lista (seção 2) */
   .filex{width:var(--h-ghost);height:var(--h-ghost);flex-shrink:0;border:none;border-radius:var(--radius-sm);
     background:var(--color-bg-rail);color:var(--color-danger);font:var(--t-ui);font-weight:700;cursor:pointer;box-shadow:var(--metal)}
@@ -540,6 +553,7 @@
   .libdrop.big .libdrop-btn{height:var(--h-field);min-width:200px;width:100%}
   .libdrop.big .libdrop-btn .code{font:var(--t-mono-lg)}
   .libdrop-btn.is-empty .code{font:var(--t-body);color:var(--color-text-tertiary)}
+  .libdrop-btn.is-remove .code{color:var(--color-danger);font:var(--t-body-strong)}
   .libdrop .libdrop-btn .caret{transition:transform .15s ease}
   .libdrop.open .libdrop-btn .caret{transform:rotate(180deg)}
   .libdrop.big .libdrop-pop{width:100%;min-width:240px;top:calc(var(--h-field) + var(--sp-4))}
@@ -557,12 +571,11 @@
   .rules-empty .re-ic{font-size:30px}
   .rules-empty .re-t1{font:var(--t-body-strong);color:var(--color-text-primary)}
   .rules-empty .re-t2{font:var(--t-caption);color:var(--color-text-tertiary);max-width:320px}
-  /* Passo 13: menu de configurações salvas no header */
-  .profile .ctl{position:relative}
+  /* Passo 13: menu de configurações salvas (no bloco Configurações) */
   .cfgmenu{display:none;position:absolute;top:calc(100% + var(--sp-4));left:0;z-index:50;min-width:220px;
     background:var(--color-white);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
     box-shadow:var(--shadow-modal);padding:var(--sp-8);flex-direction:column;gap:var(--sp-2)}
-  .profile .ctl.open .cfgmenu{display:flex}
+  .cfgsel.open .cfgmenu{display:flex}
   .cfgitem{text-align:left;border:none;background:transparent;border-radius:var(--radius-xs);padding:var(--sp-8);
     font:var(--t-body);color:var(--color-text-primary);cursor:pointer}
   .cfgitem:hover{background:var(--color-interactive-bg)}
@@ -591,6 +604,27 @@
   .ins-chip:hover{background:var(--color-interactive-bg)}
   .ins-chip.empty{color:var(--color-text-tertiary);cursor:default}
 
+  /* Revisão: aviso flutuante (toast) de feedback */
+  .toast{position:absolute;left:50%;bottom:var(--sp-24);transform:translateX(-50%) translateY(8px);
+    background:var(--color-interactive);color:var(--color-white);padding:var(--sp-8) var(--sp-16);border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-modal);font:var(--t-body-strong);opacity:0;pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;z-index:60;max-width:80%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.ok{background:var(--color-success)}
+  .toast.warn{background:var(--color-warning)}
+  /* Revisão: janela "Biblioteca de Códigos" (lista + busca + remover) */
+  .lib-head{display:flex;gap:var(--sp-8);align-items:center;margin-bottom:var(--sp-8)}
+  .lib-head .ac-input{flex:1}
+  .lib-count{font:var(--t-caption);color:var(--color-text-tertiary);margin-bottom:var(--sp-8)}
+  .lib-list{max-height:340px;overflow:auto;border:var(--border-width) solid var(--color-border);
+    border-radius:var(--radius-sm);background:var(--color-white)}
+  .lib-row{display:flex;align-items:center;gap:var(--sp-12);padding:var(--sp-8) var(--sp-12);
+    border-bottom:var(--border-width) solid var(--color-bg-subtle)}
+  .lib-row:last-child{border-bottom:none}
+  .lib-row .code{font:var(--t-mono-md);min-width:72px}
+  .lib-row .desc{font:var(--t-body);color:var(--color-text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lib-row.empty{justify-content:center;color:var(--color-text-tertiary)}
+
   /* ===== RESPONSIVIDADE — 3 faixas (ver docs/RESPONSIVIDADE.md) ===== */
   /* Compacto (≤1440px): paddings/gaps menores p/ ganhar área útil; colunas no mínimo confortável. */
   @media (max-width:1440px){
@@ -611,15 +645,8 @@
   <div class="head">
     <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
     <div class="brand"><div class="logo">◉</div><div><div class="nm">FlowNC</div><div class="sub">Editor de Lotes</div></div></div>
-    <div class="profile">
-      <span class="label-caps">Configurações salvas</span>
-      <div class="ctl" id="cfgCtl" onclick="toggleCfg(event)"><div class="mname" id="cfgName">Máquina 01</div><span class="caret">▾</span>
-        <div class="cfgmenu" id="cfgMenu"></div>
-      </div>
-    </div>
-    <button class="hbtn" onclick="show('ovSaveConfig')">Salvar configuração</button>
     <span class="spacer"></span>
-    <button class="hbtn">Biblioteca de Códigos</button>
+    <button class="hbtn" onclick="openLibrary()">Biblioteca de Códigos</button>
   </div>
 
   <!-- BODY: 2 colunas dinâmicas -->
@@ -630,7 +657,14 @@
       <div class="panel compositor">
         <div class="c1head">
           <div class="ztitle"><span class="znum">1</span> Configurações</div>
-          <button class="ghost" onclick="show('ovAddCode')" title="Cadastrar um novo código na biblioteca">+ Adicionar código</button>
+          <div class="cfgsel" id="cfgCtl" onclick="toggleCfg(event)" title="Configuração ativa — clique para trocar ou criar uma nova">
+            <div class="mname" id="cfgName">Máquina 01</div><span class="caret">▾</span>
+            <div class="cfgmenu" id="cfgMenu"></div>
+          </div>
+          <div class="c1tools">
+            <button class="ghost" onclick="openSaveConfig()" title="Salvar a configuração atual (edições + preferências)">Salvar configuração</button>
+            <button class="ghost" onclick="openAddCode()" title="Cadastrar um novo código na biblioteca">+ Adicionar código</button>
+          </div>
         </div>
         <div class="comp-row">
           <div class="comp-field"><span class="label-caps">Código de origem</span>
@@ -893,6 +927,23 @@
     </div>
     <div class="mf"><button class="mbtn ghost" onclick="hide('ovInsert')">Cancelar</button><button class="mbtn save" onclick="insConfirm()">Inserir bloco</button></div>
   </div></div>
+
+  <!-- Revisão: Biblioteca de Códigos (lista + busca + remover) -->
+  <div class="overlay" id="ovLibrary"><div class="modal res">
+    <div class="mh">Biblioteca de Códigos <span class="x" onclick="hide('ovLibrary')">✕</span></div>
+    <div class="mb">
+      <div class="lib-head">
+        <input class="ac-input" id="libSearch" placeholder="Procurar código ou descrição…" oninput="renderLibrary()">
+        <button class="btn-soft" onclick="openAddCode()">+ Adicionar código</button>
+      </div>
+      <div class="lib-count" id="libCount"></div>
+      <div class="lib-list" id="libList"></div>
+    </div>
+    <div class="mf"><button class="mbtn save" onclick="hide('ovLibrary')">Fechar</button></div>
+  </div></div>
+
+  <!-- Revisão: aviso flutuante de feedback -->
+  <div class="toast" id="toast"></div>
 </div>
 
 <script>
@@ -917,7 +968,18 @@
     else{ btn.classList.remove('is-empty'); code.textContent=val; btn.title=desc||''; }
   }
   function setSrc(code,desc){ srcVal=code||''; srcDesc=desc||libDesc(code); paintPick('pickSrc',srcVal,srcDesc,'Selecione o código'); updateAddBtn(); }
-  function setDst(code,desc){ dstVal=code||''; dstDesc=desc||libDesc(code); paintPick('pickDst',dstVal,dstDesc,'Selecione · vazio = remover'); }
+  var dstIsRemove=false;
+  function setDst(code,desc,isRemove){
+    dstVal=code||''; dstDesc=desc||libDesc(code); dstIsRemove=(!!isRemove && dstVal==='');
+    var dd=document.getElementById('pickDst'); if(!dd) return;
+    dd.dataset.val=dstVal;
+    var btn=dd.querySelector('.libdrop-btn'), cd=btn.querySelector('.code');
+    btn.classList.remove('is-empty','is-remove');
+    if(dstVal===''){
+      if(dstIsRemove){ btn.classList.add('is-remove'); cd.textContent='✕ remover'; btn.title='Remove o código nos programas selecionados'; }
+      else{ btn.classList.add('is-empty'); cd.textContent='Selecione · vazio = remover'; btn.title=''; }
+    } else { cd.textContent=dstVal; btn.title=dstDesc||''; }
+  }
   function updateAddBtn(){ var b=document.getElementById('addEditBtn'); if(b){ b.disabled=!srcVal; b.title=srcVal?'Adicionar esta edição à lista':'Escolha a origem para habilitar'; } }
   function clearComposer(){ setSrc('',''); setDst('',''); }
   function fmtFormula(e){
@@ -952,24 +1014,34 @@
     if(typeof addRuleBtn!=='undefined') addRuleBtn.disabled=(n===0);
   }
   /* Passo 4/17: cadastrar código (e, opcional, um bloco multi-linha) — simulado */
+  function openAddCode(){
+    document.getElementById('acCode').value=''; document.getElementById('acDesc').value=''; document.getElementById('acBlock').value='';
+    show('ovAddCode'); setTimeout(function(){ document.getElementById('acCode').focus(); },50);
+  }
   function addCodeConfirm(){
     var c=document.getElementById('acCode').value.trim();
     var d=document.getElementById('acDesc').value.trim();
     var blk=document.getElementById('acBlock').value.replace(/\s+$/,'');
     if(!c){ document.getElementById('acCode').focus(); return; }
+    if(LIB.some(function(x){ return x[0].toLowerCase()===c.toLowerCase(); })){
+      toast('“'+c+'” já existe na biblioteca','warn'); document.getElementById('acCode').focus(); return;
+    }
     LIB.unshift([c, d||'(sem descrição)']);
     if(blk) BLOCKS.unshift({name:c, desc:d||c, text:blk});
     buildLibLists();
+    if(document.getElementById('ovLibrary').classList.contains('show')) renderLibrary();
     document.getElementById('acCode').value=''; document.getElementById('acDesc').value=''; document.getElementById('acBlock').value='';
     hide('ovAddCode');
+    toast('Código “'+c+'” adicionado'+(blk?' (com bloco)':''),'ok');
   }
   /* "Adicionar edição ao lote" — envia as edições montadas ao Resumo (Passos 12/14) */
   function addRule(){
     if(!pendingEdits.length) return;
-    var nProg=selectedCount();
-    pendingEdits.forEach(function(e){ summaryCards.push({code:e.code,dst:e.dst,prog:nProg}); });
+    var n=pendingEdits.length;
+    pendingEdits.forEach(function(e){ summaryCards.push({code:e.code,dst:e.dst}); });
     pendingEdits=[]; renderEditList();
     renderSummary();
+    toast(n+' edição'+(n>1?'ões':'')+' adicionada'+(n>1?'s':'')+' ao lote','ok');
   }
 
   /* ============ ③ RESUMO — orientado a dados (Passos 12/14) ============ */
@@ -984,8 +1056,9 @@
     var origin={}; summaryCards.forEach(function(c){ origin[c.code]=(origin[c.code]||0)+1; });
     var conflict={}; summaryCards.forEach(function(c){ if(origin[c.code]>1) conflict[c.code]=true; });
     var nRules=summaryCards.length, nProg=selectedCount();
-    var nChg=summaryCards.reduce(function(a,c){ return a+(c.prog||0); },0);
+    var nChg=nRules*nProg;                 /* cada edição vale para cada programa marcado */
     setCounters(nRules,nProg,nChg);
+    updateMatch();                          /* nota "X de Y programas marcados" reage à seleção */
     var chip=document.getElementById('chipState'), seal=document.getElementById('sealBig'), cta=document.getElementById('ctaBtn');
     if(!nRules){
       rules.innerHTML='<div class="rules-empty"><div class="re-ic">📋</div>'
@@ -996,8 +1069,9 @@
     var nConf=summaryCards.filter(function(c){ return conflict[c.code]; }).length;
     chip.classList.remove('gone');
     if(nConf){ chip.className='chip-state warn'; chip.textContent='⚠ '+nConf+' conflito'+(nConf>1?'s':''); }
+    else if(nProg===0){ chip.className='chip-state warn'; chip.textContent='⚠ selecione programas'; }
     else{ chip.className='chip-state ok'; chip.textContent='✓ Pronto'; }
-    seal.classList.remove('gone'); cta.disabled=false;
+    seal.classList.remove('gone'); cta.disabled=(nProg===0);
     rules.innerHTML=summaryCards.map(function(c,i){
       var idx=('0'+(i+1)).slice(-2), warn=conflict[c.code];
       var formula = c.dst==='' ? esc(c.code)+' → (remover)' : esc(c.code)+' → '+esc(c.dst);
@@ -1006,16 +1080,23 @@
       return '<div class="rcard'+(warn?' is-warn':'')+'">'
         +'<div class="rc-row"><span class="ridx">'+idx+'</span>'
         +'<span class="rformula"><span class="a">'+formula+'</span></span>'
-        +'<span class="rscope">'+(c.prog?c.prog+' programas':'nenhum sel.')+'</span>'+chipv
+        +'<span class="rscope">'+(nProg?nProg+' programa'+(nProg>1?'s':''):'nenhum selecionado')+'</span>'+chipv
         +'<span class="racts"><span title="Editar" onclick="editCard('+i+')">✎</span>'
         +'<span title="Duplicar" onclick="dupCard('+i+')">⧉</span>'
         +'<span class="del" title="Remover" onclick="delCard('+i+')">✕</span></span></div>'+conf+'</div>';
     }).join('');
     if(rules.lastElementChild) rules.lastElementChild.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
-  function delCard(i){ summaryCards.splice(i,1); renderSummary(); }
-  function dupCard(i){ var c=summaryCards[i]; summaryCards.splice(i+1,0,{code:c.code,dst:c.dst,prog:c.prog}); renderSummary(); }
-  function editCard(i){ var c=summaryCards[i]; setSrc(c.code,libDesc(c.code)); setDst(c.dst,libDesc(c.dst)); summaryCards.splice(i,1); renderSummary(); }
+  function delCard(i){ summaryCards.splice(i,1); renderSummary(); toast('Edição removida do lote','warn'); }
+  function dupCard(i){ var c=summaryCards[i]; summaryCards.splice(i+1,0,{code:c.code,dst:c.dst}); renderSummary(); toast('Edição duplicada','ok'); }
+  function editCard(i){ var c=summaryCards[i]; setSrc(c.code,libDesc(c.code)); setDst(c.dst,libDesc(c.dst),c.dst===''); summaryCards.splice(i,1); renderSummary(); }
+  /* nota da Seção 2: "X de Y programas marcados" — reflete a seleção atual */
+  function updateMatch(){
+    var m=document.getElementById('matchTxt'); if(!m) return;
+    var total=document.querySelectorAll('#files .file').length, sel=selectedCount();
+    m.textContent = total ? (sel+' de '+total+' programa'+(total>1?'s':'')+' marcado'+(sel===1?'':'s'))
+                          : 'Nenhum programa carregado.';
+  }
 
   /* ============ Passo 13: configurações salvas (header) ============ */
   var savedConfigs=['Máquina 01','Máquina 02'], activeConfig='Máquina 01';
@@ -1027,19 +1108,49 @@
   }
   function toggleCfg(ev){ if(ev) ev.stopPropagation(); document.getElementById('cfgCtl').classList.toggle('open'); }
   function closeCfg(){ var c=document.getElementById('cfgCtl'); if(c) c.classList.remove('open'); }
-  function pickConfig(ev,n){ ev.stopPropagation(); activeConfig=n; document.getElementById('cfgName').textContent=n; renderCfgMenu(); closeCfg(); }
-  function newConfig(ev){ ev.stopPropagation(); closeCfg(); show('ovSaveConfig'); }
+  function pickConfig(ev,n){ ev.stopPropagation(); activeConfig=n; document.getElementById('cfgName').textContent=n; renderCfgMenu(); closeCfg(); toast('Configuração “'+n+'” carregada',''); }
+  function newConfig(ev){ ev.stopPropagation(); closeCfg(); openSaveConfig(); }
+  function openSaveConfig(){ document.getElementById('cfgInput').value=''; show('ovSaveConfig'); setTimeout(function(){ document.getElementById('cfgInput').focus(); },50); }
   function saveConfigConfirm(){
     var n=document.getElementById('cfgInput').value.trim(); if(!n){ document.getElementById('cfgInput').focus(); return; }
     if(savedConfigs.indexOf(n)<0) savedConfigs.push(n);
     activeConfig=n; document.getElementById('cfgName').textContent=n; renderCfgMenu();
     document.getElementById('cfgInput').value=''; hide('ovSaveConfig');
+    toast('Configuração “'+n+'” salva','ok');
+  }
+
+  /* ============ Revisão: aviso flutuante (toast) ============ */
+  var _toastT=null;
+  function toast(msg,kind){
+    var t=document.getElementById('toast'); if(!t) return;
+    t.textContent=msg; t.className='toast '+(kind||'')+' show';
+    if(_toastT) clearTimeout(_toastT);
+    _toastT=setTimeout(function(){ t.classList.remove('show'); },1900);
+  }
+
+  /* ============ Revisão: janela Biblioteca de Códigos ============ */
+  function openLibrary(){ document.getElementById('libSearch').value=''; renderLibrary(); show('ovLibrary'); }
+  function renderLibrary(){
+    var q=(document.getElementById('libSearch').value||'').toLowerCase();
+    var items=LIB.filter(function(c){ return c[0].toLowerCase().indexOf(q)>=0 || c[1].toLowerCase().indexOf(q)>=0; });
+    document.getElementById('libCount').textContent=LIB.length+' código'+(LIB.length===1?'':'s')+' cadastrado'+(LIB.length===1?'':'s')
+      +(q?(' · '+items.length+' no filtro'):'');
+    var box=document.getElementById('libList');
+    box.innerHTML = items.length ? items.map(function(c){
+      var code=esc(c[0]);
+      return '<div class="lib-row"><span class="code">'+code+'</span><span class="desc">'+esc(c[1])+'</span>'
+        +'<button class="filex" onclick="removeLibCode(\''+code.replace(/'/g,"\\'")+'\')" title="Remover da biblioteca">✕</button></div>';
+    }).join('') : '<div class="lib-row empty">Nenhum código encontrado.</div>';
+  }
+  function removeLibCode(code){
+    for(var i=0;i<LIB.length;i++){ if(LIB[i][0]===code){ LIB.splice(i,1); break; } }
+    buildLibLists(); renderLibrary(); toast('“'+code+'” removido da biblioteca','warn');
   }
 
   /* ============ Passo 16: pasta de backup (lembrada/fixa, trocável) ============ */
   var backupFolders=['D:\\CNC\\backup\\','E:\\backups\\cnc\\','\\\\servidor\\cnc\\backup\\'];
   var bki=0, backupFolder=backupFolders[0];
-  function changeBackup(){ bki=(bki+1)%backupFolders.length; backupFolder=backupFolders[bki]; reflectBackup(); }
+  function changeBackup(){ bki=(bki+1)%backupFolders.length; backupFolder=backupFolders[bki]; reflectBackup(); toast('Pasta de backup: '+backupFolder,''); }
   function reflectBackup(){
     ['cfgBackup','resBackup'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=backupFolder; });
     var s=document.getElementById('sealPath'); if(s) s.textContent='Backup: '+backupFolder;
@@ -1048,10 +1159,11 @@
   /* ============ Resumo do lote (modal ovRes) — montado a partir dos dados ============ */
   function renderRes(){
     var rows=document.getElementById('resRows');
+    var nProg=selectedCount();
     var origin={}; summaryCards.forEach(function(c){ origin[c.code]=(origin[c.code]||0)+1; });
     var html=summaryCards.map(function(c){
-      if(c.dst==='') return '<div class="resrow"><span class="badge warn">remover</span> <code>'+esc(c.code)+'</code> → <b>removido</b> · '+(c.prog||0)+' programas</div>';
-      return '<div class="resrow"><span class="badge sub">substituir</span> <code>'+esc(c.code)+'</code> → <code>'+esc(c.dst)+'</code> · '+(c.prog||0)+' programas</div>';
+      if(c.dst==='') return '<div class="resrow"><span class="badge warn">remover</span> <code>'+esc(c.code)+'</code> → <b>removido</b> · '+nProg+' programas</div>';
+      return '<div class="resrow"><span class="badge sub">substituir</span> <code>'+esc(c.code)+'</code> → <code>'+esc(c.dst)+'</code> · '+nProg+' programas</div>';
     }).join('');
     Object.keys(origin).filter(function(k){ return origin[k]>1; }).forEach(function(k){
       html+='<div class="resrow"><span class="badge warn">⚠ conflito</span> <code>'+esc(k)+'</code> alterado por mais de uma edição — revise antes de publicar</div>';
@@ -1106,6 +1218,7 @@
     var info=insComputeLines(), lines=info.lines, at=info.at;
     edInput.value=lines.slice(0,at).concat(blk.split('\n')).concat(lines.slice(at)).join('\n');
     markDirty(); renderPlain(); resetCount(); hide('ovInsert');
+    toast('Bloco inserido no editor','ok');
   }
 
   /* ============ ② PROGRAMAS — adicionar / arrastar-soltar / estado vazio ============ */
@@ -1133,19 +1246,34 @@
     }
   }
   /* placeholder: insere exemplos p/ demonstrar que o estado vazio some ao entrar o 1º programa */
+  var newFileSeq=0;
+  function fileRow(name,size){
+    return '<div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span>'
+      +'<span class="fname">'+esc(name)+'</span><span class="fcol">agora</span><span class="fcol">NC</span><span class="fcol">'+size+'</span>'
+      +'<button class="editbtn" onclick="openEditor(\''+esc(name)+'\')">✎ Editar</button>'
+      +'<button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>';
+  }
   function pickFiles(){
     var f=document.getElementById('files');
+    var head=document.getElementById('filesHead'); if(head) head.style.display='';   /* Passo 8: garante o cabeçalho */
     if(f.querySelector('.files-empty')){
-      var head=document.getElementById('filesHead'); if(head) head.style.display='';   /* Passo 8: volta o cabeçalho */
-      f.innerHTML='<div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O2001_NOVO_A.NC</span><span class="fcol">agora</span><span class="fcol">NC</span><span class="fcol">6,4 KB</span><button class="editbtn" onclick="openEditor(\'O2001_NOVO_A.NC\')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>'
-        +'<div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O2002_NOVO_B.NC</span><span class="fcol">agora</span><span class="fcol">NC</span><span class="fcol">4,1 KB</span><button class="editbtn" onclick="openEditor(\'O2002_NOVO_B.NC\')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>';
+      newFileSeq=2;
+      f.innerHTML=fileRow('O2001_NOVO_A.NC','6,4 KB')+fileRow('O2002_NOVO_B.NC','4,1 KB');
+      toast('2 programas adicionados','ok');
+    } else {
+      newFileSeq++;
+      var nm='O20'+('0'+newFileSeq).slice(-2)+'_NOVO.NC';
+      f.insertAdjacentHTML('beforeend', fileRow(nm,(3+newFileSeq)+',0 KB'));
+      toast('Programa adicionado: '+nm,'ok');
     }
+    syncEditButtons(); if(typeof renderSummary==='function') renderSummary();
   }
   /* remove um programa da lista (seção 2); se esvaziar, mostra o estado vazio */
   function removeFile(btn){
     var row=btn.closest('.file'); if(row) row.remove();
     var f=document.getElementById('files');
     if(!f.querySelector('.file')) filesEmptyState(true);
+    syncEditButtons();
     if(typeof renderSummary==='function') renderSummary();
   }
   function fzOver(e){ e.preventDefault(); document.getElementById('files').classList.add('is-dragover'); }
@@ -1156,6 +1284,7 @@
   var running=false;
   function execLote(){
     if(running || !summaryCards.length) return;
+    if(selectedCount()===0){ toast('Marque ao menos 1 programa para executar','warn'); return; }
     running=true;
     var cta=document.getElementById('ctaBtn'); cta.disabled=true; cta.querySelector('.big').textContent='Processando…';
     renderRes();
@@ -1172,7 +1301,7 @@
   }
   function endRun(){
     running=false;
-    var cta=document.getElementById('ctaBtn'); cta.querySelector('.big').textContent='Executar Lote'; cta.disabled=(summaryCards.length===0);
+    var cta=document.getElementById('ctaBtn'); cta.querySelector('.big').textContent='Executar Lote'; cta.disabled=(summaryCards.length===0 || selectedCount()===0);
   }
   function runSave(){
     hide('ovRes'); show('ovSave'); saveH.textContent='Publicando…';
@@ -1223,15 +1352,31 @@
     document.getElementById('body').classList.add('editing');
     updateSaveBtn();
     edInput.scrollTop=0; syncScroll();
+    syncEditButtons();
   }
   function closeEditor(){
     if(dirty && currentFile){ pendingTarget='__summary__'; switchFrom.textContent=currentFile; show('ovSwitch'); return; }
     document.getElementById('body').classList.remove('editing'); stepEnd();
+    syncEditButtons();
+  }
+  /* na lista de programas, o botão "✎ Editar" do arquivo aberto vira "✕ Voltar" (fecha o editor) */
+  function syncEditButtons(){
+    var editing=document.getElementById('body').classList.contains('editing');
+    document.querySelectorAll('#files .file').forEach(function(row){
+      var btn=row.querySelector('.editbtn'); if(!btn) return;
+      var fn=row.querySelector('.fname'), name=fn?fn.textContent:'';
+      var isOpen = editing && name===currentFile;
+      row.classList.toggle('editing-row', isOpen);
+      if(isOpen){ btn.textContent='✕ Voltar'; btn.classList.add('is-editing'); btn.title='Fechar o editor e voltar ao resumo';
+        btn.onclick=function(){ closeEditor(); }; }
+      else{ btn.textContent='✎ Editar'; btn.classList.remove('is-editing'); btn.title='Editar este programa';
+        btn.onclick=function(){ openEditor(name); }; }
+    });
   }
   /* fluxo do pop-up "salvar antes de trocar?" */
   function applyPending(){
     var t=pendingTarget; pendingTarget=null; hide('ovSwitch');
-    if(t==='__summary__'){ document.getElementById('body').classList.remove('editing'); stepEnd(); }
+    if(t==='__summary__'){ document.getElementById('body').classList.remove('editing'); stepEnd(); syncEditButtons(); }
     else if(t){ loadFile(t); }
   }
   function cancelSwitch(){ pendingTarget=null; hide('ovSwitch'); }
@@ -1383,7 +1528,7 @@
   function pickLib(item){
     var dd=item.closest('.libdrop'), code=item.dataset.code, role=dd.dataset.role, desc=item.getAttribute('title')||'';
     if(role==='src'){ setSrc(code,desc); }
-    else if(role==='dst'){ setDst(code,desc); }
+    else if(role==='dst'){ setDst(code,desc,code===''); }
     else if(role==='inscode'){ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; insPreview(); }
     else if(role==='find'){ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; findCode=code; resetCount(); renderPlain(); }
     else{ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; replCode=code; if(stepMode) refreshStep(); }
@@ -1392,6 +1537,10 @@
   document.addEventListener('click',function(e){
     if(!e.target.closest('.libdrop')) document.querySelectorAll('.libdrop').forEach(function(d){ d.classList.remove('open'); });
     if(!e.target.closest('#cfgCtl')) closeCfg();
+    /* clicar no fundo escuro fecha o modal (exceto os de processo: ovRun/ovSave) */
+    if(e.target.classList && e.target.classList.contains('overlay') && e.target.id!=='ovRun' && e.target.id!=='ovSave'){
+      e.target.classList.remove('show');
+    }
   });
   /* teclado: Esc fecha o overlay aberto; Enter confirma o "Salvar como…" (fora dos botões de opção) */
   document.addEventListener('keydown',function(e){
@@ -1407,14 +1556,24 @@
     }
   });
 
+  /* clicar em qualquer ponto da linha do programa (fora dos botões/✓) marca/desmarca */
+  document.getElementById('files').addEventListener('click',function(ev){
+    if(ev.target.closest('.editbtn')||ev.target.closest('.filex')||ev.target.closest('.chk')) return;
+    var row=ev.target.closest('.file'); if(!row) return;
+    var chk=row.querySelector('.chk'); if(!chk) return;
+    var off=chk.classList.toggle('off'); row.classList.toggle('off', off);
+    if(typeof renderSummary==='function') renderSummary();
+  });
+
   /* ============ init ============ */
   FILES_HTML=document.getElementById('files').innerHTML;   /* guarda a lista original p/ restaurar do estado vazio */
   buildLibLists();
   clearComposer();        /* Passos 1/10: campos vazios com texto-guia */
   renderEditList();       /* Passo 11: lista recolhida (vazia) */
-  renderSummary();        /* Passo 12: Resumo começa no estado vazio */
+  renderSummary();        /* Passo 12: Resumo começa no estado vazio (contadores reagem à seleção) */
   renderCfgMenu();        /* Passo 13: menu de configurações salvas */
   reflectBackup();        /* Passo 16: caminho de backup nos textos */
+  syncEditButtons();      /* botões Editar/Voltar coerentes com o editor */
 </script>
 </body>
 </html>
