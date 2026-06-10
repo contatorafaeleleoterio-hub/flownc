@@ -1,5 +1,30 @@
 # Correções do Mockup FlowNC — Documento Técnico
 
+> ## ⚠️ AÇÃO DA PRÓXIMA SESSÃO — IMPLEMENTAR OS 17 ITENS
+> Na próxima sessão o assistente **deve implementar** os 17 itens abaixo no mockup
+> `mockups/painel-final.v2.html`, na ordem dos sprints. **As 7 decisões já estão fechadas
+> (ver "(decidido)" em cada item e a seção "Decisões tomadas") — não re-perguntar.** Começar pelo
+> **Sprint 1**. Ao final, remover as 2 variantes `painel-final.v2-*-combo-*.html`.
+>
+> **Checklist dos 17 itens** (estado: ☐ a implementar · ◐ base já aplicada):
+> - ◐ 1. Placeholders + seta nos menus de código *(feito no app; refletir no mockup)*
+> - ☐ 2. Contador no botão "Adicionar edição ao lote" (e remover texto extra)
+> - ☐ 3. Trocar o aviso verde da Seção 3 (pasta original / backup separado)
+> - ☐ 4. Mover "+ Adicionar código" para a Seção 1
+> - ◐ 5. Botão ✕ de excluir padronizado *(✕ já aplicado)* + padronizar tamanhos de botões
+> - ☐ 6. Padronizar botões e layout entre Seções 2 e 3
+> - ◐ 7. Programas iniciam desmarcados + check ✓ *(feito no app; refletir no mockup)*
+> - ☐ 8. Lista de programas em colunas: Nome | Data de modificação | Tipo | Tamanho
+> - ☐ 9. Filtrar códigos (frequentes/recentes no topo + busca)
+> - ☐ 10. Fluxo de criar edição (origem→destino→"Adicionar edição"; destino vazio = remover, c/ aviso)
+> - ☐ 11. Lista de edições dinâmica (recolhida → expande, com feedback)
+> - ☐ 12. Estado inicial/vazio da Seção 3 (muda quando há itens)
+> - ☐ 13. "Perfil" → "Configurações salvas" (criar/salvar/reutilizar)
+> - ☐ 14. Botões de ação do Resumo funcionando (✎ ⧉ ✕)
+> - ☐ 15. Feedback de execução (trava botão, pop-up, barra de progresso)
+> - ☐ 16. Salvamento: pasta original de cada arquivo + backup em pasta escolhida/fixa
+> - ☐ 17. Inserir múltiplas linhas em posição específica (novo recurso)
+
 ## Contexto
 Foram levantados **17 problemas** na interface do FlowNC. A estratégia aprovada é
 implementá-los **primeiro no mockup aprovado** (`mockups/painel-final.v2.html`),

@@ -1,6 +1,11 @@
 # Handoff — FlowNC — 2026-06-09 (sessão 9)
 Status: Mockup `painel-final.v2.html` em correção — base visual aplicada; 17 itens (sprints) pendentes.
 
+>> AÇÃO DA PRÓXIMA SESSÃO: **implementar os 17 itens** no mockup `painel-final.v2.html`,
+>> na ordem dos sprints (1→2→3). Lista completa + decisões já fechadas em
+>> `docs/CORRECOES_MOCKUP.md` (checklist no topo). NÃO re-perguntar as decisões. Começar pelo
+>> Sprint 1; ao final, remover as 2 variantes `painel-final.v2-*-combo-*.html`.
+
 Feito nesta sessão:
 - App: combos de código com placeholder + seta (classe `CodeCombo` compartilhada em
   `ui/components/code_combo.py`, reusada no editor) e programas iniciam desmarcados com ✓.
