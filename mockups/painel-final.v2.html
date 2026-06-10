@@ -152,6 +152,8 @@
     /* largura fluida com trava (ver docs/RESPONSIVIDADE.md): mín 1180 · máx 1800 */
     --app-min:1180px; --app-max:1800px;
     --col-left-min:620px; --col-right-min:420px;
+    /* Passo 8: grade das colunas da lista de programas — chk | Nome | Data | Tipo | Tamanho | Editar | ✕ */
+    --file-cols:20px minmax(120px,1.8fr) 1.1fr .7fr .8fr auto auto;
 
     /* ===== DIVERSOS ===== */
     --border-width:1px;
@@ -240,6 +242,19 @@
     display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-16)}
   .znum{width:20px;height:20px;border-radius:var(--radius-xs);display:grid;place-items:center;
     background:var(--color-bg-rail);color:var(--color-text-secondary);font:var(--t-caption);box-shadow:var(--metal)}
+  /* Passo 4: cabeçalho da Seção 1 com o botão "+ Adicionar código" à direita */
+  .c1head{display:flex;align-items:center;gap:var(--sp-12);margin-bottom:var(--sp-16)}
+  .c1head .ztitle{margin:0}
+  .c1head .ghost{margin-left:auto}
+  /* Passo 6: anel de foco único em todos os botões das Seções 1/2/3 (acessibilidade consistente) */
+  .ghost:focus-visible,.editbtn:focus-visible,.filex:focus-visible,.el-x:focus-visible,
+  .racts span:focus-visible,.addrule:focus-visible,.iconbtn:focus-visible,.btn-soft:focus-visible,
+  .comp-addbtn:focus-visible,.el-add:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+  /* Passo 4: campos do modal "Adicionar código" */
+  .ac-input{width:100%;height:var(--h-field);border:var(--border-width) solid var(--color-border-strong);
+    border-radius:var(--radius-sm);padding:0 var(--sp-12);font:var(--t-body);color:var(--color-text-primary);
+    background:var(--color-white)}
+  .ac-input:focus{outline:none;box-shadow:var(--focus-ring)}
 
   /* ====== ① COMPOSITOR ====== */
   .comp-row{display:flex;align-items:flex-start;gap:var(--sp-16);flex-wrap:wrap}
@@ -247,8 +262,12 @@
   .drop{height:var(--h-field);display:flex;align-items:center;gap:var(--sp-8);padding:0 var(--sp-12);
     border-radius:var(--radius-sm);background:var(--color-white);box-shadow:var(--metal);cursor:pointer}
   .drop .code{font:var(--t-mono-lg)}
+  /* Passo 1: texto-guia quando o campo está vazio (estado inicial do Passo 10) */
+  .drop .code:empty::before{content:"Selecione o código";font:var(--t-body);color:var(--color-text-tertiary);white-space:nowrap}
   /* descrição do código vai só no tooltip (Passo 12) — sem texto inline no .drop */
-  .drop .caret{margin-left:auto;color:var(--color-text-secondary);padding-left:var(--sp-8)}
+  .drop .caret{margin-left:auto;color:var(--color-text-secondary);padding-left:var(--sp-8);transition:transform .15s ease}
+  /* Passo 1: seta ▾ inverte para ▴ quando a lista abre (comportamento liga no Passo 9) */
+  .drop.open .caret{transform:rotate(180deg)}
   .comp-field .drop{min-width:200px}
   /* botão "+ adicionar outra edição" ao lado dos campos: cada clique empilha na lista abaixo */
   .comp-add{justify-content:flex-end}
@@ -295,14 +314,20 @@
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .match #matchTxt{overflow:hidden;text-overflow:ellipsis}
   .files{display:flex;flex-direction:column;gap:var(--sp-8);flex:1;overflow:auto}
-  .file{display:flex;align-items:center;gap:var(--sp-12);height:50px;background:var(--color-bg-subtle);
-    border-radius:var(--radius-sm);padding:0 var(--sp-12);box-shadow:var(--metal)}
+  /* Passo 8: cabeçalho fixo + linhas em colunas alinhadas (estilo Explorador) */
+  .files-head{display:grid;grid-template-columns:var(--file-cols);align-items:center;gap:var(--sp-12);
+    padding:var(--sp-4) calc(var(--sp-12) + 6px) var(--sp-4) var(--sp-12);margin-bottom:var(--sp-8);
+    font:var(--t-label);letter-spacing:.6px;text-transform:uppercase;color:var(--color-text-tertiary);
+    border-bottom:var(--border-width) solid var(--color-border)}
+  .file{display:grid;grid-template-columns:var(--file-cols);align-items:center;gap:var(--sp-12);height:50px;
+    background:var(--color-bg-subtle);border-radius:var(--radius-sm);padding:0 var(--sp-12);box-shadow:var(--metal)}
   .file.off{opacity:.72}
   .chk{width:20px;height:20px;border-radius:var(--radius-xs);flex-shrink:0;display:grid;place-items:center;cursor:pointer;
     background:var(--color-success);color:var(--color-white);font:var(--t-caption);font-weight:700;box-shadow:var(--metal)}
   .chk.off{background:var(--color-white);color:transparent}
-  .fname{font:var(--t-mono-md)}
-  .fmeta{font:var(--t-caption);color:var(--color-text-tertiary)}
+  .fname{font:var(--t-mono-md);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* colunas de metadados (Data | Tipo | Tamanho) — alinhadas sob o cabeçalho */
+  .fcol{font:var(--t-caption);color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .editbtn{margin-left:auto;display:flex;align-items:center;gap:var(--sp-4);height:var(--h-ghost);padding:0 var(--sp-12);
     border:none;border-radius:var(--radius-sm);background:var(--color-interactive-bg);color:var(--color-interactive);
     font:var(--t-caption);cursor:pointer;box-shadow:var(--metal);white-space:nowrap}
@@ -509,6 +534,63 @@
   .sa-group{display:flex;flex-wrap:wrap;gap:var(--sp-8);margin-top:var(--sp-8)}
   .btn-soft.sel{background:var(--color-interactive-bg);border-color:var(--color-interactive);color:var(--color-interactive);font-weight:700}
 
+  /* ===== Passos 9–17 — componentes acrescentados ===== */
+  /* Passo 9/1: dropdown pesquisável grande nos campos de origem/destino (reusa .libdrop) */
+  .libdrop.big{width:100%}
+  .libdrop.big .libdrop-btn{height:var(--h-field);min-width:200px;width:100%}
+  .libdrop.big .libdrop-btn .code{font:var(--t-mono-lg)}
+  .libdrop-btn.is-empty .code{font:var(--t-body);color:var(--color-text-tertiary)}
+  .libdrop .libdrop-btn .caret{transition:transform .15s ease}
+  .libdrop.open .libdrop-btn .caret{transform:rotate(180deg)}
+  .libdrop.big .libdrop-pop{width:100%;min-width:240px;top:calc(var(--h-field) + var(--sp-4))}
+  .libitem.remove .code{color:var(--color-danger)}
+  /* Passo 11: lista de edições — destaque rápido ao incluir + pílula "remover" */
+  .el-pill.el-remove{color:var(--color-danger);background:var(--color-danger-bg)}
+  @keyframes elflash{from{background:var(--color-accent-bg)}to{background:transparent}}
+  .el-row.flash{animation:elflash .9s ease}
+  /* utilitário de visibilidade (evita inline style no HTML) */
+  .gone{display:none!important}
+  /* Passo 12: estado vazio do Resumo */
+  .rules-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-8);
+    text-align:center;border:var(--border-width) dashed var(--color-border-strong);border-radius:var(--radius-sm);
+    padding:var(--sp-32) var(--sp-16);color:var(--color-text-secondary)}
+  .rules-empty .re-ic{font-size:30px}
+  .rules-empty .re-t1{font:var(--t-body-strong);color:var(--color-text-primary)}
+  .rules-empty .re-t2{font:var(--t-caption);color:var(--color-text-tertiary);max-width:320px}
+  /* Passo 13: menu de configurações salvas no header */
+  .profile .ctl{position:relative}
+  .cfgmenu{display:none;position:absolute;top:calc(100% + var(--sp-4));left:0;z-index:50;min-width:220px;
+    background:var(--color-white);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-modal);padding:var(--sp-8);flex-direction:column;gap:var(--sp-2)}
+  .profile .ctl.open .cfgmenu{display:flex}
+  .cfgitem{text-align:left;border:none;background:transparent;border-radius:var(--radius-xs);padding:var(--sp-8);
+    font:var(--t-body);color:var(--color-text-primary);cursor:pointer}
+  .cfgitem:hover{background:var(--color-interactive-bg)}
+  .cfgitem.sel{font-weight:700;color:var(--color-interactive)}
+  .cfgitem.new{border-top:var(--border-width) solid var(--color-border);color:var(--color-interactive);margin-top:var(--sp-2)}
+  /* Passo 15: barra de progresso da execução */
+  .progress{height:8px;background:var(--color-spinner-track);border-radius:var(--radius-pill);overflow:hidden;margin:var(--sp-12) 0 var(--sp-4)}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--color-cta-start),var(--color-accent-hv));transition:width .2s ease}
+  .progress-pct{font:var(--t-caption);color:var(--color-text-secondary)}
+  .cta:disabled{background:var(--color-btn-disabled-bg);color:var(--color-btn-disabled-text);cursor:not-allowed;box-shadow:none}
+  .cta:disabled:hover{background:var(--color-btn-disabled-bg)}
+  /* Passo 16: linha de pasta de backup (selecionável) */
+  .backup-row{display:flex;align-items:center;gap:var(--sp-8);flex-wrap:wrap}
+  .backup-row code{font:var(--t-mono-sm);background:var(--color-code-bg);padding:1px var(--sp-8);border-radius:var(--radius-xs)}
+  /* Passo 17: inserir bloco — textarea + posição */
+  .ac-area{height:auto;min-height:72px;padding:var(--sp-8) var(--sp-12);font:var(--t-mono-sm);line-height:1.5;resize:vertical}
+  .ins-text{width:100%;min-height:96px;border:var(--border-width) solid var(--color-border-strong);border-radius:var(--radius-sm);
+    padding:var(--sp-8) var(--sp-12);font:var(--t-mono-sm);line-height:1.5;color:var(--color-text-primary);background:var(--color-white);resize:vertical}
+  .ins-text:focus{outline:none;box-shadow:var(--focus-ring)}
+  .ins-pos{display:flex;flex-direction:column;gap:var(--sp-8);margin-top:var(--sp-8)}
+  .ins-pos label{display:flex;align-items:center;gap:var(--sp-8);font:var(--t-body);color:var(--color-text-primary)}
+  .ins-num{width:80px;height:var(--h-ghost)}
+  .ins-preview{margin:0;padding:var(--sp-12);font:var(--t-mono-sm);line-height:1.5;color:var(--color-text-primary);white-space:pre;overflow:auto;max-height:160px}
+  .ins-chip{height:var(--h-ghost);padding:0 var(--sp-12);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    background:var(--color-white);color:var(--color-interactive);font:var(--t-caption);cursor:pointer;box-shadow:var(--metal)}
+  .ins-chip:hover{background:var(--color-interactive-bg)}
+  .ins-chip.empty{color:var(--color-text-tertiary);cursor:default}
+
   /* ===== RESPONSIVIDADE — 3 faixas (ver docs/RESPONSIVIDADE.md) ===== */
   /* Compacto (≤1440px): paddings/gaps menores p/ ganhar área útil; colunas no mínimo confortável. */
   @media (max-width:1440px){
@@ -530,12 +612,14 @@
     <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
     <div class="brand"><div class="logo">◉</div><div><div class="nm">FlowNC</div><div class="sub">Editor de Lotes</div></div></div>
     <div class="profile">
-      <div class="ctl"><div class="mname">Máquina 01</div><span class="caret">▾</span></div>
+      <span class="label-caps">Configurações salvas</span>
+      <div class="ctl" id="cfgCtl" onclick="toggleCfg(event)"><div class="mname" id="cfgName">Máquina 01</div><span class="caret">▾</span>
+        <div class="cfgmenu" id="cfgMenu"></div>
+      </div>
     </div>
-    <button class="hbtn">Salvar perfil</button>
+    <button class="hbtn" onclick="show('ovSaveConfig')">Salvar configuração</button>
     <span class="spacer"></span>
     <button class="hbtn">Biblioteca de Códigos</button>
-    <button class="hbtn blue">+ Adicionar código</button>
   </div>
 
   <!-- BODY: 2 colunas dinâmicas -->
@@ -544,20 +628,35 @@
     <div class="left">
       <!-- ① COMPOSITOR -->
       <div class="panel compositor">
-        <div class="ztitle"><span class="znum">1</span> Configurações</div>
+        <div class="c1head">
+          <div class="ztitle"><span class="znum">1</span> Configurações</div>
+          <button class="ghost" onclick="show('ovAddCode')" title="Cadastrar um novo código na biblioteca">+ Adicionar código</button>
+        </div>
         <div class="comp-row">
           <div class="comp-field"><span class="label-caps">Código de origem</span>
-            <div class="drop" id="srcDrop" onclick="cycleSrc()" title="Liga refrigeração"><span class="code" id="srcCode">M8</span><span class="caret">▾</span></div>
+            <div class="libdrop big" id="pickSrc" data-role="src" data-val="">
+              <button class="libdrop-btn is-empty" onclick="toggleLib(this)"><span class="code">Selecione o código</span><span class="caret">▾</span></button>
+              <div class="libdrop-pop">
+                <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+                <div class="libdrop-list"></div>
+              </div>
+            </div>
           </div>
           <div class="comp-field"><span class="label-caps">Trocar por</span>
-            <div class="drop" id="dstDrop" title="Forma normalizada"><span class="code" id="dstCode">M08</span><span class="caret">▾</span></div>
+            <div class="libdrop big" id="pickDst" data-role="dst" data-val="">
+              <button class="libdrop-btn is-empty" onclick="toggleLib(this)"><span class="code">Selecione · vazio = remover</span><span class="caret">▾</span></button>
+              <div class="libdrop-pop">
+                <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+                <div class="libdrop-list"></div>
+              </div>
+            </div>
           </div>
           <div class="comp-field comp-add"><span class="label-caps">&nbsp;</span>
-            <button class="comp-addbtn" onclick="addEdit()" title="Empilha a edição atual na lista e abre uma nova">+ adicionar outra edição</button>
+            <button class="comp-addbtn" id="addEditBtn" onclick="confirmEdit()" disabled title="Escolha a origem para habilitar">+ Adicionar edição</button>
           </div>
         </div>
-        <div class="editlist" id="editlist">
-          <div class="editlist-head" id="editlistTitle">Edições montadas (1)</div>
+        <div class="editlist" id="editlist" hidden>
+          <div class="editlist-head" id="editlistTitle">Edições montadas (0)</div>
           <div id="elRows"></div>
         </div>
       </div>
@@ -565,18 +664,21 @@
       <!-- ② PROGRAMAS -->
       <div class="panel programas">
         <div class="c2head"><div class="ztitle"><span class="znum">2</span> Seleção de Programas</div>
-          <span class="match" id="match" title="Marque os programas que vão receber esta regra."><span id="matchTxt">✓ Regra em edição — marque os programas.</span></span>
+          <span class="match" id="match" title="Marque os programas que vão receber as edições."><span id="matchTxt">Marque os programas que vão receber as edições.</span></span>
           <div class="c2head-actions"><button class="ghost" onclick="pickFiles()">+ Adicionar programa(s)…</button></div>
         </div>
-        <div class="files" id="files" tabindex="0" ondragover="fzOver(event)" ondragleave="fzLeave(event)" ondrop="fzDrop(event)" onkeydown="fzKey(event)">
-          <div class="file"><span class="chk">✓</span><span class="fname">O1001_FLANGE.NC</span><span class="fmeta">12,4 KB · hoje 08:14</span><button class="editbtn" onclick="openEditor('O1001_FLANGE.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>
-          <div class="file"><span class="chk">✓</span><span class="fname">O1002_EIXO_REV2.NC</span><span class="fmeta">8,1 KB · hoje 08:02</span><button class="editbtn" onclick="openEditor('O1002_EIXO_REV2.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>
-          <div class="file"><span class="chk">✓</span><span class="fname">O1003_TAMPA.NC</span><span class="fmeta">21,7 KB · ontem</span><button class="editbtn" onclick="openEditor('O1003_TAMPA.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>
-          <div class="file"><span class="chk">✓</span><span class="fname">O1004_SUPORTE.NC</span><span class="fmeta">5,9 KB · ontem</span><button class="editbtn" onclick="openEditor('O1004_SUPORTE.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>
-          <div class="file off"><span class="chk off">✓</span><span class="fname">O1005_BUCHA_A.NC</span><span class="fmeta">3,2 KB · 30/05</span><button class="editbtn" onclick="openEditor('O1005_BUCHA_A.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>
-          <div class="file"><span class="chk">✓</span><span class="fname">O1006_BUCHA_B.NC</span><span class="fmeta">3,2 KB · 30/05</span><button class="editbtn" onclick="openEditor('O1006_BUCHA_B.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>
+        <div class="files-head" id="filesHead">
+          <span></span><span>Nome</span><span>Data de modificação</span><span>Tipo</span><span>Tamanho</span><span></span><span></span>
         </div>
-        <button class="addrule" id="addRuleBtn" onclick="addRule()">Adicionar edição ao lote →</button>
+        <div class="files" id="files" tabindex="0" ondragover="fzOver(event)" ondragleave="fzLeave(event)" ondrop="fzDrop(event)" onkeydown="fzKey(event)">
+          <div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O1001_FLANGE.NC</span><span class="fcol">hoje 08:14</span><span class="fcol">NC</span><span class="fcol">12,4 KB</span><button class="editbtn" onclick="openEditor('O1001_FLANGE.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>
+          <div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O1002_EIXO_REV2.NC</span><span class="fcol">hoje 08:02</span><span class="fcol">NC</span><span class="fcol">8,1 KB</span><button class="editbtn" onclick="openEditor('O1002_EIXO_REV2.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>
+          <div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O1003_TAMPA.NC</span><span class="fcol">ontem</span><span class="fcol">NC</span><span class="fcol">21,7 KB</span><button class="editbtn" onclick="openEditor('O1003_TAMPA.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>
+          <div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O1004_SUPORTE.NC</span><span class="fcol">ontem</span><span class="fcol">NC</span><span class="fcol">5,9 KB</span><button class="editbtn" onclick="openEditor('O1004_SUPORTE.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>
+          <div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O1005_BUCHA_A.NC</span><span class="fcol">30/05</span><span class="fcol">NC</span><span class="fcol">3,2 KB</span><button class="editbtn" onclick="openEditor('O1005_BUCHA_A.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>
+          <div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O1006_BUCHA_B.NC</span><span class="fcol">30/05</span><span class="fcol">NC</span><span class="fcol">3,2 KB</span><button class="editbtn" onclick="openEditor('O1006_BUCHA_B.NC')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>
+        </div>
+        <button class="addrule" id="addRuleBtn" onclick="addRule()" disabled>Adicionar edição ao lote <span id="addRuleCount">(0)</span> →</button>
       </div>
     </div>
 
@@ -586,25 +688,20 @@
       <div class="panel resumo">
         <div class="c3head">
           <div class="ztitle"><span class="znum">3</span> Resumo</div>
-          <span class="chip-state warn" id="chipState">⚠ 1 conflito</span>
+          <span class="chip-state ok gone" id="chipState">✓ Pronto</span>
         </div>
-        <div class="counters">
-            <div class="counter"><div class="n">4</div><div class="l">Regras</div></div>
-            <div class="counter"><div class="n">12</div><div class="l">Programas</div></div>
-            <div class="counter"><div class="n">34</div><div class="l">Alterações</div></div>
+        <div class="counters" id="counters">
+            <div class="counter"><div class="n">0</div><div class="l">Regras</div></div>
+            <div class="counter"><div class="n">0</div><div class="l">Programas</div></div>
+            <div class="counter"><div class="n">0</div><div class="l">Alterações</div></div>
         </div>
         <div class="divider"></div>
-        <div class="rules" id="rules">
-          <div class="rcard"><div class="rc-row"><span class="ridx">01</span><span class="rformula"><span class="a">M8 → M08</span></span><span class="rscope">10 programas</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div></div>
-          <div class="rcard"><div class="rc-row"><span class="ridx">02</span><span class="rformula"><span class="a">G54 → G55</span></span><span class="rscope">12 programas</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div></div>
-          <div class="rcard is-warn" id="cardC1"><div class="rc-row"><span class="ridx">03</span><span class="rformula"><span class="a">T1 → T01</span></span><span class="rscope">6 programas</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div><div class="rc-conflict"><span>▲</span> Conflito: <b>T1</b> também é alterado pela Regra 04.</div></div>
-          <div class="rcard is-warn" id="cardC2"><div class="rc-row"><span class="ridx">04</span><span class="rformula"><span class="a">T1 → T1.0</span></span><span class="rscope">6 programas</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div><div class="rc-conflict"><span>▲</span> Conflito: mesmo código de origem da Regra 03.</div></div>
-        </div>
-        <div class="seal-big">
+        <div class="rules" id="rules"></div>
+        <div class="seal-big gone" id="sealBig">
           <div class="shield">✓</div>
-          <div><div class="t1">Editados → pasta da máquina · originais → backup</div><div class="t2">backup: …\backup\_backup_orig_2026-06-04_14-30\</div></div>
+          <div><div class="t1">Arquivos editados serão salvos na pasta original. Backups serão armazenados em pasta separada.</div><div class="t2" id="sealPath">Backup: D:\CNC\backup\</div></div>
         </div>
-        <button class="cta" onclick="execLote()"><span class="big">Executar Lote</span><span class="small">Pré-visualizar antes de publicar</span></button>
+        <button class="cta" id="ctaBtn" onclick="execLote()" disabled><span class="big">Executar Lote</span><span class="small">Pré-visualizar antes de publicar</span></button>
       </div>
 
       <!-- EDITOR INTEGRADO -->
@@ -647,6 +744,7 @@
             </div>
             <button class="btn-soft" onclick="replaceAll()">Substituir todos</button>
             <button class="btn-soft" onclick="startStep()">Um a um</button>
+            <button class="btn-soft" onclick="insOpen()" title="Inserir um bloco de linhas em posição específica">➕ Inserir bloco</button>
             <button class="ed-save" id="edSaveBtn" onclick="edSave()" disabled>Salvar</button>
             <button class="btn-soft" id="edSaveAsBtn" onclick="saveAsOpen()" disabled>Salvar como…</button>
           </div>
@@ -672,26 +770,21 @@
 
   <!-- OVERLAYS -->
   <div class="overlay" id="ovRun"><div class="modal run"><div class="mh">Processando lote…</div>
-    <div class="mb"><div class="bigspin"></div><div class="step act" id="rs1">Executando alterações…</div><div class="step" id="rs2">Analisando resultado…</div></div></div></div>
+    <div class="mb"><div class="bigspin"></div><div class="step act" id="rs1">Executando alterações…</div><div class="step" id="rs2">Analisando resultado…</div>
+      <div class="progress"><div class="progress-fill" id="runFill"></div></div><div class="progress-pct" id="runPct">0%</div></div></div></div>
 
   <div class="overlay" id="ovRes"><div class="modal res">
     <div class="mh">Resumo do lote — confira antes de publicar <span class="x" onclick="hide('ovRes')">✕</span></div>
     <div class="mb">
-      <div class="resrow"><span class="badge sub">substituir</span> <code>M8</code> → <code>M08</code> · 10 programas · <b>10 ocorrências</b></div>
-      <div class="resrow"><span class="badge sub">substituir</span> <code>G54</code> → <code>G55</code> · 12 programas · <b>12 ocorrências</b></div>
-      <div class="resrow"><span class="badge warn">⚠ conflito</span> <code>T1</code> alterado pelas Regras 03 e 04 — revise antes de publicar</div>
-      <div class="resrow"><span class="badge ok">✓ originais → backup</span> publica em <code>\\servidor\cnc\trabalho\</code> · backup <code>…\_backup_orig_2026-06-04_14-30\</code></div>
-      <div class="preview">
-        <div class="pvh">Pré-visualização — o que muda em cada linha</div>
-        <div class="pvrow"><span class="pvtag sub">substituir</span><span class="old">N10 M8</span> <span>→</span> <span class="new">N10 M08</span></div>
-        <div class="pvrow"><span class="pvtag sub">substituir</span><span class="old">N60 G54</span> <span>→</span> <span class="new">N60 G55</span></div>
-      </div>
+      <div id="resRows"></div>
+      <div class="resrow backup-row"><span class="badge ok">✓ originais → backup</span> salva na <code>pasta original de cada arquivo</code> · backup <code id="resBackup">D:\CNC\backup\</code> <button class="btn-soft" onclick="changeBackup()">Mudar</button></div>
+      <div class="preview" id="resPreview"></div>
     </div>
-    <div class="mf"><button class="mbtn ghost" onclick="hide('ovRes')">Voltar</button><button class="mbtn save" onclick="runSave()">Publicar na máquina</button></div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovRes')">Voltar</button><button class="mbtn save" onclick="runSave()">Publicar (gravar nas pastas originais)</button></div>
   </div></div>
 
   <div class="overlay" id="ovSave"><div class="modal run"><div class="mh" id="saveH">Publicando…</div>
-    <div class="mb" id="saveBody"><div class="bigspin"></div><div class="step act">Backup dos originais → troca na pasta da máquina → conferência SHA-256…</div></div></div></div>
+    <div class="mb" id="saveBody"><div class="bigspin"></div><div class="step act">Backup dos originais → grava na pasta original → conferência SHA-256…</div></div></div></div>
 
   <!-- editor: confirmar troca/saída com alteração não salva -->
   <div class="overlay" id="ovSwitch"><div class="modal confirm">
@@ -739,6 +832,67 @@
     </div>
     <div class="mf"><button class="mbtn ghost" onclick="saveAsCancel()">Cancelar</button><button class="mbtn save" onclick="saveAsConfirm()">Salvar como…</button></div>
   </div></div>
+
+  <!-- Passo 4: adicionar código à biblioteca (simulado — sem persistência real) -->
+  <div class="overlay" id="ovAddCode"><div class="modal confirm">
+    <div class="mh">Adicionar código à biblioteca <span class="x" onclick="hide('ovAddCode')">✕</span></div>
+    <div class="mb">
+      <span class="label-caps">Código</span>
+      <div class="sa-group"><input class="ac-input" id="acCode" placeholder="ex.: M08" onkeydown="if(event.key==='Enter')addCodeConfirm()"></div>
+      <span class="label-caps">Descrição</span>
+      <div class="sa-group"><input class="ac-input" id="acDesc" placeholder="ex.: Liga refrigeração" onkeydown="if(event.key==='Enter')addCodeConfirm()"></div>
+      <span class="label-caps">Bloco de linhas (opcional)</span>
+      <div class="sa-group"><textarea class="ins-text" id="acBlock" placeholder="Várias linhas viram um modelo reutilizável em “Inserir bloco”.&#10;ex.:&#10;G43 H01&#10;M8"></textarea></div>
+      <p class="confirm-txt">O código fica disponível nos menus de origem/destino e no editor. Se preencher o bloco, ele vira um <b>modelo multi-linha</b>.</p>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovAddCode')">Cancelar</button><button class="mbtn save" onclick="addCodeConfirm()">Salvar código</button></div>
+  </div></div>
+
+  <!-- Passo 13: salvar configuração (nome + pasta de backup) — simulado -->
+  <div class="overlay" id="ovSaveConfig"><div class="modal confirm">
+    <div class="mh">Salvar configuração <span class="x" onclick="hide('ovSaveConfig')">✕</span></div>
+    <div class="mb">
+      <p class="confirm-txt">Guarda as edições montadas e as preferências (máquina ativa e pasta de backup) com um nome, para reutilizar depois.</p>
+      <span class="label-caps">Nome da configuração</span>
+      <div class="sa-group"><input class="ac-input" id="cfgInput" placeholder="ex.: Máquina 03 — turno noite" onkeydown="if(event.key==='Enter')saveConfigConfirm()"></div>
+      <span class="label-caps">Pasta de backup (lembrada e fixa até você trocar)</span>
+      <div class="sa-group backup-row"><code id="cfgBackup">D:\CNC\backup\</code> <button class="btn-soft" onclick="changeBackup()">Mudar</button></div>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovSaveConfig')">Cancelar</button><button class="mbtn save" onclick="saveConfigConfirm()">Salvar</button></div>
+  </div></div>
+
+  <!-- Passo 10: aviso antes de incluir uma edição que REMOVE o código (destino vazio) -->
+  <div class="overlay" id="ovRemoveWarn"><div class="modal confirm">
+    <div class="mh">Confirmar remoção <span class="x" onclick="hide('ovRemoveWarn')">✕</span></div>
+    <div class="mb"><p class="confirm-txt">O destino está vazio: esta edição vai <b>remover</b> o código <b id="rmCode">M8</b> dos programas selecionados. Incluir assim?</p></div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovRemoveWarn')">Cancelar</button><button class="mbtn warn" onclick="commitRemove()">Incluir remoção</button></div>
+  </div></div>
+
+  <!-- Passo 17: inserir bloco multi-linha em posição específica (simulado) -->
+  <div class="overlay" id="ovInsert"><div class="modal res">
+    <div class="mh">Inserir bloco de linhas em <span class="ed-fname" id="insFname">arquivo</span> <span class="x" onclick="hide('ovInsert')">✕</span></div>
+    <div class="mb">
+      <span class="label-caps">Modelos salvos</span>
+      <div class="sa-group" id="insBlocks"></div>
+      <span class="label-caps">Bloco a inserir (uma instrução por linha)</span>
+      <div class="sa-group"><textarea class="ins-text" id="insText" oninput="insPreview()" placeholder="ex.:&#10;G43 H01&#10;M8"></textarea></div>
+      <span class="label-caps">Posição</span>
+      <div class="ins-pos">
+        <label><input type="radio" name="insPos" value="line" checked onchange="insPreview()"> Abaixo da linha Nº <input class="ac-input ins-num" id="insLine" type="number" min="1" value="1" oninput="insPreview()"></label>
+        <label><input type="radio" name="insPos" value="code" onchange="insPreview()"> Abaixo da 1ª ocorrência do código
+          <div class="libdrop" id="insCode" data-role="inscode" data-val="M8">
+            <button class="libdrop-btn" onclick="toggleLib(this)"><span class="code">M8</span><span class="caret">▾</span></button>
+            <div class="libdrop-pop">
+              <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+              <div class="libdrop-list"></div>
+            </div>
+          </div>
+        </label>
+      </div>
+      <div class="preview"><div class="pvh">Prévia do resultado</div><pre class="ins-preview" id="insPreviewBox">—</pre></div>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovInsert')">Cancelar</button><button class="mbtn save" onclick="insConfirm()">Inserir bloco</button></div>
+  </div></div>
 </div>
 
 <script>
@@ -748,80 +902,225 @@
   function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function reEscape(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
 
-  /* ============ ① COMPOSITOR ============ */
-  /* [origem, descrição origem, destino, descrição destino] — descrição vai só no tooltip (Passo 12) */
-  var SRC=[
-    ['M8','Liga refrigeração','M08','Refrigeração (normalizado)'],
-    ['M6','Troca de ferramenta','M06','Troca de ferramenta (normalizado)'],
-    ['G54','Origem de peça 1','G55','Origem de peça 2'],
-    ['T1','Ferramenta 1','T01','Ferramenta 1 (normalizado)']
-  ];
-  var si=0;
-  function setDropTip(id,t){ var el=document.getElementById(id); if(el) el.title=t||''; }
-  function cycleSrc(){ si=(si+1)%SRC.length; srcCode.textContent=SRC[si][0]; setDropTip('srcDrop',SRC[si][1]); dstCode.textContent=SRC[si][2]; setDropTip('dstDrop',SRC[si][3]); syncBanner(); syncMatch(); }
-  /* a "configuração montada" agora é a linha "em edição" da lista única */
-  function syncBanner(){ renderEditList(); }
-  function syncMatch(){ match.className='match'; matchTxt.textContent='✓ Regra em edição — marque os programas.'; }
-  function setConflict(on){
-    chipState.className='chip-state '+(on?'warn':'ok'); chipState.textContent=on?'⚠ 1 conflito':'✓ Pronto';
-    cardC1.classList.toggle('is-warn',on); cardC2.classList.toggle('is-warn',on);
-    cardC1.querySelector('.rc-conflict').style.display=on?'flex':'none';
-    cardC2.querySelector('.rc-conflict').style.display=on?'flex':'none';
+  /* ============ ① COMPOSITOR (Passos 1/9/10/11) ============ */
+  var FREQ=['M8','M08','G54','G55','M6','T1','T01'];     /* frequentes no topo dos menus (Passo 9) */
+  var BLOCKS=[];                                          /* modelos multi-linha (Passo 17) */
+  /* edição em construção: origem obrigatória; destino vazio = remover (Passo 10) */
+  var srcVal='', srcDesc='', dstVal='', dstDesc='';
+  var pendingEdits=[];                                    /* [{code,dst}] confirmadas, ainda não no lote */
+  function libDesc(code){ for(var i=0;i<LIB.length;i++){ if(LIB[i][0]===code) return LIB[i][1]; } return ''; }
+  function paintPick(id,val,desc,emptyLabel){
+    var dd=document.getElementById(id); if(!dd) return;
+    dd.dataset.val=val;
+    var btn=dd.querySelector('.libdrop-btn'), code=btn.querySelector('.code');
+    if(val===''){ btn.classList.add('is-empty'); code.textContent=emptyLabel; btn.title=''; }
+    else{ btn.classList.remove('is-empty'); code.textContent=val; btn.title=desc||''; }
   }
-  var nextIdx=5;
-  var pendingEdits=[];
-  /* a edição em construção (refletida na linha "em edição") */
-  function draftEdit(){ return {code:SRC[si][0],dst:dstCode.textContent}; }
+  function setSrc(code,desc){ srcVal=code||''; srcDesc=desc||libDesc(code); paintPick('pickSrc',srcVal,srcDesc,'Selecione o código'); updateAddBtn(); }
+  function setDst(code,desc){ dstVal=code||''; dstDesc=desc||libDesc(code); paintPick('pickDst',dstVal,dstDesc,'Selecione · vazio = remover'); }
+  function updateAddBtn(){ var b=document.getElementById('addEditBtn'); if(b){ b.disabled=!srcVal; b.title=srcVal?'Adicionar esta edição à lista':'Escolha a origem para habilitar'; } }
+  function clearComposer(){ setSrc('',''); setDst('',''); }
   function fmtFormula(e){
-    return '<span class="el-pill">'+esc(e.code)+'</span><span class="el-arr">→</span><span class="el-pill">'+esc(e.dst)+'</span>';
+    var dst = e.dst==='' ? '<span class="el-pill el-remove">remover</span>' : '<span class="el-pill">'+esc(e.dst)+'</span>';
+    return '<span class="el-pill">'+esc(e.code)+'</span><span class="el-arr">→</span>'+dst;
   }
-  /* "+ adicionar outra edição" — congela a edição atual na lista e abre uma nova */
-  function addEdit(){ pendingEdits.push(draftEdit()); cycleSrc(); }
+  /* Passo 10: confirmar a edição (origem obrigatória; destino vazio pede aviso antes de incluir) */
+  function confirmEdit(){
+    if(!srcVal) return;
+    if(dstVal===''){ document.getElementById('rmCode').textContent=srcVal; show('ovRemoveWarn'); return; }
+    commitEdit();
+  }
+  function commitRemove(){ hide('ovRemoveWarn'); commitEdit(); }
+  function commitEdit(){ pendingEdits.push({code:srcVal,dst:dstVal}); clearComposer(); renderEditList(true); }
   function removePending(i){ pendingEdits.splice(i,1); renderEditList(); }
-  /* limpa a edição em construção (linha "em edição") — reseta os campos para o padrão */
-  function clearDraft(){ si=0; srcCode.textContent=SRC[0][0]; setDropTip('srcDrop',SRC[0][1]);
-    dstCode.textContent=SRC[0][2]; setDropTip('dstDrop',SRC[0][3]); syncMatch(); renderEditList(); }
-  /* lista única: edições já montadas (com ✕) + a linha "em edição" sempre por último */
-  function renderEditList(){
-    var html=pendingEdits.map(function(e,i){
+  /* Passo 11: lista dinâmica — recolhida quando vazia; cresce e pisca ao incluir */
+  function renderEditList(flash){
+    var box=document.getElementById('editlist');
+    box.hidden = pendingEdits.length===0;
+    elRows.innerHTML=pendingEdits.map(function(e,i){
       return '<div class="el-row"><span class="el-formula">'+fmtFormula(e)+'</span>'
-        +'<span class="el-x" onclick="removePending('+i+')">✕</span></div>';
+        +'<span class="el-x" onclick="removePending('+i+')" title="Remover">✕</span></div>';
     }).join('');
-    html+='<div class="el-row draft">'
-      +'<span class="el-formula">'+fmtFormula(draftEdit())+'</span>'
-      +'<span class="el-right"><span class="el-tag">em edição</span>'
-      +'<span class="el-x" onclick="clearDraft()" title="Limpar esta edição">✕</span></span></div>';
-    elRows.innerHTML=html;
-    editlistTitle.textContent='Edições montadas ('+(pendingEdits.length+1)+')';
+    editlistTitle.textContent='Edições montadas ('+pendingEdits.length+')';
+    if(flash && elRows.lastElementChild){ elRows.lastElementChild.classList.add('flash'); }
+    updateAddRule();
   }
-  function pushCard(e){
-    var idx=('0'+(nextIdx++)).slice(-2);
-    var div=document.createElement('div'); div.className='rcard';
-    var f='<span class="rformula"><span class="a">'+esc(e.code)+' → '+esc(e.dst)+'</span></span>';
-    div.innerHTML='<div class="rc-row"><span class="ridx">'+idx+'</span>'+f+'<span class="rscope">sel.</span><span class="rchip">✓ Validado</span><span class="racts"><span>✎</span><span>⧉</span><span class="del">✕</span></span></div>';
-    rules.appendChild(div);
+  /* Passo 2: contador ao vivo no botão "Adicionar edição ao lote" */
+  function updateAddRule(){
+    var n=pendingEdits.length;
+    if(typeof addRuleCount!=='undefined') addRuleCount.textContent='('+n+')';
+    if(typeof addRuleBtn!=='undefined') addRuleBtn.disabled=(n===0);
   }
-  /* "Adicionar ao lote" — manda todas as edições montadas + a "em edição" para o Resumo */
+  /* Passo 4/17: cadastrar código (e, opcional, um bloco multi-linha) — simulado */
+  function addCodeConfirm(){
+    var c=document.getElementById('acCode').value.trim();
+    var d=document.getElementById('acDesc').value.trim();
+    var blk=document.getElementById('acBlock').value.replace(/\s+$/,'');
+    if(!c){ document.getElementById('acCode').focus(); return; }
+    LIB.unshift([c, d||'(sem descrição)']);
+    if(blk) BLOCKS.unshift({name:c, desc:d||c, text:blk});
+    buildLibLists();
+    document.getElementById('acCode').value=''; document.getElementById('acDesc').value=''; document.getElementById('acBlock').value='';
+    hide('ovAddCode');
+  }
+  /* "Adicionar edição ao lote" — envia as edições montadas ao Resumo (Passos 12/14) */
   function addRule(){
-    var toAdd=pendingEdits.slice();
-    toAdd.push(draftEdit());
-    toAdd.forEach(pushCard);
+    if(!pendingEdits.length) return;
+    var nProg=selectedCount();
+    pendingEdits.forEach(function(e){ summaryCards.push({code:e.code,dst:e.dst,prog:nProg}); });
     pendingEdits=[]; renderEditList();
+    renderSummary();
+  }
+
+  /* ============ ③ RESUMO — orientado a dados (Passos 12/14) ============ */
+  var summaryCards=[];                                   /* {code,dst,prog} */
+  function selectedCount(){ return document.querySelectorAll('#files .file:not(.off)').length; }
+  function setCounters(r,p,c){
+    var ns=document.querySelectorAll('#counters .counter .n');
+    if(ns[0]) ns[0].textContent=r; if(ns[1]) ns[1].textContent=p; if(ns[2]) ns[2].textContent=c;
+  }
+  function renderSummary(){
+    var rules=document.getElementById('rules');
+    var origin={}; summaryCards.forEach(function(c){ origin[c.code]=(origin[c.code]||0)+1; });
+    var conflict={}; summaryCards.forEach(function(c){ if(origin[c.code]>1) conflict[c.code]=true; });
+    var nRules=summaryCards.length, nProg=selectedCount();
+    var nChg=summaryCards.reduce(function(a,c){ return a+(c.prog||0); },0);
+    setCounters(nRules,nProg,nChg);
+    var chip=document.getElementById('chipState'), seal=document.getElementById('sealBig'), cta=document.getElementById('ctaBtn');
+    if(!nRules){
+      rules.innerHTML='<div class="rules-empty"><div class="re-ic">📋</div>'
+        +'<div class="re-t1">Nenhuma edição no lote ainda</div>'
+        +'<div class="re-t2">Monte edições na Seção 1 e clique em “Adicionar edição ao lote”.</div></div>';
+      chip.classList.add('gone'); seal.classList.add('gone'); cta.disabled=true; return;
+    }
+    var nConf=summaryCards.filter(function(c){ return conflict[c.code]; }).length;
+    chip.classList.remove('gone');
+    if(nConf){ chip.className='chip-state warn'; chip.textContent='⚠ '+nConf+' conflito'+(nConf>1?'s':''); }
+    else{ chip.className='chip-state ok'; chip.textContent='✓ Pronto'; }
+    seal.classList.remove('gone'); cta.disabled=false;
+    rules.innerHTML=summaryCards.map(function(c,i){
+      var idx=('0'+(i+1)).slice(-2), warn=conflict[c.code];
+      var formula = c.dst==='' ? esc(c.code)+' → (remover)' : esc(c.code)+' → '+esc(c.dst);
+      var chipv = warn ? '' : '<span class="rchip">✓ Validado</span>';
+      var conf = warn ? '<div class="rc-conflict"><span>▲</span> Conflito: <b>'+esc(c.code)+'</b> é alterado por mais de uma edição.</div>' : '';
+      return '<div class="rcard'+(warn?' is-warn':'')+'">'
+        +'<div class="rc-row"><span class="ridx">'+idx+'</span>'
+        +'<span class="rformula"><span class="a">'+formula+'</span></span>'
+        +'<span class="rscope">'+(c.prog?c.prog+' programas':'nenhum sel.')+'</span>'+chipv
+        +'<span class="racts"><span title="Editar" onclick="editCard('+i+')">✎</span>'
+        +'<span title="Duplicar" onclick="dupCard('+i+')">⧉</span>'
+        +'<span class="del" title="Remover" onclick="delCard('+i+')">✕</span></span></div>'+conf+'</div>';
+    }).join('');
     if(rules.lastElementChild) rules.lastElementChild.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
-  function demo(which){
-    closeEditor();
-    if(which==='vazio'){ filesEmptyState(true); return; }
-    filesEmptyState(false);
-    if(which==='sub'){ si=0; srcCode.textContent='M8'; setDropTip('srcDrop','Liga refrigeração'); dstCode.textContent='M08'; setDropTip('dstDrop','Refrigeração (normalizado)'); syncBanner(); syncMatch(); setConflict(false); }
-    if(which==='conf'){ setConflict(true); }
+  function delCard(i){ summaryCards.splice(i,1); renderSummary(); }
+  function dupCard(i){ var c=summaryCards[i]; summaryCards.splice(i+1,0,{code:c.code,dst:c.dst,prog:c.prog}); renderSummary(); }
+  function editCard(i){ var c=summaryCards[i]; setSrc(c.code,libDesc(c.code)); setDst(c.dst,libDesc(c.dst)); summaryCards.splice(i,1); renderSummary(); }
+
+  /* ============ Passo 13: configurações salvas (header) ============ */
+  var savedConfigs=['Máquina 01','Máquina 02'], activeConfig='Máquina 01';
+  function renderCfgMenu(){
+    var m=document.getElementById('cfgMenu'); if(!m) return;
+    m.innerHTML=savedConfigs.map(function(n){
+      return '<button class="cfgitem'+(n===activeConfig?' sel':'')+'" data-n="'+esc(n)+'" onclick="pickConfig(event,this.dataset.n)">'+esc(n)+'</button>';
+    }).join('')+'<button class="cfgitem new" onclick="newConfig(event)">+ Nova configuração…</button>';
+  }
+  function toggleCfg(ev){ if(ev) ev.stopPropagation(); document.getElementById('cfgCtl').classList.toggle('open'); }
+  function closeCfg(){ var c=document.getElementById('cfgCtl'); if(c) c.classList.remove('open'); }
+  function pickConfig(ev,n){ ev.stopPropagation(); activeConfig=n; document.getElementById('cfgName').textContent=n; renderCfgMenu(); closeCfg(); }
+  function newConfig(ev){ ev.stopPropagation(); closeCfg(); show('ovSaveConfig'); }
+  function saveConfigConfirm(){
+    var n=document.getElementById('cfgInput').value.trim(); if(!n){ document.getElementById('cfgInput').focus(); return; }
+    if(savedConfigs.indexOf(n)<0) savedConfigs.push(n);
+    activeConfig=n; document.getElementById('cfgName').textContent=n; renderCfgMenu();
+    document.getElementById('cfgInput').value=''; hide('ovSaveConfig');
+  }
+
+  /* ============ Passo 16: pasta de backup (lembrada/fixa, trocável) ============ */
+  var backupFolders=['D:\\CNC\\backup\\','E:\\backups\\cnc\\','\\\\servidor\\cnc\\backup\\'];
+  var bki=0, backupFolder=backupFolders[0];
+  function changeBackup(){ bki=(bki+1)%backupFolders.length; backupFolder=backupFolders[bki]; reflectBackup(); }
+  function reflectBackup(){
+    ['cfgBackup','resBackup'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=backupFolder; });
+    var s=document.getElementById('sealPath'); if(s) s.textContent='Backup: '+backupFolder;
+  }
+
+  /* ============ Resumo do lote (modal ovRes) — montado a partir dos dados ============ */
+  function renderRes(){
+    var rows=document.getElementById('resRows');
+    var origin={}; summaryCards.forEach(function(c){ origin[c.code]=(origin[c.code]||0)+1; });
+    var html=summaryCards.map(function(c){
+      if(c.dst==='') return '<div class="resrow"><span class="badge warn">remover</span> <code>'+esc(c.code)+'</code> → <b>removido</b> · '+(c.prog||0)+' programas</div>';
+      return '<div class="resrow"><span class="badge sub">substituir</span> <code>'+esc(c.code)+'</code> → <code>'+esc(c.dst)+'</code> · '+(c.prog||0)+' programas</div>';
+    }).join('');
+    Object.keys(origin).filter(function(k){ return origin[k]>1; }).forEach(function(k){
+      html+='<div class="resrow"><span class="badge warn">⚠ conflito</span> <code>'+esc(k)+'</code> alterado por mais de uma edição — revise antes de publicar</div>';
+    });
+    rows.innerHTML=html||'<div class="resrow">Nenhuma edição no lote.</div>';
+    var ex=summaryCards.slice(0,2).map(function(c){
+      var label=c.dst===''?'remover':'substituir';
+      var nw=c.dst===''?'<span class="new">N60</span>':'<span class="new">N60 '+esc(c.dst)+'</span>';
+      return '<div class="pvrow"><span class="pvtag sub">'+label+'</span><span class="old">N60 '+esc(c.code)+'</span> <span>→</span> '+nw+'</div>';
+    }).join('');
+    document.getElementById('resPreview').innerHTML='<div class="pvh">Pré-visualização — o que muda em cada linha</div>'+(ex||'<div class="pvrow">—</div>');
+  }
+
+  /* ============ Passo 17: inserir bloco multi-linha no editor ============ */
+  function renderInsBlocks(){
+    var box=document.getElementById('insBlocks'); if(!box) return;
+    if(!BLOCKS.length){ box.innerHTML='<span class="ins-chip empty">Nenhum modelo salvo — crie um em “+ Adicionar código”.</span>'; return; }
+    box.innerHTML=BLOCKS.map(function(b,i){ return '<button class="ins-chip" onclick="useBlock('+i+')" title="'+esc(b.desc)+'">'+esc(b.name)+'</button>'; }).join('');
+  }
+  function useBlock(i){ var b=BLOCKS[i]; if(!b) return; document.getElementById('insText').value=b.text; insPreview(); }
+  function insOpen(){
+    if(currentFile===null) return;
+    document.getElementById('insFname').textContent=currentFile;
+    renderInsBlocks(); insPreview(); show('ovInsert');
+  }
+  function insPosMode(){ var r=document.querySelector('input[name="insPos"]:checked'); return r?r.value:'line'; }
+  function insComputeLines(){
+    var lines=((edInput&&edInput.value)||'').split('\n'), at;
+    if(insPosMode()==='line'){
+      var n=parseInt(document.getElementById('insLine').value,10); if(isNaN(n)||n<1) n=1;
+      at=Math.min(n,lines.length);
+    } else {
+      var code=document.getElementById('insCode').dataset.val||'', re=new RegExp('(^|\\s)'+reEscape(code)+'(\\s|$)');
+      at=lines.length;
+      for(var i=0;i<lines.length;i++){ if(re.test(lines[i])){ at=i+1; break; } }
+    }
+    return {lines:lines, at:at};
+  }
+  function insPreview(){
+    var box=document.getElementById('insPreviewBox'); if(!box) return;
+    var blk=(document.getElementById('insText').value||'').replace(/\s+$/,'');
+    var info=insComputeLines(), lines=info.lines, at=info.at;
+    if(!blk){ box.textContent='(digite o bloco para ver a prévia)'; return; }
+    var out=[]; for(var i=Math.max(0,at-2);i<at;i++){ if(lines[i]!==undefined) out.push('   '+(i+1)+'  '+lines[i]); }
+    blk.split('\n').forEach(function(l){ out.push(' + ▶  '+l); });
+    for(var j=at;j<Math.min(lines.length,at+2);j++){ out.push('   '+(j+1)+'  '+lines[j]); }
+    box.textContent=out.join('\n');
+  }
+  function insConfirm(){
+    var blk=(document.getElementById('insText').value||'').replace(/\s+$/,'');
+    if(!blk){ document.getElementById('insText').focus(); return; }
+    var info=insComputeLines(), lines=info.lines, at=info.at;
+    edInput.value=lines.slice(0,at).concat(blk.split('\n')).concat(lines.slice(at)).join('\n');
+    markDirty(); renderPlain(); resetCount(); hide('ovInsert');
   }
 
   /* ============ ② PROGRAMAS — adicionar / arrastar-soltar / estado vazio ============ */
   /* A seleção real de pasta/arquivo é OS-nativa (não prototipável em HTML); aqui é placeholder. */
   var FILES_HTML='';
+  /* Passo 7: clicar no ✓ marca/desmarca o programa; linha desmarcada fica esmaecida */
+  function toggleChk(el){
+    var off=el.classList.toggle('off');     /* off=true → desmarcado */
+    var row=el.closest('.file'); if(row) row.classList.toggle('off', off);
+    if(typeof renderSummary==='function') renderSummary();   /* atualiza o contador "Programas" ao vivo */
+  }
   function filesEmptyState(on){
     var f=document.getElementById('files');
+    var head=document.getElementById('filesHead');
+    if(head) head.style.display = on ? 'none' : '';   /* Passo 8: cabeçalho some quando não há programas */
     if(on){
       f.innerHTML='<div class="files-empty">'
         +'<div class="fe-ic">📂</div>'
@@ -837,8 +1136,9 @@
   function pickFiles(){
     var f=document.getElementById('files');
     if(f.querySelector('.files-empty')){
-      f.innerHTML='<div class="file"><span class="chk">✓</span><span class="fname">O2001_NOVO_A.NC</span><span class="fmeta">6,4 KB · agora</span><button class="editbtn" onclick="openEditor(\'O2001_NOVO_A.NC\')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>'
-        +'<div class="file"><span class="chk">✓</span><span class="fname">O2002_NOVO_B.NC</span><span class="fmeta">4,1 KB · agora</span><button class="editbtn" onclick="openEditor(\'O2002_NOVO_B.NC\')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover da lista">✕</button></div>';
+      var head=document.getElementById('filesHead'); if(head) head.style.display='';   /* Passo 8: volta o cabeçalho */
+      f.innerHTML='<div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O2001_NOVO_A.NC</span><span class="fcol">agora</span><span class="fcol">NC</span><span class="fcol">6,4 KB</span><button class="editbtn" onclick="openEditor(\'O2001_NOVO_A.NC\')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>'
+        +'<div class="file off"><span class="chk off" onclick="toggleChk(this)">✓</span><span class="fname">O2002_NOVO_B.NC</span><span class="fcol">agora</span><span class="fcol">NC</span><span class="fcol">4,1 KB</span><button class="editbtn" onclick="openEditor(\'O2002_NOVO_B.NC\')">✎ Editar</button><button class="filex" onclick="removeFile(this)" title="Remover">✕</button></div>';
     }
   }
   /* remove um programa da lista (seção 2); se esvaziar, mostra o estado vazio */
@@ -846,25 +1146,44 @@
     var row=btn.closest('.file'); if(row) row.remove();
     var f=document.getElementById('files');
     if(!f.querySelector('.file')) filesEmptyState(true);
+    if(typeof renderSummary==='function') renderSummary();
   }
   function fzOver(e){ e.preventDefault(); document.getElementById('files').classList.add('is-dragover'); }
   function fzLeave(e){ document.getElementById('files').classList.remove('is-dragover'); }
   function fzDrop(e){ e.preventDefault(); document.getElementById('files').classList.remove('is-dragover'); pickFiles(); }
   function fzKey(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pickFiles(); } }
+  /* Passo 15: trava o botão, mostra barra de progresso e só então abre o resumo */
+  var running=false;
   function execLote(){
-    show('ovRun'); rs1.innerHTML='Executando alterações…'; rs1.className='step act'; rs2.className='step';
-    setTimeout(function(){ rs1.innerHTML='<span class="ok">✓</span> Alterações executadas'; rs1.className='step'; rs2.className='step act'; },900);
-    setTimeout(function(){ hide('ovRun'); show('ovRes'); },1800);
+    if(running || !summaryCards.length) return;
+    running=true;
+    var cta=document.getElementById('ctaBtn'); cta.disabled=true; cta.querySelector('.big').textContent='Processando…';
+    renderRes();
+    show('ovRun');
+    rs1.innerHTML='Executando alterações…'; rs1.className='step act'; rs2.className='step';
+    runFill.style.width='0%'; runPct.textContent='0%';
+    var pct=0;
+    var iv=setInterval(function(){
+      pct+=Math.max(6,(100-pct)*0.16); if(pct>100)pct=100;
+      runFill.style.width=pct+'%'; runPct.textContent=Math.round(pct)+'%';
+      if(pct>=55 && rs2.className.indexOf('act')<0){ rs1.innerHTML='<span class="ok">✓</span> Alterações executadas'; rs1.className='step'; rs2.className='step act'; }
+      if(pct>=100){ clearInterval(iv); setTimeout(function(){ hide('ovRun'); show('ovRes'); endRun(); },350); }
+    },200);
+  }
+  function endRun(){
+    running=false;
+    var cta=document.getElementById('ctaBtn'); cta.querySelector('.big').textContent='Executar Lote'; cta.disabled=(summaryCards.length===0);
   }
   function runSave(){
     hide('ovRes'); show('ovSave'); saveH.textContent='Publicando…';
-    saveBody.innerHTML='<div class="bigspin"></div><div class="step act">Backup dos originais → troca na pasta da máquina → conferência SHA-256…</div>';
+    saveBody.innerHTML='<div class="bigspin"></div><div class="step act">Backup dos originais → grava na pasta original → conferência SHA-256…</div>';
     setTimeout(function(){ saveH.textContent='Publicado ✓';
-      saveBody.innerHTML='<div class="saved-ic">✓</div><div class="step act">Editados na pasta da máquina · originais no backup · conferência dupla OK · pasta aberta</div>'
-        +'<div class="step mono">backup: …\\_backup_orig_2026-06-04_14-30\\</div>'
-        +'<div class="saved-actions"><button class="mbtn save" onclick="hide(\'ovSave\')">OK — novo lote</button></div>';
+      saveBody.innerHTML='<div class="saved-ic">✓</div><div class="step act">Editados na pasta original · originais no backup · conferência dupla OK · pasta aberta</div>'
+        +'<div class="step mono">backup: '+backupFolder+'</div>'
+        +'<div class="saved-actions"><button class="mbtn save" onclick="newLote()">OK — novo lote</button></div>';
     },1500);
   }
+  function newLote(){ hide('ovSave'); summaryCards=[]; renderSummary(); }
 
   /* ============ EDITOR INTEGRADO ============ */
   /* biblioteca pesquisável (amostra; o app real tem 247) */
@@ -1034,12 +1353,26 @@
   function buildLibLists(){
     document.querySelectorAll('.libdrop-list').forEach(function(list){ renderLib(list,''); });
   }
+  /* Passo 12: só o código visível; a descrição vai no tooltip (title) — busca ainda casa por descrição. */
+  function rowsLib(arr){
+    return arr.map(function(c){ return '<button class="libitem code-only" onclick="pickLib(this)" data-code="'+esc(c[0])+'" title="'+esc(c[1])+'"><span class="code">'+esc(c[0])+'</span></button>'; }).join('');
+  }
+  /* Passo 9: frequentes no topo quando a busca está vazia; campo destino ganha a opção "remover". */
   function renderLib(list,q){
     q=(q||'').toLowerCase();
+    var dd=list.closest('.libdrop'), role=dd?dd.dataset.role:'';
+    var head = (role==='dst' && !q)
+      ? '<button class="libitem code-only remove" onclick="pickLib(this)" data-code="" title="Destino vazio = remover o código"><span class="code">✕ Remover (sem código)</span></button>'
+      : '';
+    if(!q){
+      var freq=LIB.filter(function(c){ return FREQ.indexOf(c[0])>=0; });
+      list.innerHTML = head
+        + '<div class="libdrop-hint">★ Frequentes</div>' + rowsLib(freq)
+        + '<div class="libdrop-hint">Todos · '+LIB.length+'</div>' + rowsLib(LIB);
+      return;
+    }
     var items=LIB.filter(function(c){ return c[0].toLowerCase().indexOf(q)>=0 || c[1].toLowerCase().indexOf(q)>=0; });
-    if(!items.length){ list.innerHTML='<div class="libitem empty">Nenhum código</div>'; return; }
-    /* Passo 12: só o código visível; a descrição vai no tooltip (title) — busca ainda casa por descrição. */
-    list.innerHTML=items.map(function(c){ return '<button class="libitem code-only" onclick="pickLib(this)" data-code="'+c[0]+'" title="'+esc(c[1])+'"><span class="code">'+c[0]+'</span></button>'; }).join('');
+    list.innerHTML = head + (items.length ? rowsLib(items) : '<div class="libitem empty">Nenhum código</div>');
   }
   function toggleLib(btn){
     var dd=btn.closest('.libdrop'), wasOpen=dd.classList.contains('open');
@@ -1048,15 +1381,17 @@
   }
   function filterLib(input){ var dd=input.closest('.libdrop'); renderLib(dd.querySelector('.libdrop-list'), input.value); }
   function pickLib(item){
-    var dd=item.closest('.libdrop'), code=item.dataset.code;
-    dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code;
-    dd.querySelector('.libdrop-btn').title=item.title||'';   /* descrição no hover do botão (Passo 12) */
-    if(dd.dataset.role==='find'){ findCode=code; resetCount(); renderPlain(); }
-    else{ replCode=code; if(stepMode) refreshStep(); }
+    var dd=item.closest('.libdrop'), code=item.dataset.code, role=dd.dataset.role, desc=item.getAttribute('title')||'';
+    if(role==='src'){ setSrc(code,desc); }
+    else if(role==='dst'){ setDst(code,desc); }
+    else if(role==='inscode'){ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; insPreview(); }
+    else if(role==='find'){ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; findCode=code; resetCount(); renderPlain(); }
+    else{ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; replCode=code; if(stepMode) refreshStep(); }
     dd.classList.remove('open');
   }
   document.addEventListener('click',function(e){
     if(!e.target.closest('.libdrop')) document.querySelectorAll('.libdrop').forEach(function(d){ d.classList.remove('open'); });
+    if(!e.target.closest('#cfgCtl')) closeCfg();
   });
   /* teclado: Esc fecha o overlay aberto; Enter confirma o "Salvar como…" (fora dos botões de opção) */
   document.addEventListener('keydown',function(e){
@@ -1075,8 +1410,11 @@
   /* ============ init ============ */
   FILES_HTML=document.getElementById('files').innerHTML;   /* guarda a lista original p/ restaurar do estado vazio */
   buildLibLists();
-  renderEditList();
-  syncBanner(); setConflict(true);
+  clearComposer();        /* Passos 1/10: campos vazios com texto-guia */
+  renderEditList();       /* Passo 11: lista recolhida (vazia) */
+  renderSummary();        /* Passo 12: Resumo começa no estado vazio */
+  renderCfgMenu();        /* Passo 13: menu de configurações salvas */
+  reflectBackup();        /* Passo 16: caminho de backup nos textos */
 </script>
 </body>
 </html>

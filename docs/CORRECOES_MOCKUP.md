@@ -1,29 +1,29 @@
 # Correções do Mockup FlowNC — Documento Técnico
 
-> ## ⚠️ AÇÃO DA PRÓXIMA SESSÃO — IMPLEMENTAR OS 17 ITENS
-> Na próxima sessão o assistente **deve implementar** os 17 itens abaixo no mockup
-> `mockups/painel-final.v2.html`, na ordem dos sprints. **As 7 decisões já estão fechadas
-> (ver "(decidido)" em cada item e a seção "Decisões tomadas") — não re-perguntar.** Começar pelo
-> **Sprint 1**. Ao final, remover as 2 variantes `painel-final.v2-*-combo-*.html`.
+> ## ✅ CONCLUÍDO — OS 17 ITENS IMPLEMENTADOS NO MOCKUP
+> Os 17 itens foram implementados em `mockups/painel-final.v2.html` (protótipo interativo,
+> sem backend real). As 2 variantes `painel-final.v2-*-combo-*.html` foram removidas.
+> **Próximo passo:** o Mestre revisa o protótipo no navegador; depois de aprovado, portar
+> as mudanças para o app Python (etapa posterior, fora deste documento).
 >
-> **Checklist dos 17 itens** (estado: ☐ a implementar · ◐ base já aplicada):
-> - ◐ 1. Placeholders + seta nos menus de código *(feito no app; refletir no mockup)*
-> - ☐ 2. Contador no botão "Adicionar edição ao lote" (e remover texto extra)
-> - ☐ 3. Trocar o aviso verde da Seção 3 (pasta original / backup separado)
-> - ☐ 4. Mover "+ Adicionar código" para a Seção 1
-> - ◐ 5. Botão ✕ de excluir padronizado *(✕ já aplicado)* + padronizar tamanhos de botões
-> - ☐ 6. Padronizar botões e layout entre Seções 2 e 3
-> - ◐ 7. Programas iniciam desmarcados + check ✓ *(feito no app; refletir no mockup)*
-> - ☐ 8. Lista de programas em colunas: Nome | Data de modificação | Tipo | Tamanho
-> - ☐ 9. Filtrar códigos (frequentes/recentes no topo + busca)
-> - ☐ 10. Fluxo de criar edição (origem→destino→"Adicionar edição"; destino vazio = remover, c/ aviso)
-> - ☐ 11. Lista de edições dinâmica (recolhida → expande, com feedback)
-> - ☐ 12. Estado inicial/vazio da Seção 3 (muda quando há itens)
-> - ☐ 13. "Perfil" → "Configurações salvas" (criar/salvar/reutilizar)
-> - ☐ 14. Botões de ação do Resumo funcionando (✎ ⧉ ✕)
-> - ☐ 15. Feedback de execução (trava botão, pop-up, barra de progresso)
-> - ☐ 16. Salvamento: pasta original de cada arquivo + backup em pasta escolhida/fixa
-> - ☐ 17. Inserir múltiplas linhas em posição específica (novo recurso)
+> **Checklist dos 17 itens** (✅ implementado no mockup):
+> - ✅ 1. Placeholders + seta nos menus de código (campos viram dropdown pesquisável; seta inverte)
+> - ✅ 2. Contador ao vivo no botão "Adicionar edição ao lote (N)" + sem texto redundante
+> - ✅ 3. Selo da Seção 3: "salvos na pasta original · backup em pasta separada" (+ overlays)
+> - ✅ 4. "+ Adicionar código" movido para a Seção 1 + modal de cadastro (com bloco opcional)
+> - ✅ 5. Botão ✕ único de excluir + tooltips "Remover" nas 3 seções + foco padronizado
+> - ✅ 6. Botões/ações padronizados entre Seções 2 e 3 (mesmo anel de foco/altura/raio)
+> - ✅ 7. Programas iniciam desmarcados; clique no ✓ marca/desmarca (linha esmaecida)
+> - ✅ 8. Lista de programas em colunas: Nome | Data de modificação | Tipo | Tamanho (cabeçalho fixo)
+> - ✅ 9. Menu de códigos pesquisável: frequentes no topo + busca por código/descrição
+> - ✅ 10. Fluxo explícito: origem→destino→"Adicionar edição"; destino vazio = remover (com aviso)
+> - ✅ 11. Lista de edições dinâmica: recolhida quando vazia, cresce e pisca ao incluir
+> - ✅ 12. Resumo com estado vazio; cards/contadores/selo/CTA só aparecem com itens
+> - ✅ 13. "Perfil" → "Configurações salvas" (seletor + criar/salvar/reutilizar, em memória)
+> - ✅ 14. Ações do Resumo funcionais: ✎ devolve ao compositor · ⧉ duplica · ✕ remove
+> - ✅ 15. Execução: trava o CTA, pop-up com barra de progresso 0→100%, reabilita ao fim
+> - ✅ 16. Narrativa de salvamento na pasta original + backup em pasta escolhida/fixa/trocável
+> - ✅ 17. Inserir bloco multi-linha em posição (linha Nº ou código), com prévia (modal ovInsert)
 
 ## Contexto
 Foram levantados **17 problemas** na interface do FlowNC. A estratégia aprovada é
@@ -65,9 +65,10 @@ Decisões confirmadas com o Mestre:
   glossy/sombras sóbrias, emojis decorativos → glifos neutros.
 - **Botão ✕ de excluir padronizado** nas 3 seções (igual ao `.filex` dos programas).
 
-**Pendente:**
-- Os **17 itens** abaixo, no mockup, organizados em 3 sprints (ver fim do documento).
-- Remover as 2 variantes `painel-final.v2-with-combo-feedback.html` e `…-CODE-COMBO-UPDATED.html`.
+**Concluído (sessão 10):**
+- Os **17 itens** implementados no mockup (3 sprints — ver fim do documento). Sintaxe JS validada.
+- As 2 variantes `painel-final.v2-with-combo-feedback.html` e `…-CODE-COMBO-UPDATED.html` **removidas**.
+- **Pendente:** revisão visual do Mestre no navegador → depois, portar ao app Python.
 
 ---
 

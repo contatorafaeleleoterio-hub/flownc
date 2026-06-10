@@ -1,31 +1,26 @@
-# Handoff — FlowNC — 2026-06-09 (sessão 9)
-Status: Mockup `painel-final.v2.html` em correção — base visual aplicada; 17 itens (sprints) pendentes.
+# Handoff — FlowNC — 2026-06-10 (sessão 10)
+Status: Mockup `painel-final.v2.html` — **os 17 itens implementados** (protótipo interativo). Aguardando revisão visual do Mestre.
 
->> AÇÃO DA PRÓXIMA SESSÃO: **implementar os 17 itens** no mockup `painel-final.v2.html`,
->> na ordem dos sprints (1→2→3). Lista completa + decisões já fechadas em
->> `docs/CORRECOES_MOCKUP.md` (checklist no topo). NÃO re-perguntar as decisões. Começar pelo
->> Sprint 1; ao final, remover as 2 variantes `painel-final.v2-*-combo-*.html`.
+>> AÇÃO DA PRÓXIMA SESSÃO: o Mestre **revisa o protótipo no navegador**
+>> (abrir `mockups/painel-final.v2.html`). Se aprovar, **portar as mudanças para o app Python**
+>> (etapa posterior). Se pedir ajustes, corrigir item a item no mesmo arquivo.
+>> Checklist completo (17 ✅) no topo de `docs/CORRECOES_MOCKUP.md`.
 
 Feito nesta sessão:
-- App: combos de código com placeholder + seta (classe `CodeCombo` compartilhada em
-  `ui/components/code_combo.py`, reusada no editor) e programas iniciam desmarcados com ✓.
-  Commit `74f899d` (master, sem push). 148 testes verdes; ruff/mypy limpos.
-- Documento técnico das 17 correções do sistema: `docs/CORRECOES_MOCKUP.md`
-  (problema/estado/mudança/interação por item) + 7 decisões fechadas + seção de status.
-- Mockup v2: paleta "Precisão Laranja" aplicada (header slate, CTA laranja único, painéis L/R,
-  azul → slate); polimento visual (raios/sombras/tags retangulares/emojis→glifos); botão ✕ de
-  excluir padronizado nas 3 seções.
-- Paleta salva como fonte da verdade: `docs/PALETA_PRECISAO_LARANJA.md`.
+- **Sprint 1 (itens 1–8):** placeholder/seta; contador no botão "Adicionar ao lote"; selo "pasta
+  original/backup separado"; "+ Adicionar código" movido p/ Seção 1 (+ modal); ✕ único + tooltips;
+  foco padronizado; programas iniciam desmarcados (clique marca); lista de programas em 4 colunas.
+- **Sprint 2 (itens 9–14):** campos origem/destino viram dropdown pesquisável (frequentes no topo);
+  fluxo explícito origem→destino→"Adicionar edição" (destino vazio = remover, com aviso); lista de
+  edições dinâmica (recolhe/cresce/pisca); Resumo data-driven com estado vazio + detecção de conflito;
+  "Configurações salvas" (criar/salvar/reutilizar, em memória); ações do card (✎ devolve, ⧉ duplica, ✕ remove).
+- **Sprint 3 (itens 15–17):** execução trava o CTA + barra de progresso 0→100%; salvamento na pasta
+  original + backup escolhido/fixo/trocável (selo, ovRes c/ [Mudar]); inserir bloco multi-linha por
+  posição (linha Nº ou código) com prévia (modal ovInsert) + biblioteca aceita blocos.
+- Removidas as 2 variantes `painel-final.v2-*-combo-*.html`. Sintaxe JS validada (node --check), sem refs órfãs.
 
-Onde parou: base visual do mockup aplicada; aguardando "pode seguir" para o Sprint 1.
-Próximo passo: Sprint 1 no mockup (itens 1–8) + remover as 2 variantes `*-combo-*.html`.
-
-Decisões-chave: alvo = `painel-final.v2.html`; excluir = botão ✕ (substitui o 🗑 do item 5);
-destino vazio = remover (com aviso); "Perfil" → "Configurações salvas"; backup em pasta
-escolhida/lembrada/trocável; colunas Nome | Data modificação | Tipo | Tamanho; códigos
-frequentes/recentes no topo; "+ Adicionar código" vai para a Seção 1.
-
+Onde parou: protótipo completo no mockup; commit feito (sem push).
+Próximo passo: revisão visual do Mestre; depois portar ao app Python.
 Blockers: nenhum.
-Arquivos tocados: mockups/painel-final.v2.html, docs/CORRECOES_MOCKUP.md,
-docs/PALETA_PRECISAO_LARANJA.md, HANDOFF.md (+ commit app `74f899d`).
-Retomar com: "pode seguir" (inicia Sprint 1) ou "continuar".
+Arquivos tocados: mockups/painel-final.v2.html, docs/CORRECOES_MOCKUP.md, HANDOFF.md (+ remoção das 2 variantes).
+Retomar com: "continuar" (entra na revisão/port) ou apontar ajustes do mockup.
