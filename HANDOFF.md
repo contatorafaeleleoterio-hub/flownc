@@ -1,21 +1,20 @@
-# Handoff — FlowNC — 2026-06-10 (sessão 11)
-Status: Redesign proposto — mockup **v3** criado (`mockups/painel-final.v3.html`); v2 intacto. Em revisão do Mestre.
-
->> AÇÃO DA PRÓXIMA SESSÃO: Mestre revisa o v3 no navegador (F5 recarrega; anotações 🛈 ligam/desligam no topo).
->> Aplicar ajustes um a um. Se ele aprovar o v3 como design alvo, atualizar CLAUDE.md/PRD/PLAN
->> (alvo passa de v2 → v3) ANTES de iniciar o porte ao app Python.
+# Handoff — FlowNC — 2026-06-11 (sessão 12)
+Status: **Mockup v4 APROVADO pelo Mestre = contrato visual.** Fase 1 concluída; pronto p/ Fase 2 (porte ao app Qt).
 
 Feito nesta sessão:
-- Diagnóstico UX do v2 (contador "Alterações" inventado; funil duplo de listas; CTA "Executar" que não executa).
-- Mockup v3 do zero (Mestre escolheu liberdade total): rail c/ 4 telas (Lote/Editor/Códigos/Histórico),
-  lista única do lote, "Conferir lote" c/ varredura real (borda CNC M8≠M80) + "Publicar — X trocas",
-  Histórico c/ restaurar backup, editor tela cheia c/ Desfazer pós-salvar, marcar todos, paleta/fontes do v2.
-- Pedido do Mestre: "Inserir bloco" também em LOTE → 2º tipo de edição (âncora por código ou linha,
-  prévia real no 1º programa marcado; conferência/publicação contam "trocas · bloco em N programas").
-- JS validado com node --check a cada rodada.
+- Mockup **v4** criado e aprovado (`mockups/painel-final.v4.html`; v3 intacto). 5 mudanças:
+  compositor único c/ abas (trocar/inserir, 1 botão); Salvar no cabeçalho do editor; conferência
+  c/ total no topo + zeros recolhidos + "Publicar mesmo assim" em conflito; topo sem ação duplicada
+  + confirmação ao carregar receita; contagem automática no editor (lupa aposentada).
+- 3 correções de honestidade/segurança: conferência simula o pipeline encadeado da publicação;
+  duplicar (⧉) clona a edição inteira; bloco sem âncora não insere no fim do arquivo.
+- Smoke headless (jsdom) 22/22 verde. Commit `feeea1e` (sem push).
+- Docs atualizados p/ v4: **`docs/CONTEXTO-IA.md` (NOVO — contexto central p/ qualquer IA)**,
+  CLAUDE.md, docs/CONTEXTO.md, PLAN.md (contrato v2→v4), HANDOFF.
 
-Onde parou: v3 completo e aberto no navegador; aguardando próxima leva de revisão.
-Próximo passo: ajustes do Mestre no v3 OU decisão v2×v3 como alvo da FASE 2 (porte ao app).
+Onde parou: v4 aprovado e documentado; anotações ✦ azuis no mockup = mudanças v4.
+Próximo passo: iniciar **FASE 2** — portar o v4 ao PySide6 tela por tela (começar pela tela Lote),
+conferindo lado a lado com o mockup; só layout/estilo, sem lógica nova.
 Blockers: nenhum.
-Arquivos tocados: mockups/painel-final.v3.html (novo), HANDOFF.md.
+Arquivos tocados: mockups/painel-final.v4.html, docs/CONTEXTO-IA.md, docs/CONTEXTO.md, CLAUDE.md, PLAN.md, HANDOFF.md.
 Retomar com: "continuar"

@@ -2,6 +2,16 @@
 
 status: pronto
 
+> 🟠 **ATUALIZAÇÃO 2026-06-11 — CONTRATO VISUAL = MOCKUP v4 (GATE DA FASE 1 CUMPRIDO).**
+> O Mestre aprovou **`mockups/painel-final.v4.html`** como o contrato visual congelado.
+> Onde este plano diz `painel-final.v2.html`, leia **v4** — as menções a v2 abaixo são
+> históricas. ⚠️ O detalhamento da Fase 2 (inventário, "Próximos passos 1–9") foi escrito
+> contra o v2; a estrutura do v4 difere (rail com 4 telas: Lote · Editor · Códigos · Histórico;
+> compositor com abas; modal de Conferência; tela Histórico) — **revisar esses passos contra o
+> v4 antes de executá-los**. Fonte da verdade do design: o próprio mockup v4 (anotações ✦/🛈
+> embutidas) + **`docs/CONTEXTO-IA.md`** (descrição completa de telas, fluxos e regras).
+> Próxima etapa: **FASE 2** — portar o v4 ao PySide6 tela por tela.
+
 ## ⛳ REGRA DE OURO — protótipo HTML antes do código (2026-06-07)
 
 > **Nenhuma tela, popup, estado ou interação é implementada no app antes de existir e estar aprovada no protótipo HTML.** O protótipo HTML (`mockups/painel-final.v2.html`) é o **contrato visual único** do projeto. O código deve segui-lo rigorosamente: cores, fontes, espaçamentos, textos, estados e comportamento. Qualquer mudança visual exige **primeiro** alterar o protótipo e obter aprovação do Mestre — só depois o código acompanha.

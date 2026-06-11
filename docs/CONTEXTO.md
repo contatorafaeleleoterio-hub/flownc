@@ -1,5 +1,19 @@
 # Contexto Atual
 
+> 🟠 **ATUALIZAÇÃO 2026-06-11 — DESIGN ALVO MUDOU PARA O MOCKUP v4.**
+> O Mestre aprovou `mockups/painel-final.v4.html` como **contrato visual** do app.
+> Linhagem: v2 (aprovado 2026-06-05) → v3 (redesign 2026-06-10: rail com 4 telas
+> Lote/Editor/Códigos/Histórico, "Conferir lote" com varredura real, Histórico com restaurar,
+> inserir bloco em lote) → **v4 (refinamento aprovado 2026-06-11)**: compositor único com abas
+> (trocar código / inserir bloco, um só botão "+ Adicionar ao lote"), Salvar no cabeçalho do
+> editor, conferência com total em destaque + zeros recolhidos + "Publicar mesmo assim" em
+> conflito, topo sem ação duplicada + confirmação ao carregar receita com lote montado,
+> contagem automática no editor; mais 3 correções de honestidade (conferência simula o pipeline
+> encadeado da publicação; duplicar clona a edição inteira; bloco sem âncora não insere no fim
+> do arquivo). **Referências a v2/v3 como "alvo" neste documento e no PLAN.md valem só como
+> histórico.** Descrição completa do v4 (telas, fluxos, interatividade, regras de negócio):
+> **`docs/CONTEXTO-IA.md`** — documento central, autossuficiente, para qualquer agente/IA.
+
 ## Termos adotados (2026-06-06)
 
 - **Plano de execução / plano de implementação:** criação de um documento com as etapas necessárias para executar uma solução já decidida. Vale para qualquer pedido de "plano", seja qual for o nome usado (stack, roteiro, documento etc.).
@@ -35,7 +49,7 @@ Mudança OpenSpec `motor-contagem-e-publicacao` (a parte "Retirar" foi removida 
 
 ## Situação do produto
 
-O produto convergiu para a dinâmica "por código" (composição de regras, seleção de programas, resumo dominante) + editor integrado por arquivo. O **design alvo é exclusivamente o mockup v2** (`mockups/painel-final.v2.html`); qualquer layout anterior está **descartado**.
+O produto convergiu para a dinâmica "por código" (composição de edições em lote, seleção de programas, conferência real antes de publicar) + editor integrado por arquivo. O **design alvo é exclusivamente o mockup v4** (`mockups/painel-final.v4.html`, aprovado 2026-06-11); v2/v3 e qualquer layout anterior estão **descartados como alvo** (ver atualização no topo).
 
 ## Situação da documentação
 
