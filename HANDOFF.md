@@ -1,16 +1,11 @@
-# Handoff — FlowNC — 2026-06-11 (sessão 12)
+# Handoff — FlowNC — 2026-06-11 (sessão 13)
 Status: **Mockup v4 APROVADO pelo Mestre = contrato visual.** Fase 1 concluída; pronto p/ Fase 2 (porte ao app Qt).
 
 Feito nesta sessão:
-- Mockup **v4** criado e aprovado (`mockups/painel-final.v4.html`; v3 intacto). 5 mudanças:
-  compositor único c/ abas (trocar/inserir, 1 botão); Salvar no cabeçalho do editor; conferência
-  c/ total no topo + zeros recolhidos + "Publicar mesmo assim" em conflito; topo sem ação duplicada
-  + confirmação ao carregar receita; contagem automática no editor (lupa aposentada).
-- 3 correções de honestidade/segurança: conferência simula o pipeline encadeado da publicação;
-  duplicar (⧉) clona a edição inteira; bloco sem âncora não insere no fim do arquivo.
-- Smoke headless (jsdom) 22/22 verde. Commit `feeea1e` (sem push).
-- Docs atualizados p/ v4: **`docs/CONTEXTO-IA.md` (NOVO — contexto central p/ qualquer IA)**,
-  CLAUDE.md, docs/CONTEXTO.md, PLAN.md (contrato v2→v4), HANDOFF.
+- Tradução e documentação dos comandos do projeto para PT-BR: `opsx:*` (4 arquivos) e `openspec-*` (4 skills).
+- Frontmatter PT-BR adicionado nos `plan-*` (que não tinham): `plan-disambiguate`, `plan-atomize`, `plan-resilience`, `plan-validate`.
+- Descrições reescritas para orientar o Mestre: cada tooltip explica QUANDO usar o comando.
+- Fluxo documentado: `/opsx:propor` = entrada para algo novo (mockup, feature); `plan-*` = refinamento do PLAN.md existente.
 
 Onde parou: v4 aprovado e documentado; anotações ✦ azuis no mockup = mudanças v4.
 Próximo passo: iniciar **FASE 2** — portar o v4 ao PySide6 tela por tela (começar pela tela Lote),

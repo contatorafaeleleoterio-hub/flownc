@@ -1,3 +1,8 @@
+---
+name: "Plano: Desambiguar"
+description: "Refinamento do PLAN.md — Etapa 2/5: remove ambiguidades e deixa cada passo claro o suficiente para qualquer agente executar."
+---
+
 # /plan-disambiguate
 
 Você está na etapa 2 de 5 do refinamento de plano.

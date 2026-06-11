@@ -1,6 +1,6 @@
 ---
-name: "OPSX: Propose"
-description: Propose a new change - create it and generate all artifacts in one step
+name: "OPSX: Propor"
+description: "Tem algo novo (mockup aprovado, ideia, feature)? Use aqui — descreva o que quer construir e receba proposta + design + lista de tarefas pronta para implementar."
 category: Workflow
 tags: [workflow, artifacts, experimental]
 ---

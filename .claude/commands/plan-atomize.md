@@ -1,3 +1,8 @@
+---
+name: "Plano: Atomizar"
+description: "Refinamento do PLAN.md — Etapa 3/5: quebra cada etapa em uma ação só com critério de conclusão mensurável."
+---
+
 # /plan-atomize
 
 Você está na etapa 3 de 5 do refinamento de plano.

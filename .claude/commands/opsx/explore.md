@@ -1,6 +1,6 @@
 ---
-name: "OPSX: Explore"
-description: "Enter explore mode - think through ideas, investigate problems, clarify requirements"
+name: "OPSX: Explorar"
+description: "Quer pensar antes de decidir? Use aqui para explorar ideias e investigar o código sem implementar nada."
 category: Workflow
 tags: [workflow, explore, experimental, thinking]
 ---

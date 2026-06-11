@@ -1,3 +1,8 @@
+---
+name: "Plano: Resiliência"
+description: "Refinamento do PLAN.md — Etapa 4/5: adiciona 'o que fazer se falhar' e como verificar o sucesso de cada passo."
+---
+
 # /plan-resilience
 
 Você está na etapa 4 de 5 do refinamento de plano.

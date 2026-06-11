@@ -1,6 +1,6 @@
 ---
-name: "OPSX: Archive"
-description: Archive a completed change in the experimental workflow
+name: "OPSX: Arquivar"
+description: "Terminou de implementar tudo? Use aqui para fechar e arquivar a mudança."
 category: Workflow
 tags: [workflow, archive, experimental]
 ---

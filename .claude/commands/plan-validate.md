@@ -1,3 +1,8 @@
+---
+name: "Plano: Validar"
+description: "Refinamento do PLAN.md — Etapa 5/5: revisão final. Quando terminar, o plano está pronto para execução por qualquer agente."
+---
+
 # /plan-validate
 
 Você está na etapa 5 de 5 do refinamento de plano.
