@@ -57,3 +57,10 @@ Após implementar os 17 itens, o Mestre revisou clicando e cobrou comportamento,
 - **Feedback visível (toast)** em cada ação simulada — o Mestre não-técnico precisa ver que "funcionou".
 - **Não deixar clique morto:** todo botão faz algo (Biblioteca de Códigos não abria nada; "+ Adicionar programa(s)" só com lista vazia). Modal: abrir limpo+focado, fechar por ✕/Esc/fundo, anti-duplicado.
 - **Agrupar por tema, sem redundância:** controles de "configuração" (seletor ativo + salvar + adicionar código) moram no **bloco Configurações**, não no header; seletor ao lado do título dispensa rótulo "Config." repetido. Rótulo solto em cima de **um só** controle numa fileira desalinha.
+
+## 2026-06-11 (sessão refino v4) — Escopo enxuto: não disparar workflow/pesquisa extensa sem o Mestre pedir
+O Mestre pediu "resolver as pontas soltas, uma pergunta de cada vez". Em vez disso, disparei um workflow multi-agente (62 agentes, ~1,2M tokens) para mapear TODAS as pendências — estourou o limite de sessão e o Mestre cortou ("não autorizei isso").
+- **Regra prática:** trazer só o que foi explicitamente mencionado/pedido; **uma pergunta por vez**, com recomendação em 1º lugar. Não escalar para fan-out/Workflow sem autorização explícita — Ultracode/Workflow **não** é o default deste projeto.
+- **Processo de plano:** o pipeline `/plan-*` opera no `PLAN.md` (raiz). Quando o detalhamento vive numa change OpenSpec, definir o **PLAN.md como fonte de verdade** e regenerar o `tasks.md` a partir dele (mantê-los em sincronia).
+- **Arquivar change não-implementada polui specs:** usar `openspec archive --skip-specs` guarda o histórico **sem** consolidar os deltas nos specs base (ou descartar a pasta). Foi a escolha do Mestre para a change v2 `redesign-fase2-fidelidade-visual`.
+- **Achado:** a "Fase 2" já tinha sido codada uma vez contra o v2 (commit `f28fdb8`) apesar do HANDOFF dizer que não havia começado — sempre conferir o git, não só o HANDOFF. Decisão do Mestre: refazer a UI do zero pro v4, preservando o `core/`.

@@ -1,15 +1,18 @@
-# Handoff — FlowNC — 2026-06-11 (sessão 13)
-Status: **Mockup v4 APROVADO pelo Mestre = contrato visual.** Fase 1 concluída; pronto p/ Fase 2 (porte ao app Qt).
+# Handoff — FlowNC — 2026-06-11 (sessão refino v4)
+Status: Planejamento concluído — PLAN.md v4 `status: pronto`. Fase 2 (porte ao app) NÃO iniciada.
 
 Feito nesta sessão:
-- Tradução e documentação dos comandos do projeto para PT-BR: `opsx:*` (4 arquivos) e `openspec-*` (4 skills).
-- Frontmatter PT-BR adicionado nos `plan-*` (que não tinham): `plan-disambiguate`, `plan-atomize`, `plan-resilience`, `plan-validate`.
-- Descrições reescritas para orientar o Mestre: cada tooltip explica QUANDO usar o comando.
-- Fluxo documentado: `/opsx:propor` = entrada para algo novo (mockup, feature); `plan-*` = refinamento do PLAN.md existente.
+- PLAN.md reescrito do zero pro v4 (rail + 4 telas: Lote/Editor/Códigos/Histórico) e refinado pelo
+  pipeline completo (disambiguate → atomize → resilience → validate).
+- Change OpenSpec `plano-execucao-mockup-v4` criada (proposal + design + 12 specs + tasks); válida.
+- Gate 0: change v2 `redesign-fase2-fidelidade-visual` arquivada com `--skip-specs` (histórico
+  guardado, specs base intactos).
+- Sincronia definida: PLAN.md = fonte de verdade; tasks.md regenerado como espelho; design.md alinhado.
 
-Onde parou: v4 aprovado e documentado; anotações ✦ azuis no mockup = mudanças v4.
-Próximo passo: iniciar **FASE 2** — portar o v4 ao PySide6 tela por tela (começar pela tela Lote),
-conferindo lado a lado com o mockup; só layout/estilo, sem lógica nova.
-Blockers: nenhum.
-Arquivos tocados: mockups/painel-final.v4.html, docs/CONTEXTO-IA.md, docs/CONTEXTO.md, CLAUDE.md, PLAN.md, HANDOFF.md.
+Onde parou: planejamento fechado e validado; nada de código de UI escrito ainda.
+Próximo passo: `/opsx:apply plano-execucao-mockup-v4` (Bloco 1 — theme.py + style.qss da paleta v4).
+  Opcional antes: decidir destino da change `add-code-combo-placeholder` (0/17, fora do v4).
+Blockers: nenhum (limite de sessão atingido nesta sessão — reseta 18:30).
+Arquivos tocados: PLAN.md, HANDOFF.md, LESSONS.md, openspec/changes/plano-execucao-mockup-v4/*,
+  openspec/changes/archive/2026-06-11-redesign-fase2-fidelidade-visual/* (movido da pasta ativa).
 Retomar com: "continuar"

@@ -1,411 +1,525 @@
-# Plano de Execução
+# Plano de Execução — FlowNC (mockup v4)
 
 status: pronto
 
-> 🟠 **ATUALIZAÇÃO 2026-06-11 — CONTRATO VISUAL = MOCKUP v4 (GATE DA FASE 1 CUMPRIDO).**
-> O Mestre aprovou **`mockups/painel-final.v4.html`** como o contrato visual congelado.
-> Onde este plano diz `painel-final.v2.html`, leia **v4** — as menções a v2 abaixo são
-> históricas. ⚠️ O detalhamento da Fase 2 (inventário, "Próximos passos 1–9") foi escrito
-> contra o v2; a estrutura do v4 difere (rail com 4 telas: Lote · Editor · Códigos · Histórico;
-> compositor com abas; modal de Conferência; tela Histórico) — **revisar esses passos contra o
-> v4 antes de executá-los**. Fonte da verdade do design: o próprio mockup v4 (anotações ✦/🛈
-> embutidas) + **`docs/CONTEXTO-IA.md`** (descrição completa de telas, fluxos e regras).
-> Próxima etapa: **FASE 2** — portar o v4 ao PySide6 tela por tela.
-
-## ⛳ REGRA DE OURO — protótipo HTML antes do código (2026-06-07)
-
-> **Nenhuma tela, popup, estado ou interação é implementada no app antes de existir e estar aprovada no protótipo HTML.** O protótipo HTML (`mockups/painel-final.v2.html`) é o **contrato visual único** do projeto. O código deve segui-lo rigorosamente: cores, fontes, espaçamentos, textos, estados e comportamento. Qualquer mudança visual exige **primeiro** alterar o protótipo e obter aprovação do Mestre — só depois o código acompanha.
+> **Base deste plano:** o contrato visual é o mockup **`mockups/painel-final.v4.html`** (aprovado
+> pelo Mestre em 2026-06-11). A descrição completa de telas, fluxos e regras está em
+> **`docs/CONTEXTO-IA.md`** (fonte central). Onde houver dúvida visual/comportamental, vale o
+> mockup v4 + o CONTEXTO-IA.
 >
-> **Isso inclui TODOS os componentes de sistema/feedback** — pop-ups de carregamento e de salvamento, avisos e mensagens do sistema, modais de confirmação, telas/efeitos de transição e demais elementos de navegação e interação. Cada um deve ter **estrutura, layout, tamanho, posição, aparência e comportamento** definidos e aprovados no protótipo **antes** de qualquer código. **Nada é decidido ou assumido durante o desenvolvimento:** o que não estiver especificado e aprovado no protótipo não se implementa — volta-se ao protótipo, aprova-se, e só então o código segue.
+> **Decisão do Mestre (2026-06-11):** a interface é **reconstruída do zero** seguindo o v4. O
+> código de UI feito antes contra o mockup v2 (commit `f28fdb8`: `compositor.py`, `header.py`,
+> `program_list.py`, `summary.py`, `editor_panel.py` no formato de 2 colunas) **não é base** —
+> será substituído pela estrutura nova do v4 (rail + 4 telas). O **núcleo (`core/`)** é
+> preservado e reaproveitado.
 >
-> **Por quê:** até aqui o design era improvisado durante a programação e o app entregue saía diferente do proposto (ver "Divergências de fidelidade abertas"). Congelar o visual num protótipo aprovado **antes** de codar elimina o improviso — o que o Mestre aprova é o que o sistema entrega.
+> **Detalhamento executável:** a Fase 2 está atomizada na change OpenSpec
+> **`plano-execucao-mockup-v4`** (`openspec/changes/plano-execucao-mockup-v4/`: `proposal.md`,
+> `design.md`, `specs/`, `tasks.md`). Este `PLAN.md` é o plano vivo de alto nível; a change é o
+> passo-a-passo que o `/opsx:apply` executa.
 
-## Reestruturação em 3 fases (2026-06-07) — manda sobre a ordem antiga
+## ⛳ REGRA DE OURO — protótipo aprovado é o contrato
 
-> Esta seção **reorganiza a execução** em 3 fases sequenciais com **gate de aprovação**. As seções detalhadas mais abaixo (Mudanças C/D, "Próximos passos 1–9", "Estado real auditado") continuam válidas como **detalhamento** das Fases 2 e 3 — esta seção fixa a **ordem** e o **gate**. A "Ordem recomendada (2026-06-07)" antiga fica **subordinada** a esta.
->
-> **Tecnologia:** protótipo = HTML/CSS/JS autocontido (roda no navegador, fácil de revisar); produção = **PySide6 nativo** (mantém a stack atual; app rápido e EXE pequeno, sem embutir navegador, reaproveita o `core/` e os testes). O HTML **não** roda dentro do app — é a **referência** que o Qt reproduz fielmente.
-
-### FASE 1 — Protótipo HTML completo e interativo ⛳ GATE (antes de qualquer código)
-
-Criar/concluir **um único** HTML interativo cobrindo **100%** das telas, popups e estados (inventário abaixo); torná-lo **offline** (fontes IBM Plex locais, sem CDN); revisar textos/estados reais; e **obter aprovação explícita do Mestre** ("é esse"). **A Fase 2 não começa sem esse "ok".** Entregável: `mockups/painel-final.v2.html` completo, offline e **congelado** = contrato visual.
-
-> **Inclui nesta FASE 1 (2026-06-08):** (a) **responsividade/dimensionamento** — `docs/RESPONSIVIDADE.md` (largura fluida 1180–1800, altura preenchendo a janela, scroll interno nos painéis); (b) **Catálogo Técnico** (Passo 11) e **dropdowns code-only + tooltip** (Passo 12). Tudo entra no mesmo protótipo antes do gate.
->
-> **⚠️ REVISÃO 2026-06-08 (sessão 6) — Catálogo Técnico DESCARTADO pelo Mestre.** O Passo 11 (Catálogo Técnico / modelo LIGADO) foi **removido do protótipo e do escopo**; volta-se ao modelo **anterior: biblioteca simples código + descrição** (`data/library.json` continua a fonte; **nada de catálogo-mestre nem `active_catalog`**). O **Passo 12** (dropdowns só-código + descrição no hover) **permanece aplicado**. A "Decisão LIGADO" abaixo e o Passo 11 ficam **históricos/inválidos** — não reimplementar.
-
-**Inventário que o protótipo DEVE cobrir (checklist de completude):**
-- **Telas principais:** normal (Resumo à direita); "regra em edição" (banner verde + linha draft); "editando arquivo" (colunas ~40/60, Editor no lugar do Resumo).
-- **Compositor:** campo origem; campo destino; lista de edições montadas; linha normal; linha em edição/draft; tag de status; botão remover ✕; "+ adicionar outra edição".
-- **Programas:** linha marcada; linha desmarcada (`.off`); botão Editar; **linha "em edição" com botão contextual `Voltar`** (arquivo aberto no editor); banner "regra em edição"; **"+ adicionar programas" (abre pasta/arquivos) + arrastar-e-soltar + estado vazio com CTA**; "Adicionar edição ao lote →" (normal e desabilitado).
-- **Resumo:** chip ok; chip aviso/conflito; contadores; card de regra normal; card com conflito; selo de backup; CTA "Executar Lote".
-- **Editor:** **cabeçalho com "Voltar ao resumo" proeminente no topo-esquerdo**; toolbar; dropdown biblioteca `libdrop` (fechado/aberto/busca/lista/item vazio); realce de ocorrência normal e atual; barra "um a um"; botão Salvar (ativo/desabilitado) **+ acesso a "Salvar como…"**; aviso "sem cópia".
-- **Componentes de sistema (transição/feedback) — OBRIGATÓRIOS, cada um com estrutura/layout/tamanho/posição/aparência/comportamento (gatilho, foco/teclado, como abre/fecha, duração):**
-  - *Carregando/processando:* abrir pasta; varrer programas; processar lote (spinner/progresso).
-  - *Salvando:* salvar no editor (em progresso) + sucesso "Salvo".
-  - *Avisos/mensagens:* erro (arquivo em uso / falha de rede / permissão); aviso "salva sem cópia/backup"; validação.
-  - *Modais de confirmação:* publicar lote; voltar/trocar arquivo com alterações não salvas; primeiro save sem backup; excluir regra/código/perfil.
-  - *Transições:* abrir editor (animação 60/40 ↔ 40/60); trocar arquivo no editor; voltar ao resumo.
-  - *Estados de componente:* vazio, carregando, sucesso, erro, desabilitado (lista, biblioteca, busca).
-  - *Notificações leves / tooltips:* ex. "perfil salvo"; tooltip de descrição do código.
-  - *Janelas de conteúdo:* Biblioteca de Códigos; Adicionar/editar código; Salvar perfil.
-  - *Salvar como…:* diálogo com escolha de **extensão/tipo** + **codificação/quebra de linha** (default = preservar o original) — ver Próximo passo 10.
-  - *Catálogo Técnico (janela não-modal):* botão `Catálogos` no header; seletor de catálogo + `+ Adicionar Catálogo` + busca; lista de categorias; lista de itens (código + descrição) editável; detalhe do item (código/descrição/exemplo/observação); seção `Exemplos` (texto livre); estados vazio/salvando — ver Passo 11.
-  - *Dropdowns de código (Configurações + Editor):* mostram **só o código**; descrição no **hover** (tooltip), sem texto inline — ver Passo 12.
-- **Exceções OS-nativas (placeholder, não prototipáveis em HTML):** seleção de pasta; seleção de arquivos.
-
-### FASE 2 — App nativo seguindo o protótipo à risca (só após o GATE)
-
-Reproduzir o contrato visual em PySide6, **tela por tela**, conferindo **lado a lado** com o protótipo (mesmo tamanho). Botões existem e respondem visualmente, mas **sem lógica de negócio** ainda (dados de exemplo fixos). Absorve os **Próximos passos 1, 2, 3, 5 e 6** (fidelidade de Compositor, header, lista, editor, modais/dropdowns) + sincronizar tokens `theme.py`/`style.qss` 1:1 com o protótipo. **Regra: só se mexe em arquivos de layout/estilo.**
-
-### FASE 3 — Ligar backend + empacotamento (só após app aprovado visualmente)
-
-Dar vida aos botões já aprovados **sem alterar o layout congelado**. Absorve o **Próximo passo 4** (`publish_batch` + contador), **7** (empacotamento do EXE), **8** (persistência de perfil), **9** (Seed) e as **Mudanças C e D**. **Regra: só se mexe em arquivos de lógica.**
-
-## Estado de execução e ordem recomendada (2026-06-07)
-
-> ⚠️ **Subordinado à "Reestruturação em 3 fases" acima.** A ordem abaixo só vale **dentro das Fases 2 e 3**, e somente **após** a Fase 1 (protótipo HTML aprovado).
-
-> **Leia primeiro — o ponto de partida.** As Mudanças **A e B já estão IMPLEMENTADAS e ARQUIVADAS** no OpenSpec:
-> - A → `openspec/changes/archive/2026-06-06-redesign-fundacao-visual`
-> - B → `openspec/changes/archive/2026-06-07-redesign-layout-principal` (atenção ao nome: foi arquivada como **`redesign-layout-principal`**, não `redesign-layout-paineis`).
->
-> Por isso as **Etapas 1–21 são registro histórico** — **não repropor nem reimplementar** (rodar `/opsx:propose redesign-fundacao-visual` ou `redesign-layout-paineis` recriaria mudanças já encerradas e geraria conflito). A execução real começa nas **pendências de fidelidade** ao mockup e segue por **C** e **D**.
->
-> **Crítico:** o **empacotamento (itens 7a–7e)** e a **Seed Fanuc (itens 9a–9e)** não são opcionais nem "do fim". Têm de estar prontos **antes de qualquer build de entrega** (Etapas 33 **e** 49); caso contrário o EXE sai "pelado" (sem tema, fontes, biblioteca ou perfil em outro PC).
-
-**Ordem recomendada (do estado atual até a entrega):**
-1. **Fidelidade ao mockup** — fechar as divergências do que A/B entregaram: Compositor no formato `editlist` (Próximo passo **1**), header (**2**), lista de programas sem checkbox duplo (**3**), orquestrador `publish_batch` + contador `Alterações` (**4**). Esses pendentes pertencem ao que A/B entregaram com divergência; agora estão em formato de etapa (critério + fallback) na seção "Próximos passos".
-2. **Mudança C** — Editor, limpeza e entrega (Etapas 22–36): glifos/realce/stepbar do editor (≈ Próximo passo **5**), remoção de redundâncias, smoke. **Não rodar o build da Etapa 33 sem o passo 3 abaixo.**
-3. **Empacotamento + Seed** — Próximos passos **7** (7a–7e) e **9** (9a–9e). **Pré-requisito do primeiro build de entrega (Etapa 33).**
-4. **Mudança D** — Segurança e polimento (Etapas 37–50): modais dos 4 overlays e dropdowns `libdrop` (≈ Próximo passo **6**), persistência de perfil (**8**), entrega final.
-
-> Cada item acima já tem critério de conclusão e fallback no bloco correspondente (Etapas C/D e Próximos passos 1–9). Esta seção fixa só **o que já está pronto**, **os nomes reais** e **a ordem**.
+> **Nenhuma tela, popup, estado ou interação se implementa no app sem estar no protótipo
+> aprovado.** O protótipo HTML (`mockups/painel-final.v4.html`) é o **contrato visual único**: o
+> código segue cores, fontes, espaçamentos, textos, estados e comportamento. Qualquer mudança
+> visual exige **primeiro** alterar o protótipo e obter aprovação do Mestre — só depois o código
+> acompanha. Isso inclui **todos** os componentes de sistema/feedback: pop-ups de
+> carregamento/salvamento, avisos, modais de confirmação, transições. Nada é decidido ou assumido
+> durante o desenvolvimento: o que não estiver no protótipo aprovado não se implementa.
 
 ## Objetivo
 
-Implementar o **novo design já aprovado** (mockup `mockups/painel-final.v2.html`) no app FlowNC, deixando a interface idêntica ao mockup e preservando a lógica atual (perfis, execução de substituições, biblioteca e o editor por arquivo já existente). O design antigo está **totalmente descartado** e não serve mais de referência.
+Reproduzir o mockup **v4** no app FlowNC (PySide6), entregando uma interface fiel ao protótipo e
+ligando-a ao núcleo já existente. O v4 organiza o app em **4 telas-lugar** numa barra lateral
+(rail): **Lote · Editor · Códigos · Histórico**, com um **topo global** (seletor de configuração +
+chip de backup) presente em todas elas. O coração do produto é o fluxo **Conferir → Publicar**:
+nada é gravado sem uma conferência com números reais, e toda publicação cria backup versionado.
 
-> **Como fica na nova atualização (verificações):** as **verificações automáticas de perfil** (conferir se o programa tem/não tem certo código — `must_exist`/`must_not_exist`) **saem do escopo** e não são mais preservadas. O sistema novo não confere nada sozinho: a biblioteca vira uma lista de **código + descrição curta, totalmente editável**; o operador escolhe um código (vai ao campo de origem) e outro (vai ao campo de destino), montando cada substituição manualmente. Onde este plano ainda citar "verificações" como lógica a manter, vale esta direção.
+## Estado atual (honesto)
 
-> **Decisão de modelo de dados da biblioteca (registrada):** o design aprovado fixa o modelo **"código + descrição curta" com montagem manual** (o operador escolhe um código para a origem e outro para o destino). A biblioteca é, na prática, um **dicionário de códigos** — cada código com o que ele significa —, não uma lista de trocas prontas. A **lógica interna não muda**: ao montar origem→destino, a regra continua sendo um par "trocar de X por Y" em tempo de execução.
+**Pronto e testado (núcleo — preservar):**
+- Motor de substituição com **borda CNC** (`core/matcher.py`), contagem (`core/scan.py`),
+  planejamento (`core/replacement_plan.py`), substituição (`core/replacer.py`).
+- **Conferência** (`core/conference.py`) e **publicação** com backup versionado + SHA-256
+  (`core/publisher.py`).
+- Gravação in-place atômica preservando codificação/BOM/EOL (`core/inplace_save.py`,
+  `core/file_handler.py`).
+- Biblioteca de códigos (`core/library_store.py`), perfis/receitas (`core/preset_store.py`),
+  configurações (`core/settings_store.py`), semente de fábrica (`core/seed.py`).
+- Suíte de testes verde (o número atual e os comandos exatos estão na seção **Tecnologias e
+  verificação**; usar sempre o venv `flownc/.venv`, PySide6 6.11.1 — nunca o `pytest` global).
+
+**A refazer (interface — Fase 2):**
+- A UI atual está na **estrutura de 2 colunas do v2** (`main_window.py` com `QSplitter`;
+  componentes `compositor.py`, `header.py`, `summary.py`, `program_list.py`). **Será substituída**
+  pela estrutura do v4 (rail + topo + 4 telas + modais), conforme decisão do Mestre.
+
+**A ligar/empacotar (Fase 3):**
+- Ligar as telas v4 ao núcleo (conferência, publicação, biblioteca, receitas, histórico).
+- Empacotar o EXE com tema, fontes IBM Plex e dados de fábrica (PyInstaller).
+
+## Fases
+
+### FASE 1 — Protótipo v4 ✅ CONCLUÍDA (gate cumprido)
+Mockup `mockups/painel-final.v4.html` completo, interativo e **aprovado** (2026-06-11) =
+contrato visual congelado. Documentado em `docs/CONTEXTO-IA.md`.
+
+### FASE 2 — Porte visual do v4 ao app (em execução)
+Reconstruir a interface em PySide6 seguindo o v4 **uma tela de cada vez**, na ordem definida no
+`tasks.md` da change `plano-execucao-mockup-v4`. **Conferência lado a lado** = abrir o
+`mockups/painel-final.v4.html` no navegador e o app rodando ao lado, comparando cada tela (mesma
+largura de janela) antes de marcar a tarefa como concluída. **"Botões respondem visualmente"** =
+têm estados de hover/pressionado pelo QSS e as ações de **navegação** (trocar de tela, abrir/fechar
+modal, marcar/desmarcar item) funcionam; ações que dependem do núcleo (publicar de verdade, salvar
+receita em disco, varrer arquivos) ainda **não** funcionam nesta fase — as telas exibem **dados de
+exemplo** (valores fixos escritos no próprio código da UI, não lidos de `core/`). **Regra: nesta
+fase só se altera arquivos de UI** (`flownc/ui/**`: layout, estilo, componentes, telas, modais);
+o núcleo (`flownc/core/`) **não muda**. Detalhamento tarefa a tarefa na change
+`plano-execucao-mockup-v4`.
+
+Alvo de estrutura de arquivos (novos):
+- `flownc/ui/components/rail.py` — barra lateral com os 4 botões-lugar.
+- `flownc/ui/components/top_bar.py` — topo global (configuração/receita + chip de backup).
+- `flownc/ui/screens/lote_screen.py` — tela Lote (Programas + Compositor com abas + Lote de edições).
+- `flownc/ui/screens/editor_screen.py` — tela Editor (faixa de arquivos + editor tela cheia).
+- `flownc/ui/screens/codigos_screen.py` — tela Códigos (biblioteca).
+- `flownc/ui/screens/historico_screen.py` — tela Histórico.
+- `flownc/ui/modals/conferencia_modal.py` — modal "Conferência do lote — números reais".
+- `flownc/ui/modals/publicacao_modal.py` — modal de publicação (progresso + resultado).
+- `flownc/ui/theme.py` + `flownc/ui/style.qss` — paleta "Precisão Laranja" do v4 (CTA `#E85D04`).
+- `flownc/ui/main_window.py` — vira o maestro: topo + (rail + `QStackedWidget` das 4 telas).
+
+### FASE 3 — Ligar núcleo + empacotamento (só após a Fase 2 ser aprovada pelo Mestre)
+**"Fase 2 aprovada"** = o Mestre conferiu o app contra o mockup v4 (smoke visual de todas as telas)
+e deu o aval explícito ("é esse"). Só então começa a Fase 3: dar vida às telas aprovadas **sem
+alterar o layout congelado** — conferência e publicação reais (`core/conference.py` +
+`core/publisher.py`), biblioteca/receitas/histórico lidos e gravados em disco
+(`core/library_store.py`, `core/preset_store.py`, `core/session_log.py`), semente de fábrica no
+boot (`core/seed.py`), e empacotamento do EXE (tema, fontes IBM Plex, dados de fábrica) via
+PyInstaller (`flownc/FlowNC.spec`). **Regra: nesta fase só se altera arquivos de lógica/ligação e
+empacotamento**, nunca o layout aprovado. Será proposta como uma ou mais changes OpenSpec próprias
+(`/opsx:propose`) quando a Fase 2 estiver aprovada.
+
+## Mapa das telas do v4 (resumo — detalhe em CONTEXTO-IA)
+
+- **Rail (lateral escura):** 4 botões-lugar; ativo com filete laranja; bolinha laranja no Editor
+  quando há alteração não salva.
+- **Topo global:** seletor de configuração/receita (com "💾 Salvar lote atual como…") + chip de
+  backup clicável; visível em todas as telas.
+- **Lote:** coluna Programas (lista, marcar/desmarcar, +adicionar, arrastar-e-soltar, estado vazio)
+  + Compositor com **2 abas** ("Trocar código" e "➕ Inserir bloco") e botão único "+ Adicionar ao
+  lote" + Lote de edições (cartões numerados, conflito âmbar) + CTA laranja "Conferir lote →".
+- **Conferência (modal):** total de alterações, avisos, cartão por edição com exemplo real,
+  linha de backup, rodapé fixo com "Publicar". **Contagem honesta** = a varredura simula as edições
+  em sequência, na mesma ordem em que seriam gravadas (uma troca anterior pode mudar a âncora de um
+  bloco posterior), então o número que o operador confere é exatamente o número que será publicado.
+- **Publicação (modal):** progresso (backup → gravação → SHA-256) + resultado (caminho do backup,
+  "Ver no Histórico" / "OK — novo lote").
+- **Editor:** faixa de arquivos + editor tela cheia; cabeçalho com aviso "salva direto, sem cópia"
+  + "Salvar"/"Salvar como…"; toolbar em 3 grupos (localizar com contagem automática · substituir ·
+  inserir bloco); toast "Desfazer" após salvar.
+- **Códigos:** biblioteca (código + descrição), busca, "+ Adicionar código" (com bloco opcional).
+- **Histórico:** uma linha por publicação; "↩ Restaurar originais" (com backup dos atuais antes).
+
+## Regras de negócio essenciais (do v4)
+
+1. **Borda CNC:** um código só casa isolado (`M8` ≠ `M80`/`T1.0`). Segurança nº 1.
+2. **Conferir ≠ Publicar:** conferir nunca grava; publicar sempre faz backup antes e confere por SHA-256.
+3. **Edições rodam em cadeia, na ordem do lote** — a conferência conta nessa mesma ordem.
+4. **Remover = trocar por vazio**, sempre por escolha explícita ("✕ Remover"); destino vazio **não**
+   vira remoção.
+5. **Lote** = edições + programas marcados; **Configuração/receita** = lote + preferências salvos.
+6. **Editor salva sem backup** (decisão consciente, com Desfazer); **o Lote nunca grava sem backup**.
+
+## Etapas atômicas da Fase 2
+
+> Convenção: cada etapa tem **um verbo de ação** + **um critério de conclusão mensurável**
+> (_em itálico_). Estas etapas são a versão refinada do `tasks.md` da change
+> `plano-execucao-mockup-v4` — **manter PLAN.md e tasks.md em sincronia** (ao reaplicar a change,
+> regenerar o `tasks.md` a partir daqui). Os números abaixo são a ordem de execução.
+
+> Convenção de resiliência: `↳ Se falhar:` = o que fazer quando a etapa não atinge o critério.
+> `[CRÍTICO]` = não pode avançar com falha: **parar, reportar ao Mestre e só seguir após resolver.**
+> Regra geral de parada segura: nenhum `git commit` enquanto pytest/mypy/ruff da mudança não
+> estiverem verdes; em qualquer falha não prevista, parar e reportar em vez de improvisar.
+
+### Gate 0 — Resolver a pendência da change v2 ✅ RESOLVIDO (2026-06-11)
+
+> **Decisão do Mestre:** **arquivar guardando só o histórico** — executado com
+> `openspec archive redesign-fase2-fidelidade-visual --skip-specs -y`. A change foi para
+> `openspec/changes/archive/2026-06-11-redesign-fase2-fidelidade-visual` **sem** consolidar os
+> deltas do v2 nos specs base (documentação oficial intacta). `openspec list` não a mostra mais
+> como ativa. Gate liberado para o Bloco 1.
 >
-> **Como os dados foram gravados (2026-06-07):** a biblioteca (89 códigos) está no schema `find`=código, `replace`=**vazio**, `label`=descrição, `tags`=categoria. O `replace` fica **vazio de propósito**: quem define o destino é o operador, na hora. Isso é o meio-termo combinado (não quebra o `load_library` atual e já está no formato certo para a tela nova).
->
-> **Decisão LIGADO (2026-06-08) — Catálogo Técnico como fonte-mestre.** O novo **Catálogo Técnico** (Passo 11) passa a ser a fonte de código+descrição; `data/library.json` vira **cache gerado** do **catálogo ativo** (`settings.active_catalog`, default `Fanuc`) — não se edita à mão. Mantém o modelo "código + descrição" e o `replace=""` (destino é escolha do operador). **Não** altera a lógica de substituição (matcher/inplace_save) — só muda a **origem** dos dados dos dropdowns. Os 89 códigos atuais migram para `data_default/catalogs/Fanuc.json` (organizados por categoria, a partir do guia).
->
-> ⚠️ **AVISO IMPORTANTE — comportamento transitório (ler antes de usar/mexer):** enquanto o **Compositor não for reescrito** (Próximo passo 1), a tela de montar edição **ainda é a antiga**, que espera um par "de → para" pronto vindo da biblioteca. Como o `replace` está vazio, **escolher um código da biblioteca direto na tela antiga pode virar "trocar o código por nada" (apagar)** em vez de trocar. **Não usar os códigos da biblioteca direto na tela antiga até a reescrita.** A tela nova terá **dois campos separados** (código que sai / código que entra) e elimina o risco. Os dados estão corretos; o que falta é só a tela nova (já prevista no Próximo passo 1). **Não "consertar" isso preenchendo o `replace` na biblioteca** — isso voltaria ao modelo de pares prontos, que foi descartado.
-
-Forma de execução livre (criar documentos, escrever código novo, reprogramar ou reconstruir do zero) — o foco é colocar o novo design em funcionamento no sistema atual.
-
-> **Arquivos suportados (certificado 2026-06-07).** O motor já **aceita qualquer arquivo de texto** e **preserva o tipo de entrada ao salvar**: detecta e mantém codificação (UTF-8, UTF-8-BOM, UTF-16 LE/BE, ANSI/cp1252, latin-1), BOM e quebra de linha (CRLF/CR/LF), gravando byte-a-byte quando nada muda (`read_file`/`encode_text` em `core/file_handler.py`; perfis MAQ01–03 com `extensions: ["*"]`; diálogo de abrir em "Todos os arquivos"). Arquivos **binários** (imagem, etc.) são recusados de propósito (`BinaryFileError`) — correto para um editor de texto.
->
-> **Requisito novo — "Salvar como…" (a desenhar no protótipo ANTES de codar).** Além de salvar no formato de entrada, o editor deve oferecer **"Salvar como…"** com escolha de **extensão/tipo** (.nc, .txt, .tap, .iso, .min, .mpf…) **e codificação/quebra de linha** (UTF-8, ANSI, com/sem BOM, CRLF/LF). **Default = preservar o original**; só troca quando o operador escolher. Detalhe atômico no **Próximo passo 10**.
-
-## Glossário
-
-- **Modo edição:** estado em que `editor_panel.py` está visível na coluna direita (o usuário clicou em "✎ Editar" em um arquivo). Ao sair do editor (fechar ou voltar), o app retorna ao modo padrão (coluna direita = Resumo).
-- **Proporção dinâmica:** as duas colunas ficam lado a lado num `QSplitter(Qt.Horizontal)` (esquerda e direita). No modo padrão ficam 60 % esquerda / 40 % direita; no modo edição ficam 40 % / 60 %. A troca é feita via `QSplitter.setSizes()` com `QPropertyAnimation` ou animação manual no `resizeEvent`. "Vertical/horizontal" aqui sempre se refere à **orientação do QSplitter**: para colunas lado a lado a orientação é **horizontal**.
-- **Fundação visual:** aplicar tokens (cores, fontes, espaçamentos, cantos, alturas do mockup) ao app via `theme.py` + QSS. **Não** alterar posição, número ou hierarquia de widgets existentes — só aparência (cores de fundo, bordas, fontes, tamanho de controles).
-- **Layout:** posição, número e hierarquia dos widgets (`QVBoxLayout`, `QHBoxLayout`, `QSplitter`, `QStackedWidget`, etc.). Mudanças de layout pertencem à Mudança B, não à A.
-- **Rascunho / "em edição":** a linha de input ainda em construção pelo usuário no compositor de edições — sempre renderizada no fim da lista "Edições montadas" com visual diferenciado (fundo `--color-bg-subtle`, borda tracejada). No mockup essa linha é a classe **`em edição`** (o termo "rascunho" é só o apelido interno deste plano).
-- **Bloco "Editados → backup":** área na coluna direita que lista os nomes dos arquivos que foram salvos em lote com o caminho da pasta de backup criada. Aparece só depois de uma execução bem-sucedida; permanece até o app fechar ou uma nova execução começar.
-- **Lógica atual:** todo o código em `flownc/core/` (matcher, inplace_save, perfis) e os sinais/slots que conectam a UI à lógica em `main_window.py`. Nada disso muda de comportamento — só muda de onde é chamado (o "maestro" vira `main_window.py` refatorado, que instancia os componentes novos e repassa os mesmos sinais/slots). **Como fica na nova atualização (verificações):** o `core/verifier.py` **existe no código, mas** as verificações automáticas de perfil **não fazem mais parte da lógica a preservar** — saem do escopo (o módulo fica órfão, sem ser chamado pela UI nova). A lógica mantida cobre só busca/substituição (`matcher`), salvamento por arquivo (`inplace_save`) e os perfis como dado de configuração, sem conferência embutida.
-- **Comandos de verificação (lint/testes):** sempre rodar na raiz do projeto — `pytest flownc/tests/` · `mypy flownc/ --ignore-missing-imports` · `ruff check flownc/`.
-- **Fluxo OpenSpec por mudança:** cada Mudança segue três fases. (1) **Propor** com a skill `/opsx:propose` — gera `proposal.md`, `design.md`, `specs/` e `tasks.md` na pasta `openspec/changes/<nome>/`. (2) **Implementar** com a skill `/opsx:apply <nome>` — ela percorre o `tasks.md` gerado; as etapas de implementação deste plano **são** essas tarefas e são executadas dentro do `/opsx:apply`. (3) **Arquivar** com `/opsx:archive <nome>`. **Validar a proposta** significa conferir que o `/opsx:propose` terminou sem apontar erros e que os artefatos acima existem e estão coerentes; se houver a CLI do OpenSpec instalada, rodar também `openspec validate <nome>` como reforço. **Não existe skill `/opsx:validate`** — a "validação" é essa conferência manual (+ CLI opcional).
-
-## Etapas
-
-> Convenção: cada etapa = **um verbo de ação** + **um critério de conclusão mensurável** (_itálico_) + **fallback** (`↳ Se falhar:`). Etapas marcadas `[CRÍTICO]` não podem avançar com falha: parar, reportar ao Mestre e só seguir após resolver. Regra geral de parada segura: nenhum `git commit` enquanto a verificação (pytest/mypy/ruff) da mudança não estiver verde; em qualquer falha não prevista, parar e reportar em vez de improvisar.
-
-### Mudança A — Fundação visual (`redesign-fundacao-visual`) — ✅ CONCLUÍDA E ARQUIVADA
-
-> Implementada e **arquivada em 2026-06-06** (`openspec/changes/archive/2026-06-06-redesign-fundacao-visual`). As Etapas 1–9 abaixo são **registro histórico** do que foi feito — **não reexecutar**.
-
-1. **Propor a Mudança A** — rodar `/opsx:propose` com o nome `redesign-fundacao-visual`, descrevendo: criar `theme.py`, carregar fontes IBM Plex, gerar QSS central, aplicar sem mudar layout. _Concluído quando: a pasta `openspec/changes/redesign-fundacao-visual/` existe com `proposal.md`, `design.md`, `tasks.md` e `specs/`._
-   ↳ Se falhar: revisar a descrição passada ao comando e repropor; não criar a pasta à mão.
-
-2. **Validar a proposta da Mudança A** — conferir que o `/opsx:propose` terminou sem erros e que `proposal.md`, `design.md`, `tasks.md` e `specs/` existem e estão coerentes (se a CLI estiver instalada, rodar `openspec validate redesign-fundacao-visual` como reforço). _Concluído quando: os quatro artefatos existem e nenhuma validação aponta erro._
-   ↳ Se falhar: ler o erro, ajustar o artefato apontado (`proposal`/`specs`/`tasks`) e revalidar; não avançar para a implementação (Etapa 3) com a proposta inválida.
-
-> **Etapas 3–7 (implementação) são as tarefas do `tasks.md` desta mudança e foram executadas dentro de `/opsx:apply redesign-fundacao-visual`.**
-
-3. **[CRÍTICO] Criar `flownc/ui/theme.py`** — definir, como constantes Python, todos os tokens do mockup: cores `--color-*`, tipografia `--t-*`, espaçamentos `--sp-*`, raios `--radius-*`, alturas `--h-*`, dimensões `--dim-*`. _Concluído quando: o arquivo `flownc/ui/theme.py` existe e `import flownc.ui.theme` não levanta erro._
-   ↳ Se falhar: conferir os valores direto no `<style>` de `mockups/painel-final.v2.html`; faltando algum token, criar mesmo assim com os que existem e anotar o pendente. Base de todo o visual — não prosseguir para o QSS sem os tokens essenciais de cor e tipografia.
-
-4. **Adicionar as fontes IBM Plex ao projeto** — colocar os arquivos `.ttf` de IBM Plex Sans e IBM Plex Mono em `flownc/assets/fonts/`. _Concluído quando: os arquivos `.ttf` das duas famílias existem em `flownc/assets/fonts/`._
-   ↳ Se falhar (sem acesso aos `.ttf`): registrar como blocker e seguir usando fallback de fonte do sistema (`Segoe UI` / `Consolas`) nos tokens de tipografia; trocar para IBM Plex quando os arquivos chegarem. **(Estado real: ainda pendente — `assets/fonts/` só tem `.gitkeep`; ver Próximo passo 7d.)**
-
-5. **Registrar as fontes no app** — chamar `QFontDatabase.addApplicationFont()` para cada `.ttf` na inicialização de `main_window.py`. _Concluído quando: as duas famílias aparecem em `QFontDatabase.families()` após o boot do app._
-   ↳ Se falhar (retorno -1 do add): logar o caminho tentado, manter o fallback de fonte do sistema e não bloquear o boot.
-
-6. **Criar `flownc/ui/style.qss`** — escrever a folha QSS usando os tokens de `theme.py`, cobrindo QMainWindow, QPushButton, QComboBox, QListWidget, QLineEdit, QLabel, QCheckBox e QSplitter. _Concluído quando: o arquivo `flownc/ui/style.qss` existe e contém um seletor para cada um desses 8 tipos de widget._
-   ↳ Se falhar (token ausente): usar o valor literal do mockup naquele ponto e anotar para tokenizar depois (Etapa 30).
-
-7. **[CRÍTICO] Aplicar o QSS na inicialização** — em `main_window.py`, ler `style.qss` e chamar `app.setStyleSheet()` no boot, sem remover, mover ou criar widgets. _Concluído quando: o app abre com as cores/fontes do mockup e o número/hierarquia de widgets é idêntico ao de antes._
-   ↳ Se falhar (app quebra ou widget some): reverter o `setStyleSheet` e aplicar o QSS em partes (por tipo de widget) até isolar o seletor culpado. Não alterar layout para "consertar" — risco de quebrar a lógica.
-
-8. **[CRÍTICO] Verificar a Mudança A** — rodar `pytest flownc/tests/`, `mypy flownc/ --ignore-missing-imports` e `ruff check flownc/`. _Concluído quando: os três comandos terminam sem falhas._
-   ↳ Se falhar: corrigir antes de arquivar; gate obrigatório. Não arquivar nem commitar com qualquer um dos três vermelho.
-
-9. **Arquivar a Mudança A** — rodar `/opsx:archive redesign-fundacao-visual`. _Concluído quando: a change sai de `openspec/changes/` e vai para o histórico de arquivadas._
-   ↳ Se falhar: não forçar mover pastas à mão; reportar o erro do comando.
-
-### Mudança B — Layout e painéis (`redesign-layout-principal`) — ✅ CONCLUÍDA E ARQUIVADA
-
-> Implementada e **arquivada em 2026-06-07** sob o nome **`redesign-layout-principal`** (`openspec/changes/archive/2026-06-07-redesign-layout-principal`). Etapas 10–21 = **registro histórico**. As **pendências de fidelidade** desta entrega (Compositor, header, lista com checkbox duplo) estão nos **Próximos passos 1–3**, já em formato de etapa.
-
-10. **Propor a Mudança B** — rodar `/opsx:propose` com o nome `redesign-layout-principal`, descrevendo: criar `flownc/ui/components/` (`header.py`, `compositor.py`, `program_list.py`, `summary.py`), refatorar `main_window.py` como "maestro", colunas dinâmicas. _Concluído quando: a pasta `openspec/changes/redesign-layout-principal/` existe com todos os artefatos._
-    ↳ Se falhar: revisar a descrição e repropor; não editar artefatos à mão.
-
-11. **Validar a proposta da Mudança B** — conferir que o `/opsx:propose` terminou sem erros e que `proposal.md`, `design.md`, `tasks.md` e `specs/` existem e estão coerentes (reforço opcional: `openspec validate redesign-layout-principal`). _Concluído quando: os quatro artefatos existem e nenhuma validação aponta erro._
-    ↳ Se falhar: ajustar o artefato apontado e revalidar antes de codar (Etapa 12).
-
-> **Etapas 12–19 (implementação) são as tarefas do `tasks.md` desta mudança e foram executadas dentro de `/opsx:apply redesign-layout-principal`.**
-
-12. **Criar `flownc/ui/components/header.py`** — header fixo com logo FlowNC, título "FlowNC", `QComboBox` de máquina e botões de biblioteca. _Concluído quando: o arquivo existe e a classe de header instancia sem erro._
-    ↳ Se falhar (logo indisponível): usar placeholder de texto "FlowNC" e seguir; trocar pelo asset depois.
-
-13. **Montar o esqueleto de 2 colunas em `main_window.py`** — adicionar um `QSplitter(Qt.Horizontal)` (colunas lado a lado) com dois painéis filhos (esquerda e direita). _Concluído quando: o app abre exibindo duas colunas lado a lado._
-    ↳ Se falhar: commitar/branch de segurança antes de refatorar `main_window.py`; se a janela não abrir, voltar ao estado anterior e mover os widgets em incrementos menores.
-
-14. **Implementar a proporção dinâmica das colunas** — alternar 60/40 ↔ 40/60 via `QSplitter.setSizes()` (com `QPropertyAnimation`), acionada pelos sinais `editor_opened`/`editor_closed` do `EditorPanel`. _Concluído quando: abrir o editor alarga a coluna direita para ~60% e fechá-lo volta a ~40%._
-    ↳ Se falhar (animação travada): usar `setSizes()` direto sem animação como fallback funcional; o efeito suave é secundário.
-
-15. **Adicionar o rodapé/status** — incluir `QStatusBar` (ou rodapé equivalente) na janela. _Concluído quando: a barra de status aparece na base da janela._
-    ↳ Se falhar: item de menor prioridade; anotar e seguir.
-
-16. **[CRÍTICO] Criar `flownc/ui/components/compositor.py`** — dropdowns origem→destino, lista "Edições montadas", rascunho no fim e botão "+ adicionar outra edição"; emitir os mesmos sinais dos widgets atuais. _Concluído quando: o arquivo existe e o compositor emite os mesmos sinais que o `main_window` atual ao montar uma edição._
-    ↳ Se falhar (sinal divergente quebra a lógica): manter a assinatura exata dos sinais/slots atuais; se preciso, adaptar dentro do componente em vez de mudar o `core`. Comparar com os `connect()` atuais de `main_window.py` antes de remover o widget antigo. **(Entregue com divergências de fidelidade — ver Próximo passo 1.)**
-
-17. **[CRÍTICO] Criar `flownc/ui/components/program_list.py`** — lista de arquivos com `QCheckBox` e botão "✎ Editar" por linha; emitir os mesmos sinais atuais. _Concluído quando: o arquivo existe e a lista emite o mesmo sinal de "editar arquivo" do código atual ao clicar no botão da linha._
-    ↳ Se falhar: igual à 16 — preservar a interface de sinais; testar a seleção de arquivos antes de descartar o widget antigo. **(Entregue com checkbox duplicado — ver Próximo passo 3.)**
-
-18. **Criar `flownc/ui/components/summary.py`** — selo de estado (⚠/✓ via tokens warning/success), contadores Regras/Programas/Alterações, cartões de regra (editar/duplicar/excluir + borda inset âmbar em conflito), bloco "Editados → backup" (visível só após execução bem-sucedida) e botão "Executar Lote" (CTA escuro, altura `--h-cta`). _Concluído quando: o arquivo existe e o painel Resumo renderiza todos esses elementos._
-    ↳ Se falhar: implementar os elementos em ordem de importância (botão Executar e contadores primeiro); anotar o que faltar. **(Nome real do arquivo: `summary.py`. Entregue com divergências — ver Próximo passo 2/4.)**
-
-19. **Conectar o `QStackedWidget` Resumo ↔ Editor no maestro** — em `main_window.py`, alternar entre `summary.py` e `editor_panel.py` na coluna direita. _Concluído quando: clicar em "✎ Editar" troca a coluna direita para o editor e fechar volta ao Resumo._
-    ↳ Se falhar: validar que o `EditorPanel` ainda recebe o arquivo correto; se a troca não ocorrer, conferir a conexão do sinal de seleção da `program_list`.
-
-20. **[CRÍTICO] Verificar a Mudança B** — rodar `pytest flownc/tests/`, `mypy flownc/ --ignore-missing-imports` e `ruff check flownc/`. _Concluído quando: os três comandos terminam sem falhas._
-    ↳ Se falhar: corrigir antes de arquivar; gate obrigatório. Atenção especial a testes de UI (`test_ui_smoke.py`) que dependem dos sinais migrados.
-
-21. **Arquivar a Mudança B** — rodar `/opsx:archive redesign-layout-principal`. _Concluído quando: a change vai para o histórico de arquivadas._
-    ↳ Se falhar: reportar o erro do comando; não mover pastas à mão.
-
-### Mudança C — Editor, limpeza e entrega (`redesign-editor-limpeza`)
-
-> **Próxima a executar** (depois de fechar os Próximos passos 1–4 de fidelidade). **Atenção:** o build da Etapa 33 só deve rodar com o **empacotamento (7a–7e) e a Seed Fanuc (9a–9e) já aplicados**, senão o EXE sai "pelado".
-
-22. **Propor a Mudança C** — rodar `/opsx:propose` com o nome `redesign-editor-limpeza`, cobrindo as etapas 24–35. _Concluído quando: a pasta `openspec/changes/redesign-editor-limpeza/` existe com todos os artefatos._
-    ↳ Se falhar: revisar a descrição e repropor.
-
-23. **Validar a proposta da Mudança C** — conferir que o `/opsx:propose` terminou sem erros e que `proposal.md`, `design.md`, `tasks.md` e `specs/` existem e estão coerentes (reforço opcional: `openspec validate redesign-editor-limpeza`). _Concluído quando: os quatro artefatos existem e nenhuma validação aponta erro._
-    ↳ Se falhar: ajustar o artefato apontado e revalidar antes de codar (Etapa 24).
-
-> **Etapas 24–30 (implementação) são as tarefas do `tasks.md` desta mudança e são executadas dentro de `/opsx:apply redesign-editor-limpeza`.**
-
-24. **Estilizar o cabeçalho do editor** — em `editor_panel.py`, adicionar `QLabel` com nome do arquivo + `QLabel` menor "salva direto, sem cópia" (cor `--color-text-tertiary`) e deixar o **`✕ Voltar ao resumo` proeminente no topo-esquerdo** (alto contraste — hoje `editor_panel.py:194` usa o cinza apagado `.ed-back`). _Concluído quando: o cabeçalho do editor mostra nome do arquivo, o subtítulo e o `Voltar` em destaque no topo-esquerdo._
-    ↳ Se falhar: não mexer na lógica de save de `inplace_save.py`; só camada visual. O destaque do `Voltar` é a melhoria de navegação do Passo 5 (decisão de UX 2026-06-07).
-
-25. **Montar a toolbar do localizador** — em `editor_panel.py`, adicionar `QComboBox` da biblioteca de termos, `QLineEdit` de busca, `QLabel` contador "N/M", botões anterior/próxima, "Substituir todos" e "Um a um". _Concluído quando: a toolbar exibe todos esses controles._
-    ↳ Se falhar: reaproveitar os controles de busca já existentes no `editor_panel.py` antes de criar novos; preservar os handlers atuais.
-
-26. **Destacar ocorrências no editor** — aplicar um `QSyntaxHighlighter` no `QPlainTextEdit` com `--color-occurrence` nas ocorrências e `--color-occurrence-current` na atual. _Concluído quando: ao buscar um termo, as ocorrências ficam realçadas e a navegada com cor distinta._
-    ↳ Se falhar (highlight pesado em arquivos grandes): limitar o realce à viewport visível ou desligar acima de N linhas; funcionalidade de busca não pode travar.
-
-27. **Adicionar o gutter de numeração de linha** — implementar `paintEvent` customizado no editor para a régua de números. _Concluído quando: a coluna de números de linha aparece à esquerda do texto._
-    ↳ Se falhar: item cosmético; anotar e seguir sem o gutter.
-
-28. **Remover a contagem automática de ocorrências do painel principal** — apagar de `main_window.py`/`compositor.py` as chamadas que contam e exibem ocorrências fora do editor. _Concluído quando: nenhuma contagem de ocorrências aparece fora da toolbar do editor._
-    ↳ Se falhar (algo deixa de funcionar ao remover): conferir se a contagem alimentava outra lógica antes de apagar; remover só a exibição, não o cálculo se ele for usado em outro lugar. (`count_occurrences` vive em `core/scan.py` e é usado em `main_window.py:276` — manter a função, remover só a exibição fora do editor.)
-
-29. **Remover os widgets redundantes do v2** — apagar a faixa de conflito extra (mantendo só o cartão com borda inset âmbar), o subtítulo de máquina no header (se existir) e o indicador circular. _Concluído quando: esses widgets não aparecem mais na UI._
-    ↳ Se falhar: remover um widget por vez e rodar o app entre cada remoção para isolar quebras.
-
-30. **Substituir valores fixos restantes por tokens** — trocar qualquer cor/fonte/espaçamento hardcoded remanescente pelos tokens de `theme.py`. _Concluído quando: uma busca por hex de cor/px fixos nos arquivos de UI não retorna ocorrências de estilo._
-    ↳ Se falhar (token faltando): adicionar o token em `theme.py` em vez de manter o valor fixo.
-
-31. **[CRÍTICO] Verificar a Mudança C** — rodar `pytest flownc/tests/`, `mypy flownc/ --ignore-missing-imports` e `ruff check flownc/`. _Concluído quando: os três comandos terminam sem falhas._
-    ↳ Se falhar: corrigir antes de buildar; gate obrigatório. Não gerar EXE com testes vermelhos.
-
-32. **Fazer o smoke test manual** — abrir o app e comparar configuração, edição de arquivo e execução de lote lado a lado com `mockups/painel-final.v2.html`, anotando divergências. _Concluído quando: cada seção foi percorrida e as divergências foram anotadas (ou nenhuma encontrada)._
-    ↳ Se falhar (divergência relevante): registrar como ajuste e voltar à etapa visual correspondente antes de buildar.
-
-33. **[CRÍTICO] Rebuildar o EXE** — rodar `pyinstaller flownc/FlowNC.spec` dentro da pasta `flownc/`. **Pré-requisito: empacotamento (7a–7e) e Seed Fanuc (9a–9e) já aplicados**, senão o EXE sai "pelado" (sem tema/fontes/dados). _Concluído quando: `flownc/dist/FlowNC/FlowNC.exe` existe com data de modificação atual._
-    ↳ Se falhar (erro de build): ler o log do PyInstaller; conferir se as fontes/assets novos estão declarados em `FlowNC.spec` (`datas`). Não entregar EXE que não abre.
-
-34. **[CRÍTICO] Preservar o EXE antigo** — renomear o EXE `CNC_BatchEditor` para `CNC_BatchEditor_OLD.exe` (ou mover para subpasta `antigo/` na Área de Trabalho), sem deletar. _Concluído quando: o EXE antigo existe com o novo nome/local e nada foi apagado._
-    ↳ Se falhar: passo irreversível se deletar — em caso de dúvida, só copiar/renomear, nunca remover. Fazer ANTES de copiar o novo (Etapa 35) para não sobrescrever.
-
-35. **Entregar o novo EXE** — copiar `flownc/dist/FlowNC/FlowNC.exe` e a pasta `FlowNC/` para a Área de Trabalho, substituindo o atalho anterior. _Concluído quando: o novo `FlowNC.exe` abre a partir da Área de Trabalho._
-    ↳ Se falhar (arquivo em uso): fechar o app aberto antes de copiar; confirmar que o antigo já foi preservado (Etapa 34).
-
-36. **Arquivar a Mudança C** — rodar `/opsx:archive redesign-editor-limpeza`. _Concluído quando: a change vai para o histórico de arquivadas._
-    ↳ Se falhar: reportar o erro do comando; não mover pastas à mão.
-
-### Mudança D — Segurança e polimento (`redesign-seguranca-polimento`)
-
-> Origem: relatório de revisão técnica (2026-06-07). Cobre as camadas de **segurança de dados** e **polimento de UX** não detalhadas nas Mudanças A–C. É **aditiva**: não altera nenhuma etapa anterior (1–36) nem renumera nada. Onde um item dialoga com os "Próximos passos para fechar 100%" (modais dos overlays `.run`/`.res`/`.confirm`/`.saved`, dropdowns pesquisáveis `.libdrop`, publicação real via `publish_batch`), esta mudança **estende** o que já estiver feito — não duplica.
->
-> ⛳ **Gate (REGRA DE OURO):** todos os componentes de feedback/transição desta mudança (modais, overlays, avisos, confirmações, estados vazios/carregando/erro, diff do preview) só são implementados **após** especificados e aprovados no protótipo HTML (FASE 1, inventário "Componentes de sistema"). Esta mudança reproduz o contrato aprovado — não decide visual/comportamento na hora.
-
-37. **Propor a Mudança D** — rodar `/opsx:propose` com o nome `redesign-seguranca-polimento`, descrevendo as etapas 39–47 (confirmação de save, robustez de gravação, bloqueio de UI na publicação, atalhos, estados vazios, diff colorido, modais estilizados, tooltips, polimentos opcionais). _Concluído quando: a pasta `openspec/changes/redesign-seguranca-polimento/` existe com `proposal.md`, `design.md`, `tasks.md` e `specs/`._
-    ↳ Se falhar: revisar a descrição e repropor; não criar a pasta à mão.
-
-38. **Validar a proposta da Mudança D** — conferir que o `/opsx:propose` terminou sem erros e que `proposal.md`, `design.md`, `tasks.md` e `specs/` existem e estão coerentes (reforço opcional: `openspec validate redesign-seguranca-polimento`). _Concluído quando: os quatro artefatos existem e nenhuma validação aponta erro._
-    ↳ Se falhar: ajustar o artefato apontado e revalidar antes de codar (Etapa 39).
-
-> **Etapas 39–47 (implementação) são as tarefas do `tasks.md` desta mudança e são executadas dentro de `/opsx:apply redesign-seguranca-polimento`.**
-
-39. **Adicionar confirmação ao primeiro salvamento do editor** — em `editor_panel.py`, antes do save in-place, exibir um modal "Tem certeza? Esta ação sobrescreve o arquivo original, sem cópia." na primeira vez de cada sessão, com opção "não perguntar de novo nesta sessão". _Concluído quando: o primeiro `Salvar` da sessão abre o modal e, confirmado, grava normalmente; o segundo save não repergunta._
-    ↳ Se falhar: não tocar na lógica de `inplace_save.py` — o modal é só uma porta antes da chamada de save. Em dúvida, manter o modal sempre (mais seguro que nunca perguntar).
-
-40. **[CRÍTICO] Tratar erros de gravação (arquivo em uso / rede)** — capturar `PermissionError`/`OSError` no save do editor e na publicação do lote; mostrar mensagem clara ("arquivo aberto em outro programa" / "falha de gravação na rede") e, no lote, **parar com segurança preservando o backup já criado** e informando o caminho dele. _Concluído quando: simular um arquivo bloqueado/sem permissão exibe a mensagem (sem travar o app) e, no lote, o backup permanece e o caminho é mostrado._
-    ↳ Se falhar: como o save do editor é atômico (temp + rename), um erro não corrompe o original — garantir ao menos a mensagem; o rollback do lote é o ponto crítico, não pode deixar arquivos pela metade sem avisar.
-
-41. **Bloquear a UI durante a publicação** — enquanto o lote grava, desabilitar a janela principal (`setEnabled(False)`) com overlay/spinner de "Processando", reabilitando ao terminar (sucesso ou erro). _Concluído quando: durante a publicação a janela fica inerte a cliques e volta ao normal ao fim._
-    ↳ Se falhar: no mínimo desabilitar o botão "Executar Lote" durante a operação para evitar duplo-clique. Complementa (não duplica) os overlays previstos nos "Próximos passos".
-
-42. **Implementar atalhos de teclado** — registrar `QShortcut` para `Ctrl+S` (salvar no editor), `Ctrl+F` (focar busca), `Ctrl+H` (substituir), `Esc` (fechar modal/editor) e `F3` (próxima ocorrência). _Concluído quando: cada atalho dispara a ação correspondente com o editor aberto._
-    ↳ Se falhar: priorizar `Ctrl+S` e `Esc` (os mais usados) e anotar os demais.
-
-43. **Tratar estados vazios** — exibir mensagem de orientação quando não há programas carregados (área da lista), a biblioteca está vazia (dropdowns) e a busca do editor não retorna ocorrências (toolbar). _Concluído quando: cada um dos três casos mostra um texto de orientação em vez de área em branco._
-    ↳ Se falhar: cobrir ao menos "nenhum programa carregado" (o mais visível ao abrir o app). A biblioteca vazia é mitigada pela Seed Fanuc (Próximo passo 9), mas a mensagem vale como rede de segurança.
-
-44. **Destacar diferenças no preview do lote** — na pré-visualização, realçar em verde o conteúdo adicionado e em vermelho o removido na linha (tokens `--color-success`/`--color-danger`), em vez de só exibir a linha nova. _Concluído quando: o preview mostra a diferença colorida por linha alterada._
-    ↳ Se falhar (diff por caractere pesado): cair para realce da linha inteira (verde = nova, vermelho = antiga); o objetivo é a conferência rápida.
-
-45. **Padronizar avisos e erros no estilo do app** — substituir os `QMessageBox` padrão do Windows remanescentes por modais estilizados com o QSS/tokens do mockup (mesma linguagem visual dos overlays). _Concluído quando: os diálogos de erro/aviso seguem o visual do app, sem caixas cinza padrão do sistema._
-    ↳ Se falhar: estilizar via QSS o próprio `QMessageBox` como meio-termo; o essencial é a consistência visual.
-
-46. **Adicionar tooltips na biblioteca** — exibir a descrição do código ao passar o mouse nos itens dos dropdowns origem/destino e nos cartões de regra. _Concluído quando: o tooltip aparece com a descrição cadastrada do código._
-    ↳ Se falhar: item de menor prioridade; anotar e seguir.
-
-47. **(Opcional / baixa prioridade) Polimentos finos** — avaliar e, se couber, aplicar: bloqueio de caracteres inválidos nos campos do compositor que possam corromper o `.NC`; revisão de contraste dos tokens para fábrica com alta luminosidade; micro-animações de `hover/active` nos botões via QSS. _Concluído quando: os três foram avaliados e aplicados ou registrados como dispensáveis._
-    ↳ Se falhar/sem tempo: pular sem bloquear a entrega; nenhum é essencial.
-
-48. **[CRÍTICO] Verificar a Mudança D** — rodar `pytest flownc/tests/`, `mypy flownc/ --ignore-missing-imports` e `ruff check flownc/`. _Concluído quando: os três comandos terminam sem falhas._
-    ↳ Se falhar: corrigir antes de buildar; gate obrigatório. Não gerar EXE com testes vermelhos.
-
-49. **[CRÍTICO] Rebuildar e entregar o EXE final** — rodar `pyinstaller flownc/FlowNC.spec`, conferir que o `.exe` abre e copiá-lo para a Área de Trabalho substituindo o anterior. **O EXE antigo `CNC_BatchEditor` já foi preservado na Etapa 34 — não repetir.** **Pré-requisito:** empacotamento (7a–7e) e Seed Fanuc (9a–9e) já aplicados, senão o EXE sai "pelado" (sem tema/dados). _Concluído quando: o novo `FlowNC.exe` (com segurança e polimento) abre a partir da Área de Trabalho._
-    ↳ Se falhar (arquivo em uso): fechar o app antes de copiar. Se C e D forem executadas em sequência, pode-se buildar só uma vez aqui, no fim da D.
-
-50. **Arquivar a Mudança D** — rodar `/opsx:archive redesign-seguranca-polimento`. _Concluído quando: a change vai para o histórico de arquivadas._
-    ↳ Se falhar: reportar o erro do comando; não mover pastas à mão.
-
-## Dependências
-
-- **Mudança A (Etapas 1–9):** ✅ concluída/arquivada — não é mais dependência ativa. (Histórico: a Etapa 3 `theme.py` é a base de todo o visual; as fontes (4) precisam existir antes de registrá-las (5); o QSS (6) precisa de `theme.py` (3).)
-- **Mudança B (Etapas 10–21):** ✅ concluída/arquivada (nome real `redesign-layout-principal`) — não é mais dependência ativa. Suas **pendências de fidelidade** (Compositor, header, lista) viraram os Próximos passos 1–3.
-- **Pendências de fidelidade (Próximos passos 1–4):** dependem de A e B já entregues (estão). São o **primeiro bloco a executar** e antecedem a entrada formal na Mudança C.
-- **Mudança C (Etapas 22–36):** depende das Mudanças A e B arquivadas (têm). Recomenda-se fechar os Próximos passos 1–4 antes. A estilização do editor (24–27) depende da alternância Resumo ↔ Editor já existir (Etapa 19, feita). A limpeza (28–30) depende das telas montadas. **O build (33) depende do empacotamento (7a–7e) e da Seed (9a–9e)**; preservar o EXE antigo (34) precede entregar o novo (35).
-- **Mudança D (Etapas 37–50):** depende da Mudança C arquivada (Etapa 36). Aditiva e de baixo acoplamento. O rebuild/entrega final (49) reaproveita a preservação do EXE antigo já feita na Etapa 34 (não repetir) e **pressupõe o empacotamento (7a–7e) e a Seed Fanuc (9a–9e) já aplicados**.
-- **Empacotamento (7a–7e) + Seed (9a–9e):** independentes entre si na maior parte, mas **ambos pré-requisitos de qualquer build de entrega (Etapas 33 e 49)**. O 7c (semear `data/` ao lado do `.exe`) e o 9b/9c se complementam.
-- **Regra OpenSpec:** cada mudança nova (C, depois D) é **proposta + validada** (`/opsx:propose` + conferência manual; **não existe `/opsx:validate`**) antes de implementar e **arquivada** (`/opsx:archive`) antes de começar a próxima. Uma mudança por vez. A e B já cumpriram esse ciclo.
-
-## Tecnologias
+> ⚠️ Ainda há outra change ativa fora deste plano — `add-code-combo-placeholder` (0/17). Não faz
+> parte do v4; decidir o destino dela à parte para respeitar "uma mudança por vez".
+
+### Bloco 1 — Fundação visual v4 (tokens + QSS)
+
+1.1 **[CRÍTICO] Atualizar** `flownc/ui/theme.py` com os tokens da paleta v4 (valores do `<style>` do
+   `painel-final.v4.html` + seção 4 do CONTEXTO-IA) — _Concluído quando: `COLOR_CTA == "#E85D04"`,
+   existem `COLOR_RAIL` e `COLOR_TOP`, e `import flownc.ui.theme` não levanta erro._
+   ↳ Se falhar: conferir os valores direto no `<style>` do mockup v4; faltando um token, criar com o
+   que houver e anotar o pendente. É a base de todo o visual — não seguir pro QSS sem as cores e a
+   tipografia essenciais.
+1.2 **Atualizar** `flownc/ui/style.qss` com seletores para `QTabWidget` e `QDialog` usando tokens —
+   _Concluído quando: o arquivo tem blocos para QTabWidget e QDialog e nenhuma cor hexadecimal
+   literal (todos os valores vêm de tokens)._
+   ↳ Se falhar (token ausente): usar o valor literal do mockup naquele ponto e anotar para
+   tokenizar depois.
+1.3 **[CRÍTICO] Verificar** a fundação — _Concluído quando: pytest, mypy e ruff (comandos da seção
+   Verificação) ficam verdes._
+   ↳ Se falhar: corrigir antes de avançar; gate obrigatório — não iniciar o Bloco 2 com qualquer um
+   dos três vermelho.
+
+### Bloco 2 — Estrutura raiz (rail + topo + pilha de telas)
+
+2.1 **Criar** `flownc/ui/components/rail.py` com a classe `RailWidget` (4 botões + sinal
+   `tela_mudou(int)`) — _Concluído quando: o arquivo existe, instancia sem erro e expõe o sinal._
+   ↳ Se falhar: componente novo e isolado; se o sinal não emitir, conferir a declaração
+   `Signal(int)` antes de integrar no maestro.
+2.2 **Adicionar** o filete laranja no botão ativo do rail — _Concluído quando: só o botão da tela
+   ativa exibe o filete._
+   ↳ Se falhar: cosmético; usar uma cor de fundo distinta no botão ativo como meio-termo e anotar.
+2.3 **Adicionar** a bolinha de status no botão Editor do rail — _Concluído quando: existe um método
+   para ligar/desligar a bolinha e ela aparece quando ligada._
+   ↳ Se falhar: cosmético; deixar o método pronto (mesmo sem o desenho final) e anotar.
+2.4 **Criar** `flownc/ui/components/top_bar.py` com a classe `TopBar` — _Concluído quando: o arquivo
+   existe e instancia com o `QComboBox` de receitas (item "💾 Salvar lote atual como…") e o chip de
+   backup._
+   ↳ Se falhar: componente isolado; se o combo/chip não montar, entregar o mínimo (logo + combo) e
+   anotar o resto.
+2.5 **Criar** o pacote `flownc/ui/screens/` (com `__init__.py`) e os 4 stubs de tela — _Concluído
+   quando: `flownc/ui/screens/__init__.py` existe e `lote_screen.py` (classe `LoteScreen`),
+   `editor_screen.py` (`EditorScreen`), `codigos_screen.py` (`CodigosScreen`) e `historico_screen.py`
+   (`HistoricoScreen`) existem, cada um com a classe nomeada herdando de `QWidget`._
+   ↳ Se falhar: trivial; cada stub é uma classe `QWidget` com um `QLabel` de título. Atenção: sem o
+   `__init__.py` os imports do maestro falham.
+2.6 **[CRÍTICO] Reestruturar** `flownc/ui/main_window.py` para topo + (rail + `QStackedWidget`),
+   inserindo as telas na ordem fixa **índice 0 = Lote, 1 = Editor, 2 = Códigos, 3 = Histórico**
+   (mesma ordem dos botões do rail) — _Concluído quando: não há mais `QSplitter` raiz e o app abre
+   mostrando o rail à esquerda e a tela Lote (índice 0)._
+   ↳ Se falhar (app não abre): **fazer commit/branch de segurança antes de mexer**; se a janela não
+   subir, voltar ao estado anterior e migrar em incrementos menores (primeiro empilhar as telas no
+   `QStackedWidget`, depois remover o `QSplitter`). Não alterar a lógica de `core/` para "consertar".
+2.7 **Conectar** `RailWidget.tela_mudou` ao `QStackedWidget.setCurrentIndex` — _Concluído quando:
+   clicar em cada um dos 4 botões troca o widget central._
+   ↳ Se falhar: conferir o `connect()`; como fallback, trocar a tela direto no handler do clique de
+   cada botão.
+2.8 **[CRÍTICO] Verificar** a estrutura raiz — _Concluído quando: o app abre, os 4 botões trocam de
+   tela e o pytest fica verde._
+   ↳ Se falhar: corrigir antes de seguir; é a base de todas as telas — não avançar com o app sem
+   abrir ou com o pytest vermelho.
+
+### Bloco 3 — Tela Lote · painel Programas
+
+3.1 **Criar** `flownc/ui/components/program_list_v4.py` — _Concluído quando: a lista renderiza
+   linhas com checkbox, nome (mono), data, tamanho, botão "✎ Abrir" e "✕"._
+   ↳ Se falhar: componente novo; renderizar primeiro a linha mínima (checkbox + nome) e somar as
+   colunas (data, tamanho, botões) depois.
+3.2 **Implementar** marcar/desmarcar com destaque visual e o chip "N de M marcados" — _Concluído
+   quando: clicar na linha alterna o destaque e o chip atualiza a contagem._
+   ↳ Se falhar: garantir ao menos o checkbox funcional alimentando a seleção; o destaque visual é
+   secundário.
+3.3 **Adicionar** o botão "Marcar todos / Desmarcar todos" — _Concluído quando: o botão marca e
+   desmarca todas as linhas._
+   ↳ Se falhar: item secundário; anotar e seguir.
+3.4 **Adicionar** arrastar-e-soltar de arquivos na lista — _Concluído quando: soltar arquivos do
+   Windows na área adiciona as linhas correspondentes._
+   ↳ Se falhar (drag&drop trabalhoso no Qt): manter o botão "+ Adicionar programa(s)…" como caminho
+   principal e anotar o D&D como ajuste posterior.
+3.5 **Implementar** o estado vazio com botão "+ Adicionar programa(s)…" — _Concluído quando: sem
+   arquivos a área mostra ícone + texto-guia + botão grande._
+   ↳ Se falhar: cosmético; ao menos exibir o botão de adicionar quando a lista estiver vazia.
+3.6 **Integrar** `program_list_v4` na coluna esquerda da `LoteScreen` — _Concluído quando: a tela
+   Lote exibe a lista de programas à esquerda._
+   ↳ Se falhar: testar o componente isolado antes de integrar; conferir o layout da coluna esquerda.
+
+### Bloco 4 — Tela Lote · Compositor com abas e Lote de edições
+
+4.1 **Criar** `flownc/ui/components/compositor_v4.py` com `QTabWidget` de 2 abas — _Concluído quando:
+   o arquivo existe e mostra as abas "Trocar código" e "➕ Inserir bloco" com um único botão
+   "+ Adicionar ao lote" abaixo._
+   ↳ Se falhar: começar com uma aba funcional e adicionar a segunda depois.
+4.2 **Montar** a aba "Trocar código" com dois dropdowns pesquisáveis — _Concluído quando: os dois
+   `QComboBox` abrem com busca + seção "★ Frequentes" e mostram só o código (descrição no tooltip)._
+   ↳ Se falhar (dropdown pesquisável difícil): usar `QComboBox` editável simples como meio-termo e
+   anotar "★ Frequentes"/tooltip como ajuste.
+4.3 **Adicionar** a opção "✕ Remover (sem código)" no dropdown de destino — _Concluído quando:
+   selecioná-la deixa o destino vermelho "✕ remover"._
+   ↳ Se falhar: garantir ao menos um item "Remover" selecionável; o estilo vermelho é secundário.
+4.4 **Habilitar** "+ Adicionar ao lote" só com origem e destino preenchidos — _Concluído quando: o
+   botão fica desabilitado faltando qualquer um dos dois._
+   ↳ Se falhar: na dúvida **manter o botão desabilitado** (mais seguro — evita edição "trocar por
+   nada") e conferir os sinais de mudança dos combos.
+4.5 **Montar** a aba "➕ Inserir bloco" — _Concluído quando: a aba mostra textarea, seletor de
+   posição (com aviso na opção por número de linha), chips de modelos e a prévia do primeiro
+   programa marcado._
+   ↳ Se falhar: entregar textarea + seletor de posição primeiro; prévia e chips de modelo depois.
+4.6 **Implementar** a lista de edições (cartões numerados) na `LoteScreen` — _Concluído quando:
+   adicionar uma edição cria um cartão numerado com as ações ✎/⧉/✕._
+   ↳ Se falhar: renderizar uma lista de texto simples antes dos cartões estilizados.
+4.7 **Implementar** editar/duplicar/excluir do cartão — _Concluído quando: ✎ recarrega a edição no
+   compositor na aba certa, ⧉ duplica e ✕ remove e renumera os cartões._
+   ↳ Se falhar: priorizar o excluir (✕); editar e duplicar podem vir depois.
+4.8 **Detectar** conflito (mesma origem) com destaque âmbar + chip — _Concluído quando: dois cartões
+   de mesma origem ficam âmbar e o chip mostra "⚠ N conflitos"._
+   ↳ Se falhar: a detecção é por código de origem repetido; se o destaque âmbar falhar, ao menos
+   mostrar o chip "⚠ N conflitos".
+4.9 **Implementar** o CTA "Conferir lote →" com a regra de habilitação — _Concluído quando: fica
+   desabilitado sem edições ou sem programas marcados (tooltip explica o que falta) e habilitado
+   com ambos._
+   ↳ Se falhar: na dúvida manter desabilitado; conferir as duas condições (tem edição? tem programa
+   marcado?).
+
+### Bloco 5 — Modal Conferência
+
+5.1 **Criar** o pacote `flownc/ui/modals/` (com `__init__.py`) e `conferencia_modal.py` (`QDialog`
+   bloqueante) — _Concluído quando: `flownc/ui/modals/__init__.py` existe e o modal abre exibindo
+   faixa de total, avisos, cartões por edição, linha de backup e rodapé fixo._
+   ↳ Se falhar: modal novo isolado; montar as seções de cima pra baixo (faixa → avisos → cartões →
+   backup → rodapé), validando uma de cada vez.
+5.2 **Preencher** o modal com dados de exemplo — _Concluído quando: a faixa mostra um total e os
+   cartões listam programas afetados com exemplo real (valores fixos no código da UI)._
+   ↳ Se falhar: usar um conjunto mínimo fixo (1 edição, 2 programas) só para validar o visual.
+5.3 **Implementar** o rodapé conforme o estado — _Concluído quando: botão laranja sem conflito,
+   âmbar com conflito, desabilitado com total 0._
+   ↳ Se falhar: na dúvida desabilitar o botão (mais seguro) e conferir a lógica de conflito/total.
+5.4 **Ligar** o CTA "Conferir lote →" para abrir o modal — _Concluído quando: clicar no CTA abre o
+   modal de Conferência._
+   ↳ Se falhar: conferir o sinal do CTA; como fallback, abrir o modal direto no handler do clique.
+
+### Bloco 6 — Modal Publicação
+
+6.1 **Criar** `flownc/ui/modals/publicacao_modal.py` com barra de progresso — _Concluído quando: o
+   modal mostra as etapas backup → gravação → SHA-256 e não fecha durante o progresso._
+   ↳ Se falhar: começar com a barra estática; o ponto-chave é **impedir o fechar durante o
+   progresso** (desabilitar ✕ e Esc).
+6.2 **Implementar** a tela de resultado — _Concluído quando: ao concluir mostra "Publicado ✓", o
+   caminho do backup e os botões "Ver no Histórico" e "OK — novo lote"._
+   ↳ Se falhar: ao menos exibir "Publicado ✓" e o caminho do backup.
+6.3 **Ligar** "OK — novo lote" para limpar a lista de edições — _Concluído quando: clicar remove
+   todos os cartões da `LoteScreen`._
+   ↳ Se falhar: conferir o método de limpar a lista de edições da `LoteScreen`.
+6.4 **Ligar** "Ver no Histórico" para navegar à tela Histórico — _Concluído quando: clicar fecha o
+   modal e ativa a tela Histórico no rail._
+   ↳ Se falhar: reusar o caminho do rail (`setCurrentIndex` da tela Histórico) no handler.
+6.5 **Encadear** Conferência → Publicação — _Concluído quando: clicar "Publicar" na Conferência
+   fecha-a e abre o modal de Publicação._
+   ↳ Se falhar: fechar a Conferência e abrir a Publicação no mesmo handler do botão "Publicar".
+
+### Bloco 7 — Tela Editor
+
+7.1 **Criar** `flownc/ui/screens/editor_screen.py` reaproveitando o motor de edição existente —
+   _Concluído quando: a tela abre um arquivo em tela cheia com numeração de linha e fonte mono._
+   ↳ Se falhar: **não alterar `core/inplace_save.py` nem `core/file_handler.py`** (lógica de save
+   testada); embrulhar o `editor_panel` existente como widget interno da tela em vez de reescrever.
+7.2 **Implementar** a faixa de arquivos à esquerda — _Concluído quando: a faixa lista os programas
+   carregados e clicar troca o arquivo aberto._
+   ↳ Se falhar: começar com uma lista simples de nomes; clicar carrega o arquivo no editor.
+7.3 **[CRÍTICO] Implementar** a guarda de alterações ao trocar/sair — _Concluído quando: com edição
+   pendente, trocar de arquivo abre o diálogo Salvar / Descartar / Cancelar._
+   ↳ Se falhar: na dúvida **sempre perguntar** antes de trocar/sair (perder edição do operador é
+   inaceitável); Cancelar deve manter o editor exatamente como estava.
+7.4 **Montar** o cabeçalho do editor — _Concluído quando: mostra "Editando NOME.NC", o aviso
+   "⚠ salva direto, sem cópia" e os botões "Salvar como…" e "Salvar"._
+   ↳ Se falhar: cosmético; garantir ao menos o aviso "salva direto, sem cópia" e o botão Salvar.
+7.5 **Implementar** o toast "Desfazer" após salvar — _Concluído quando: salvar mostra um toast com
+   "Desfazer" que restaura o conteúdo anterior ao save._
+   ↳ Se falhar: guardar o conteúdo pré-save em memória; se o toast falhar, manter ao menos o Ctrl+Z
+   do editor como rede de segurança.
+7.6 **Implementar** a bolinha de alteração na faixa e no rail — _Concluído quando: editar sem salvar
+   mostra a bolinha laranja na faixa e no botão Editor; salvar a remove._
+   ↳ Se falhar: cosmético; anotar e seguir.
+
+### Bloco 8 — Toolbar do Editor (3 grupos)
+
+8.1 **Organizar** a toolbar em 3 grupos com separadores — _Concluído quando: a toolbar mostra
+   Localizar | Substituir | Inserir bloco separados._
+   ↳ Se falhar: reaproveitar os controles de busca já existentes no editor; o agrupamento visual é
+   secundário.
+8.2 **Implementar** a contagem automática de ocorrências — _Concluído quando: trocar código, trocar
+   arquivo ou editar o texto recalcula "N encontrados" sem botão manual._
+   ↳ Se falhar: usar `core/matcher.py` (`find_matches`) / `core/scan.py` (`count_occurrences`) já
+   prontos; se recalcular a cada tecla pesar, recalcular ao trocar código/arquivo primeiro.
+8.3 **Implementar** a navegação ↑/↓ circular com realce da corrente — _Concluído quando: as setas
+   rolam até a ocorrência, "i/N" atualiza e a corrente fica com realce mais forte._
+   ↳ Se falhar: garantir próximo/anterior não-circular antes de fechar o ciclo.
+8.4 **Implementar** o realce de todas as ocorrências (`QSyntaxHighlighter`) — _Concluído quando:
+   escolher um código realça todas as ocorrências no texto._
+   ↳ Se falhar (lento em arquivo grande): limitar o realce à área visível ou desligar acima de N
+   linhas; a busca não pode travar.
+8.5 **Implementar** "Substituir todos" — _Concluído quando: o botão substitui todas as ocorrências
+   no buffer de uma vez._
+   ↳ Se falhar: reaproveitar a substituição já existente no editor atual.
+8.6 **Implementar** "Um a um" como stepbar inline — _Concluído quando: clicar abre a barra inferior
+   com Substituir / Pular → / Concluir, sem usar `QMessageBox`._
+   ↳ Se falhar: manter o fluxo um-a-um atual como meio-termo até a stepbar inline ficar pronta.
+8.7 **[CRÍTICO] Implementar** "➕ Inserir bloco" no editor com proteção de âncora — _Concluído
+   quando: o modal mostra a prévia e bloqueia o botão se a âncora não existe no arquivo._
+   ↳ Se falhar: priorizar a **proteção** (âncora inexistente bloqueia a inserção) — é segurança
+   contra inserir no lugar errado; a prévia visual pode vir depois.
+
+### Bloco 9 — Tela Códigos
+
+9.1 **Criar** `flownc/ui/screens/codigos_screen.py` com lista + busca + contador — _Concluído quando:
+   a tela lista código+descrição, filtra pela busca e mostra "N cadastrados"._
+   ↳ Se falhar: entregar a lista simples + busca primeiro; o contador depois.
+9.2 **Implementar** "+ Adicionar código" (com bloco opcional) — _Concluído quando: o formulário cria
+   um código novo que aparece na lista._
+   ↳ Se falhar: salvar via `core/library_store.py` já existente; conferir o schema (`find`=código,
+   `label`=descrição, `replace`="").
+9.3 **Marcar** com a tag "bloco" os códigos com bloco e expô-los como modelos — _Concluído quando:
+   códigos com bloco mostram a tag e aparecem como chips nos inseridores de bloco._
+   ↳ Se falhar: o campo bloco é opcional; entregar código+descrição primeiro e o bloco depois.
+
+### Bloco 10 — Tela Histórico
+
+10.1 **Criar** `flownc/ui/screens/historico_screen.py` com lista cronológica reversa — _Concluído
+   quando: a tela lista publicações (quando/resumo/backup/configuração), mais recente no topo._
+   ↳ Se falhar: lista simples de linhas com dados de exemplo; a leitura real de `core/session_log.py`
+   é da Fase 3.
+10.2 **Implementar** o estado vazio do Histórico — _Concluído quando: sem publicações a tela mostra
+   ícone + texto-guia._
+   ↳ Se falhar: cosmético; anotar e seguir.
+10.3 **Implementar** "↩ Restaurar originais" por linha — _Concluído quando: o botão pede confirmação
+   e fica desabilitado se o backup não existir._
+   ↳ Se falhar: na Fase 2 basta o botão + diálogo de confirmação (visual). A restauração real (criar
+   backup dos atuais **antes** de devolver os originais) é da Fase 3 e é **[CRÍTICO]** lá — mexe em
+   arquivos do operador.
+
+### Bloco 11 — Topo global (receitas + backup)
+
+11.1 **Implementar** a seleção de receita no `QComboBox` — _Concluído quando: selecionar com lote
+   vazio carrega direto e com lote preenchido pede confirmação._
+   ↳ Se falhar: na dúvida **sempre pedir confirmação** antes de substituir (não perder o lote
+   montado pelo operador).
+11.2 **Implementar** "💾 Salvar lote atual como…" — _Concluído quando: o item abre um diálogo para
+   nomear e a receita passa a aparecer na lista._
+   ↳ Se falhar: na Fase 2 basta o diálogo de nome; a gravação real via `core/preset_store.py` é da
+   Fase 3.
+11.3 **Implementar** o chip de backup clicável — _Concluído quando: clicar abre o seletor de pasta e
+   o chip passa a mostrar o novo caminho._
+   ↳ Se falhar: usar o `QFileDialog` nativo do Qt para escolher a pasta; conferir o caminho
+   retornado antes de atualizar o chip.
+
+### Bloco 12 — Verificação da Fase 2
+
+12.1 **[CRÍTICO] Rodar** o pytest — _Concluído quando: zero regressões frente ao baseline._
+   ↳ Se falhar: corrigir antes de pedir o aval do Mestre; não aprovar nem commitar com teste vermelho.
+12.2 **[CRÍTICO] Rodar** o mypy — _Concluído quando: sem novos erros de tipo._
+   ↳ Se falhar: corrigir os tipos dos arquivos novos da UI; não silenciar com `type: ignore` sem motivo.
+12.3 **[CRÍTICO] Rodar** o ruff — _Concluído quando: sem violações._
+   ↳ Se falhar: rodar `ruff check --fix` para o trivial e ajustar o resto à mão.
+12.4 **Fazer** o smoke visual de todas as telas — _Concluído quando: cada tela foi comparada ao
+   mockup v4 e as divergências anotadas (ou nenhuma encontrada)._
+   ↳ Se falhar (divergência relevante): anotar e voltar ao bloco da tela correspondente antes de
+   pedir o aval do Mestre — é o gate da Fase 2.
+
+## Etapas da Fase 3 (alto nível — atomizar na proposta da change da Fase 3)
+
+> Só começam após o gate "Fase 2 aprovada pelo Mestre". Serão **atomizadas com fallback próprio na
+> proposta da change da Fase 3** (`/opsx:propose`). Aqui valem o critério mensurável e a marcação de
+> criticidade; o fallback fino entra na proposta. Regra geral até lá: em falha de gravação, **parar
+> preservando o backup já criado** e reportar, nunca deixar arquivos pela metade em silêncio.
+
+- **Ligar** a biblioteca real aos dropdowns (`core/library_store.py`) — _Concluído quando: os
+  dropdowns mostram os códigos do disco, não dados de exemplo._
+- **Ligar** a varredura/conferência real (`core/conference.py` + `core/scan.py` +
+  `core/replacement_plan.py`) ao modal de Conferência — _Concluído quando: o modal mostra números
+  reais dos arquivos marcados._
+- **[CRÍTICO] Ligar** a publicação real (`core/publisher.py`) ao botão Publicar — _Concluído quando:
+  publicar grava com backup versionado + SHA-256._ (Crítico: grava nos arquivos do operador.)
+- **Ligar** as receitas (`core/preset_store.py`) ao seletor de configuração — _Concluído quando:
+  salvar e carregar receita persiste em disco._
+- **[CRÍTICO] Ligar** o histórico (`core/session_log.py`) e a restauração à tela Histórico —
+  _Concluído quando: cada publicação aparece no Histórico e "Restaurar" devolve os originais do
+  backup, criando antes um backup dos arquivos atuais._ (Crítico: restaurar mexe nos arquivos atuais.)
+- **Chamar** `core/seed.py` (`ensure_seed`) no boot — _Concluído quando: abrir numa pasta `data/`
+  vazia repõe biblioteca + receitas de fábrica._
+- **[CRÍTICO] Configurar** `flownc/FlowNC.spec` (`datas` com QSS, fontes e `data_default`) —
+  _Concluído quando: o build inclui tema, fontes e dados de fábrica._ (Crítico: sem isso o EXE sai
+  "pelado" na entrega.)
+- **[CRÍTICO] Empacotar e verificar** o EXE numa pasta limpa — _Concluído quando: `FlowNC.exe` abre
+  com tema, fontes e biblioteca/receitas carregados (não "pelado")._
+
+## Dependências e ordem
+
+- **Sequência de fases:** Fase 1 ✅ → Fase 2 (atual) → Fase 3 (só após a Fase 2 ser aprovada pelo Mestre).
+- **Dentro da Fase 2:** o Gate 0 precede tudo; depois os blocos seguem a ordem numérica
+  (1 → 12). O Bloco 2 (estrutura raiz) é pré-requisito de todos os blocos de tela (3–11). Os modais
+  (5, 6) dependem da tela Lote (3, 4). A toolbar do Editor (8) depende da tela Editor (7).
+- **Núcleo é pré-requisito de ligação (Fase 3), não de layout (Fase 2):** a Fase 2 usa dados de
+  exemplo; a Fase 3 conecta o `core/`.
+
+## Tecnologias e verificação
 
 - **Linguagem/UI:** Python 3.11+, PySide6 (Qt Widgets).
-- **Estilo:** folha QSS central (`flownc/ui/style.qss`) + módulo de tema/tokens (`flownc/ui/theme.py`); fontes IBM Plex Sans / IBM Plex Mono (carregadas via `QFontDatabase`; `.ttf` ainda pendentes — ver Próximo passo 7d).
-- **Arquitetura:** componentes separados em `flownc/ui/components/` (`header.py`, `compositor.py`, `program_list.py`, `summary.py`); `flownc/ui/main_window.py` é o "maestro" (instancia componentes, conecta sinais/slots, gerencia o `QStackedWidget` Resumo ↔ Editor e o `QSplitter` de proporção dinâmica).
-- **Editor:** `flownc/ui/editor_panel.py` (existe, será estilizado na Mudança C) + `core/inplace_save.py` (existe, não muda).
-- **Build:** PyInstaller (`flownc/FlowNC.spec`) → `flownc/dist/FlowNC/FlowNC.exe`.
-- **Verificação:** `pytest flownc/tests/` + `mypy flownc/ --ignore-missing-imports` + `ruff check flownc/`; todos devem passar antes de arquivar cada mudança. Usar o venv `flownc/.venv` (PySide6 6.11.1). _Nota: a auditoria de 2026-06-07 contou **123 funções `def test_`** em 17 arquivos; a contagem de **146** citada antes inclui casos parametrizados — **revalidar rodando o `pytest`** em vez de fixar o número._
-- **Processo:** OpenSpec (propose → apply → archive). 4 mudanças: A (`redesign-fundacao-visual`, ✅) → B (`redesign-layout-principal`, ✅) → C (`redesign-editor-limpeza`) → D (`redesign-seguranca-polimento`).
-- **Referência de design:** `mockups/painel-final.v2.html` (único modelo válido; o v1 `painel-final.html` foi removido — fora do repo, árvore git limpa). Tokens citados neste plano (`--color-occurrence`, `--h-cta`, `--color-success`, `--t-*`, `--sp-*`, `--radius-*`, etc.) e classes (`editlist`, `libdrop`, `em edição`, "Edições montadas", "Adicionar edição ao lote →") foram conferidos e **existem** no mockup.
+- **Estilo:** `flownc/ui/theme.py` (tokens) + `flownc/ui/style.qss`; fontes IBM Plex Sans/Mono
+  (empacotar na Fase 3).
+- **Arquitetura:** rail + topo + `QStackedWidget` de 4 telas em `main_window.py` (maestro);
+  telas em `flownc/ui/screens/`; modais em `flownc/ui/modals/`; componentes compartilhados em
+  `flownc/ui/components/`.
+- **Núcleo:** `flownc/core/` (preservado, não muda na Fase 2).
+- **Build:** PyInstaller (`flownc/FlowNC.spec`) → `flownc/dist/FlowNC/FlowNC.exe` (Fase 3).
+- **Verificação (sempre a partir da raiz do projeto, com o Python do venv `flownc/.venv`):** no
+  Windows/PowerShell, `flownc\.venv\Scripts\python.exe -m pytest flownc/tests/`,
+  `flownc\.venv\Scripts\python.exe -m mypy flownc/ --ignore-missing-imports` e
+  `flownc\.venv\Scripts\python.exe -m ruff check flownc/`. **"Verde"** = todos os testes que já
+  passavam continuam passando (zero regressões frente ao estado atual — não fixar um número
+  absoluto, comparar com o baseline rodando antes da mudança). Os três verdes são pré-requisito
+  para arquivar qualquer change.
+- **Processo OpenSpec:** propose → apply → archive, **uma mudança por vez**. Fase 2 =
+  `plano-execucao-mockup-v4`; Fase 3 = change(s) futura(s). "Validar" = conferir que os artefatos
+  existem e estão coerentes (+ `openspec validate <nome>` opcional). Não existe `/opsx:validate`.
 
-> **Plano único.** Este `PLAN.md` é o único plano vivo. Os planos antigos/superados e o relatório item-a-item de conformidade foram arquivados em `_descarte/` (recuperáveis, fora do caminho). A seção abaixo consolida o estado real auditado.
+## Histórico (registro — não reexecutar)
 
-## Estado real auditado (2026-06-07)
+- **Fundação visual** (`redesign-fundacao-visual`) e **Layout 2 colunas** (`redesign-layout-principal`):
+  propostas, implementadas e **arquivadas** (2026-06-06/07) no OpenSpec. Eram do desenho anterior
+  (v2). O **mecanismo** de tokens (`flownc/ui/theme.py` + `flownc/ui/style.qss`) é reaproveitável,
+  mas os **valores** serão atualizados para a paleta do v4; o layout de 2 colunas (`QSplitter`)
+  será substituído pelo rail + `QStackedWidget` do v4.
+- **Fidelidade v2** (`redesign-fase2-fidelidade-visual`): change proposta e parcialmente codada
+  (commit `f28fdb8`) contra o mockup **v2**. **Descartada como base** pela decisão de refazer do
+  zero no v4 (ver topo).
+  ✅ **Resolvido (2026-06-11):** arquivada com `openspec archive --skip-specs -y` →
+  `openspec/changes/archive/2026-06-11-redesign-fase2-fidelidade-visual`. O `--skip-specs` preserva
+  o histórico do trabalho v2 **sem** consolidar os deltas nos specs base, mantendo a documentação
+  oficial (`openspec/specs/`) intacta e evitando conflito quando o v4 for arquivado.
 
-> Auditoria independente cruzando o app real, o mockup `mockups/painel-final.v2.html` e o código (venv `flownc/.venv` com PySide6 6.11.1). Consolida o antigo `docs/PLANO-CONFORMIDADE-MOCKUP-V2.md` (agora em `_descarte/`, com o detalhe item-a-item).
+## Glossário rápido
 
-### Entregue e verificado em execução
-- Mudanças A (fundação visual) e B (layout 2 colunas + 4 componentes + `QStackedWidget` Resumo↔Editor) entregues, **arquivadas** e **verificadas em execução** — `test_ui_smoke.py` instancia `MainWindow` + componentes e passa.
-- Resumo recalcula de verdade: chip de estado (`validate_batch` em `core/batch.py:16`), contadores, cards `De→Para`, selo `✓ Validado`, meta de ocorrências (`count_occurrences` em `core/scan.py:16`).
-  - → **Como fica na nova atualização (verificações):** o `selo ✓ Validado`/`validate_batch` deixa de representar verificação de perfil — não há mais conferência automática (`must_exist`/`must_not_exist`). O Resumo passa a refletir só o que o operador montou manualmente (contadores e cards `De→Para` das substituições origem→destino vindas da biblioteca editável); o chip de estado, se mantido, indica apenas se há edições prontas para publicar, não "programa aprovado".
-- Editor por arquivo: varredura com borda CNC (`M8`≠`M80`), substituir todos/um a um, **salvar in-place atômico com conferência SHA** (CRLF preservado). Botão `✎ Editar` e duplo-clique abrem o editor correto.
-- Preview com nomenclatura de publicação; QSS com tokens/hex do mockup.
+**Termos do produto/v4**
+- **Rail:** barra lateral escura com os 4 botões-lugar (Lote/Editor/Códigos/Histórico).
+- **Topo global:** faixa no alto, visível em todas as telas, com o seletor de configuração/receita
+  e o chip de backup.
+- **Chip de backup:** botão pequeno no topo que mostra o caminho da pasta de backup atual; clicar
+  abre um seletor para trocar a pasta.
+- **Receita/Configuração:** lote de edições + preferências salvos com um nome, para reutilizar.
+- **Lote:** conjunto de edições a aplicar nos programas marcados.
+- **Edição:** uma troca de código (origem → destino/remover) **ou** uma inserção de bloco.
+- **Conferir:** varredura real que mostra o que mudaria, sem gravar.
+- **Publicar:** gravar as edições com backup versionado e conferência dupla (SHA-256).
+- **Borda CNC:** regra que impede `M8` de casar dentro de `M80`/`T1.0`.
 
-### Divergências de fidelidade abertas (a fechar — viram os Próximos passos 1–6)
-- **Header:** marca `⚙ FlowNC`/`LOCAL · OFFLINE` (vs `FlowNC`/`Editor de Lotes`); 2 botões fora do mockup (`Abrir pasta`/`Abrir programa(s)`); `Salvar perfil` à direita (mockup: à esquerda) e só avisa (stub `_save_profile_stub` em `main_window.py:550`); `+ Adicionar código` azul-claro (mockup: azul sólido) e sem comportamento próprio (abre a Biblioteca).
-- **Compositor (painel 1):** título `Montar edição` sem número; `QComboBox` sem busca; lista plana sem rascunho/`✕` por linha; o botão adicionar **comete a regra na hora**; tem seletor `Escopo` **inexistente no mockup**; falta o CTA `Adicionar edição ao lote →` do painel 2.
-- **Lista de programas:** **dois checkboxes por linha** (confirmado em render); título `Programas` (vs `Seleção de Programas`); metadados absolutos (vs relativos); sem `.file.off` na linha desmarcada.
-- **Resumo:** escopo `todos/sel.` (vs `N programas`); ações `✎ ⧉ 🗑` decorativas (QLabel sem clique); selo de backup em 1 linha (vs escudo + 2 linhas); contador `Alterações` **superestima sob conflito** (contagem bruta, sem descontar supressão — 10 vs ~6 reais).
-- **Editor:** glifos `🔎`/`◂▸` (vs `🔍`/`↑↓`); `Substituir por` único (vs `Substituir`+`por`); `Salvar` sem `💾`; **não realça todas as ocorrências**; `Um a um` por `QMessageBox` (vs stepbar inline).
-- **Preview/publicação:** cores hardcoded (fora dos tokens); fluxo de 4 overlays do mockup ausente; o CTA ainda usa `_save()` legado (`main_window.py:466`, chamado em `:418`) em vez de `publish_batch` (`core/publisher.py:56`, backup versionado + SHA já prontos e testados, mas órfãos da UI). _Obs.: a UI já usa `build_plan`/`apply_edits` (`main_window.py:328`/`:329`); falta só trocar o salvamento final._
+**Termos de interface (UX)**
+- **Estado vazio:** o que uma lista/tela mostra quando ainda não tem dados — ícone + texto-guia +
+  botão de ação, nunca uma área em branco.
+- **Toast:** aviso passageiro que aparece no rodapé e some sozinho após alguns segundos (pode
+  trazer um botão, ex.: "Desfazer").
+- **Smoke (teste de fumaça) visual:** abrir o app de verdade e conferir cada tela a olho contra o
+  mockup v4, anotando divergências — não é teste automatizado.
 
-### Lacunas confirmadas (fora do mockup, mas bloqueiam a entrega)
-- **Biblioteca de códigos:** ✅ **populada (2026-06-07)** — `data/library.json` e `data_default/library.json` têm **89 códigos** (53 G + 14 M + 6 eixos + 11 parâmetros + 2 variáveis + 3 fluxo), no schema `find`=código / `replace`="" / `label`=descrição / `tags`=categoria (meio-termo do modelo "código + descrição"). _Resta: o `ensure_seed` em runtime (9b/9c) caso `data/` seja apagada._
-- **Perfis iniciais:** ✅ **criados (2026-06-07)** — `MAQ01`, `MAQ02`, `MAQ03` (apenas esses 3, sem regras nem verificações) em `data/presets/` e `data_default/presets/`. O exemplo `MAZAK_VTC530.json` foi removido (recuperável no git).
-- **`FlowNC.spec datas=[]`** (linha 8): o EXE não inclui `ui/style.qss`, `data/` nem fontes → roda sem tema/perfil/biblioteca. **(Ainda pendente — Próximo passo 7.)**
-- **Fontes IBM Plex não empacotadas** (`assets/fonts/` só tem `.gitkeep`) → fallback Segoe UI/Consolas. **(Ainda pendente — Próximo passo 7d.)**
-
-### Resposta à auditoria de 2026-06-07 (alarmes falsos fechados)
-
-> Conferência item-a-item da auditoria (`auditoria_plano.md`) contra o código real. Registro para não reabrir discussão:
-> - **CRLF no `publisher.py` — não é problema.** O `publisher.py` é **byte-exato** (`read_bytes` + `_write_bytes_atomic`); não usa `read_text`/`write_text` e não toca em quebras de linha. Impossível corromper CRLF. O cuidado real (preservar EOL ao montar os `edited_bytes`) está no **Passo 4**.
-> - **`scope-select` — não existe no mockup v2** (0 ocorrências). O seletor "Escopo" já é removido (Compositor, Passo 1). Nada a implementar.
-> - **`core/verifier.py` — existe** (a auditoria errou ao dizer que não). Sai do escopo (verificações automáticas não preservadas), mas o arquivo está no código.
-> - **Overlays do mockup:** as classes `diff-line`/`summary-grid`/`progress-bar`/`result-item` citadas pela auditoria **são fictícias**. As reais são `.run` / `.res` (+`.preview`) / `.confirm` / `.saved` (ver Passo 6).
-> - **Contagem de testes: 123** em 17 arquivos (a auditoria disse ~114; o plano já estava certo).
-> - **Números de linha** citados no plano são **indicativos** — a referência primária é o **nome da função** (podem ter drift entre edições).
-
-### Próximos passos para fechar 100%
-
-> Reformatados em etapa (verbo + critério _itálico_ + fallback `↳`). Os passos 1–4 são o **primeiro bloco de execução** (fidelidade do que A/B entregaram); 5–6 dialogam com C/D; 7 e 9 são pré-requisitos de build; 8 fecha a persistência.
-
-1. **Reescrever o `CompositorPanel` no formato `editlist`/rascunho do mockup** — painel 1 com `1 Configurações`, lista `Edições montadas (N)`, linha `em edição` com `✕` por linha, botão `+ adicionar outra edição` e o CTA `Adicionar edição ao lote →` no painel 2. **Requisito do modelo aprovado:** a tela deve ter **dois campos separados** — "código que sai" (origem) e "código que entra" (destino) — e o operador escolhe cada um da biblioteca; a biblioteca é **dicionário** (código + descrição), não fornece o par pronto (ver "Decisão de modelo de dados da biblioteca" no Objetivo). _Concluído quando: o painel 1 bate visualmente com o mockup (lista empilhada + rascunho + `✕` + CTA), tem os dois campos origem/destino e montar/remover edição funciona._
-   ↳ Se falhar: **preservar os sinais/slots atuais** (a lógica core não muda); reescrever só a camada visual/UX, comparando com os `connect()` atuais antes de remover widgets.
-   ⚠️ **Atenção (transitório):** a biblioteca tem `replace` **vazio** de propósito. Até esta reescrita, a tela antiga pode tratar um código escolhido como "trocar por nada" (apagar) — ver AVISO no Objetivo. A correção é **esta tela nova com dois campos**; **não** preencher o `replace` da biblioteca para "resolver" (volta ao modelo de pares prontos, descartado). O destino só existe quando o operador escolhe o segundo código.
-
-2. **Corrigir a fidelidade do header e do Resumo** — header com marca `FlowNC`/subtítulo do mockup; **mover `Abrir pasta`/`Abrir programa(s)` para o painel de programas como `+ Adicionar programas`** (abre pasta/arquivos), com **arrastar-e-soltar** na lista e **estado vazio com CTA destacado** (ver Passo 43) — cabeçalho fica limpo conforme o mockup; `Salvar perfil` à esquerda; `+ Adicionar código` azul sólido. Resumo com escopo `N programas`, ações do card clicáveis (`✎ ⧉ 🗑`) e selo de backup em escudo + 2 linhas. _Concluído quando: header e Resumo batem com o mockup nesses pontos e o operador carrega arquivos pelo `+ Adicionar programas`/arrastar-e-soltar._
-   ↳ Se falhar: aplicar um controle por vez rodando o app entre cada mudança para isolar quebras. **Decisão de UX (2026-06-07):** o destino de `Abrir pasta`/`Abrir programa(s)` é o painel de programas (proximidade ação↔conteúdo) — não deixar no cabeçalho.
-
-3. **Remover o checkbox duplicado da lista de programas e aplicar `.file.off`** — deixar **um** checkbox por linha; aplicar o estilo `.file.off` na linha desmarcada; título `Seleção de Programas`; metadados relativos. **Navegação de retorno (decisão de UX 2026-06-07 — entra antes no protótipo):** a linha do arquivo aberto no editor ganha estado **"em edição"** (destaque) e seu botão troca de `✎ Editar` → **`Voltar`** (muda cor + texto, estilo neutro/secundário) — retorno no próprio lugar do clique e indicador de qual arquivo está aberto (`btn_edit` em `program_list.py`). _Concluído quando: cada linha tem só um checkbox, a linha desmarcada fica esmaecida (`.file.off`) e a linha em edição mostra o botão `Voltar` contextual._
-   ↳ Se falhar: identificar qual checkbox alimenta a seleção real antes de remover o outro; não quebrar o sinal de seleção. O botão contextual deve passar pela guarda de "alterações não salvas" (mockup `.confirm`) ao voltar/trocar de arquivo.
-
-4. **Trocar o `_save()` legado pelo orquestrador `publish_batch` e corrigir o contador `Alterações`** — o CTA `Executar Lote` deve publicar via `build_plan` + `apply_edits` + `publish_batch` (`core/publisher.py`, backup versionado + SHA); o contador `Alterações` deve descontar supressões (não superestimar sob conflito). _Concluído quando: a publicação roda pelo `publish_batch` (não pelo `_save()` de `main_window.py:466`) e o contador mostra o número real de alterações._
-   ↳ Se falhar: manter `_save()` como fallback funcional até o `publish_batch` estar testado na UI; corrigir o contador isoladamente, conferindo a lógica de supressão no `build_plan`.
-   ⚠️ **Codificação/CRLF (esclarecido na auditoria 2026-06-07):** o `publisher.py` é **byte-exato** (`read_bytes` + `_write_bytes_atomic`) e **NÃO precisa de alteração** — ele não toca em quebras de linha. O cuidado está em **quem monta** os `PublishItem.edited_bytes`: produzir esses bytes pelo caminho que **preserva codificação + EOL** (`encode_batch`/`encode_text` por `EncodingInfo`, o mesmo que o `_save` já usa) — **nunca** `text.encode("utf-8")` cru, que perderia o CRLF dos `.NC`.
-   ⚠️ **Contador `Alterações` — fonte certa:** usar a contagem **efetiva** `sum(len(o.edits))` (supressões já descontadas), **não** `plan.match_count_by_rule` (`core/replacement_plan.py`), que é o total bruto **pré-conflito** (é o que hoje superestima 10 vs ~6).
-   ⚠️ **`backup_dir`:** definir o destino do backup ao chamar `publish_batch` — pasta de backup ao lado da `working_dir`; o próprio publisher cria `_backup_orig_<DATA_HORA>/` lá dentro.
-
-5. **Acertar o editor (glifos, labels, realce, stepbar, `💾`, Voltar)** — usar `🔍`/`↑↓`, separar `Substituir`+`por`, `💾 Salvar`, realçar **todas** as ocorrências, trocar o `Um a um` por stepbar inline e **deixar o `✕ Voltar ao resumo` proeminente no topo-esquerdo do cabeçalho** (alto contraste, sair do cinza `--color-bg-rail`/`--t-caption` atual — `editor_panel.py:194` / mockup `.ed-back`). Somado ao `Esc` (Passo 42) e ao botão contextual da linha (Passo 3), são três caminhos de retorno. _Concluído quando: o editor bate com o mockup nesses pontos, realça todas as ocorrências da busca e o `Voltar` do cabeçalho fica em destaque no topo-esquerdo._
-   ↳ Se falhar: priorizar o realce de todas as ocorrências (maior valor de uso). Boa parte está nas **Etapas 24–27 (Mudança C)** — executar lá.
-
-6. **Modais Qt dos overlays + dropdowns pesquisáveis (`libdrop`)** — transformar os overlays de publicação do mockup em modais Qt estilizados e tornar os dropdowns origem/destino pesquisáveis (`libdrop`). **Overlays reais do mockup (classes):** `.run` (processando lote, spinner), `.res` (resumo do lote + `.preview` antes/depois), `.confirm` (confirmação / alterações não salvas) e `.saved` (sucesso "Salvo"). _Concluído quando: esses overlays existem como modais estilizados e os dropdowns filtram por digitação._
-   ↳ Se falhar: estilizar `QMessageBox` como meio-termo; isto se estende nas **Etapas 41/45 (Mudança D)**.
-   ⛳ **Gate (REGRA DE OURO):** estes modais — e os demais componentes de feedback/transição da Mudança D (Etapas 39/41/44/45) — só são implementados **depois** de especificados e aprovados no protótipo HTML (FASE 1, inventário "Componentes de sistema"). Herdam o contrato do protótipo: não inventam visual/comportamento na hora.
-
-7. **Corrigir o empacotamento do EXE.** Hoje `FlowNC.spec datas=[]` → o EXE abre "pelado" em outro PC. **Atenção:** só preencher `datas` **não basta** — no PyInstaller 6.x os arquivos de `datas` caem na subpasta `_internal/` (= `sys._MEIPASS`), mas o `app_paths.base_dir()` atual procura ao lado do `.exe` (`Path(sys.executable).parent`); sem ajustar isso o app continua pelado. São 3 sub-passos + decisão das fontes:
-   - **7a. `app_paths.py` — dois "baldes" de caminho.** Criar `resource_dir()` que usa `sys._MEIPASS` quando empacotado (lê **recurso fixo**: `ui/style.qss` e `assets/fonts/*.ttf` de dentro do `_internal/`); manter os **dados editáveis** (`presets/`, `library.json`, `settings.json`) saindo da pasta do `.exe`, pra o operador continuar editando no pen drive. _Concluído quando: `qss_path()`/`fonts_dir()` apontam pro bundle e `presets_dir()`/`library_path()`/`settings_path()` apontam pra pasta do `.exe`._ ↳ Se falhar: o `app_paths.py` atual já tem `base_dir()`/`presets_dir()`/`library_path()`/`settings_path()`/`fonts_dir()`/`qss_path()`, mas **sem** `resource_dir()` nem `_MEIPASS` — adicionar sem quebrar as funções existentes.
-   - **7b. `FlowNC.spec` — `datas` do recurso fixo (inclui os defaults de fábrica).** Declarar em `datas`: `('ui/style.qss', 'ui')`, `('assets/fonts/*.ttf', 'assets/fonts')` **e `('data_default', 'data_default')`** (os defaults que o `ensure_seed` lê — ver item 9). **Não** pôr `data/` (editável) aqui (senão vira só-leitura escondido no `_internal/`). _Concluído quando: o build gera `_internal/ui/style.qss`, `_internal/assets/fonts/*.ttf` e `_internal/data_default/`._ **(Esta linha já cobre o que o item 9d só confirma — não depender só do 9d.)**
-   - **7c. Semente de `data/` ao lado do `.exe`.** Passo de build (script pós-PyInstaller ou cópia no `.spec`) que copia `data/` (presets + `library.json`) pra `dist/FlowNC/data/`, editável. _Concluído quando: `dist/FlowNC/data/presets/*.json` e `dist/FlowNC/data/library.json` existem ao lado do `.exe`._
-   - **7d. Fontes (na execução).** Baixar IBM Plex Sans + IBM Plex Mono `.ttf` reais (gratuitas, OFL — Google Fonts/GitHub) e colocar em `flownc/assets/fonts/` (hoje só tem `.gitkeep`). Fallback automático Segoe UI/Consolas já existe no `theme.py` se faltar. _Concluído quando: os `.ttf` das duas famílias existem em `assets/fonts/` e são empacotados (7b)._
-   - **7e. Verificar.** Buildar e abrir o `.exe` numa pasta limpa (idealmente outro PC): conferir que o visual (QSS), as fontes e os presets/biblioteca carregam. _Concluído quando: o app não abre "pelado"._
-
-8. **Persistência completa do perfil + conferência visual final** — implementar a gravação real de perfil (hoje `Salvar perfil` é stub `_save_profile_stub` em `main_window.py:550`): salvar grava em disco via `preset_store` e o perfil reaparece ao reabrir; ao fim, conferência visual completa contra o mockup. _Concluído quando: salvar um perfil e reabrir o app mantém o perfil; a conferência final foi feita._
-   ↳ Se falhar: implementar primeiro só a gravação/leitura (o essencial) e deixar a conferência visual como passo final separado.
-
-9. **Semear na primeira execução (Seed).** Os dados de fábrica **já existem** (ver 9a/9e), mas falta a cópia automática em runtime: hoje, se a pasta `data/` for apagada, o FlowNC abre **pelado** porque `_load_library` ([main_window.py:529](flownc/ui/main_window.py:529)) devolve lista vazia sem reclamar e `_load_presets` ([main_window.py:177](flownc/ui/main_window.py:177)) não acha presets. Falta `core/seed.py`/`ensure_seed` para repor a fábrica. A biblioteca é uma lista de **código + descrição curta, totalmente editável** (modelo aprovado — ver "Decisão de modelo de dados da biblioteca" no Objetivo). Decisão de design: **dado de fábrica como arquivo** (não string em Python), separado do dado editável, reaproveitando o caminho de empacotamento dos itens 7a–7c. Sub-passos:
-   - **9a. ✅ Defaults de fábrica em `flownc/data_default/` (feito 2026-06-07).** Criados `data_default/library.json` (**89 códigos**) e `data_default/presets/MAQ01.json`/`MAQ02.json`/`MAQ03.json`, versionados no repo e validados via `load_library`/`load_preset`. Schema único entre `data/` e `data_default/`: biblioteca = `find`=código / `replace`="" / `label`=descrição / `tags`=categoria (meio-termo do modelo "código + descrição", sem quebrar o `load_library` atual).
-   - **9b. `core/seed.py` com `ensure_seed(data_dir)`.** No boot, se `library.json` ou a pasta `presets/` não existirem, estiverem vazios **ou estiverem corrompidos** (JSON inválido / não carregável), repor os defaults na pasta editável ao lado do `.exe`. **Fonte e destino (coerência com o item 7a):** a **fonte** é `resource_dir()/"data_default"` (no EXE = `_internal/`/`sys._MEIPASS`; em dev = pasta do projeto); o **destino** é `base_dir()/"data"` (editável). **Checagem de integridade (decisão 2026-06-08, fecha o ponto 3.3 da auditoria):** antes de decidir *não* sobrescrever, validar que o `library.json` existente é JSON válido e carregável por `load_library` (e cada preset por `load_preset`); se algum estiver corrompido, tratá-lo como ausente e repor **só aquele item**. **Nunca apagar dado do operador em silêncio:** antes de repor um arquivo corrompido, renomeá-lo para `<nome>.corrompido` (fica preservado ao lado) — nunca sobrescrever direto. **Idempotente:** se já houver conteúdo válido do operador, não tocar em nada. _Concluído quando: rodar `ensure_seed` numa pasta `data/` vazia gera `library.json` + `presets/MAQ01.json`/`MAQ02`/`MAQ03`; rodar de novo com dados válidos não altera nada; e rodar com um `library.json` corrompido renomeia o corrompido para `.corrompido` e repõe o default._ ↳ Se falhar (erro de cópia/permissão/leitura): logar e seguir com biblioteca/perfil vazios, sem travar o boot.
-   - **9c. Chamar `ensure_seed` no boot.** Invocar em `main.py` (ou no `__init__` da `MainWindow`) **antes** de `_load_library`/`_load_presets`, usando `app_paths` (pasta editável do item 7a). _Concluído quando: app aberto numa pasta limpa já mostra a biblioteca (89 códigos) e um dos perfis MAQ0X selecionado._ ↳ Se falhar: conferir a ordem de inicialização; a semente tem de ocorrer antes do load.
-   - **9d. Confirmar os defaults empacotados no EXE.** O `data_default/` **já é declarado** como recurso fixo no `datas` do `.spec` (item 7b). Aqui só **confirmar** que o bundle contém `_internal/data_default/` e que o `ensure_seed` (9b) o encontra via `resource_dir()`/`_MEIPASS`. _Concluído quando: o EXE recém-buildado em pasta limpa semeia a biblioteca + perfis sozinho._ ↳ Se falhar: conferir o `('data_default', 'data_default')` no `datas` do `FlowNC.spec` (7b) e o caminho de recurso (`resource_dir`/`_MEIPASS` do item 7a).
-   - **9e. ✅ Conteúdo da biblioteca (lista do Mestre) — fornecida 2026-06-07.** 89 códigos G/M/eixos/parâmetros/variáveis/fluxo, cada um como `código` + `descrição curta`. _Já em `data/library.json` e `data_default/library.json`._ ↳ Pendente só a conferência visual de que aparecem nos dois campos (origem/destino) ao abrir o app (smoke).
-
-10. **"Salvar como…" no editor (extensão + codificação) — requisito novo (2026-06-07).** Hoje o editor só salva in-place no formato de entrada (já atendido). Adicionar um **"Salvar como…"** que permita escolher **extensão/tipo de arquivo** e **codificação + quebra de linha** ao gravar, com **default = preservar o original**. Reaproveita o motor: montar um `EncodingInfo` novo (codificação/EOL/BOM escolhidos) e gravar via `write_atomic` (`core/file_handler.py:95`) no caminho/extensão escolhidos — a lógica de codificação já existe (`encode_text`), falta a UI e a escolha. _Concluído quando: o editor oferece "Salvar como…", grava no formato/codificação escolhidos e, sem escolha, preserva o tipo de entrada._
-   ⛳ **Gate (REGRA DE OURO):** desenhar o "Salvar como…" no protótipo HTML (FASE 1) e obter aprovação **antes** de codar (UI na FASE 2, ligação na FASE 3).
-   ↳ Se falhar: manter o `Salvar` in-place (preserva entrada) como base; "Salvar como…" é aditivo e não altera o salvamento padrão.
-
-11. **Adicionar o Catálogo Técnico de Comandos (modelo LIGADO).** Criar uma seção no cabeçalho (botão `Catálogos`) que abre uma **janela separada não-modal** de referência editável, organizada por **categorias**, com **itens** (código + descrição + exemplo? + observação?) e uma seção **`Exemplos`** em texto livre; com **busca** e botão **`+ Adicionar Catálogo`** (Fanuc é o primeiro, semeado do guia). **LIGADO:** o catálogo é a **fonte-mestre** — os dropdowns de substituição (Compositor/Editor) leem código+descrição do **catálogo ativo** (`settings.active_catalog`, default `Fanuc`); `data/library.json` vira **cache gerado** do catálogo ativo (achatamento `find`=código/`replace`=""/`label`=descrição/`tags`=categoria — **`replace` continua vazio**). Novo `core/catalog_store.py` espelha `library_store.py` (reusa `json_store` + `backup_before_write`); novo `app_paths.catalogs_dir()`; nova `ui/catalog_window.py`; botão+sinal em `ui/components/header.py`; wiring + `_load_library` LIGADO em `ui/main_window.py`. _Concluído quando: o botão `Catálogos` abre a janela não-modal; dá pra editar/adicionar item, categoria e catálogo; trocar o catálogo ativo reflete nos dropdowns; e os dados vêm do catálogo._
-    ↳ Se falhar: manter `library.json` como fonte (comportamento atual) enquanto o `catalog_store` não estiver verde; **nunca** preencher `replace` (AVISO do Objetivo). **Seed:** `data_default/catalogs/Fanuc.json` entra no `ensure_seed` (Passo 9b) e no `datas` do `.spec` (Passo 7b).
-    ⛳ **Gate (REGRA DE OURO):** desenhar a janela do catálogo e o `+ Adicionar Catálogo` no protótipo (FASE 1) e aprovar **antes** de codar (UI na FASE 2, lógica na FASE 3).
-
-12. **Dropdowns de código: só o código + descrição no hover (tooltip).** Nos campos de **Configurações** (Compositor origem/destino) e nos dropdowns do **Editor**, remover a descrição **inline** (polui o visual) e exibi-la apenas ao **passar o mouse** (tooltip). No app: `addItem(e.find, e.find)` + `setItemData(i, e.label, ToolTipRole)` em `editor_panel._fill_combo` e `compositor.set_library`. _Concluído quando: os dropdowns mostram só o código e a descrição aparece no hover, sem texto inline._
-    ↳ Se falhar: manter o código visível (prioridade) e anotar o tooltip como ajuste.
-    ⛳ **Gate (REGRA DE OURO):** isto **muda o contrato visual atual** (o mockup mostra a descrição inline no Compositor) — alterar no protótipo e **reaprovar** antes de codar.
-
-> **Nota de ligação:** o passo 7 (empacotamento) cita "Seed Fanuc" de passagem — o detalhamento atômico é **este item 9**. O 7c (semear `data/` ao lado do `.exe`) e o 9b/9c se complementam: 7c garante o arquivo na entrega; 9b/9c garantem a semente também em runtime se a pasta for apagada.
+**Termos técnicos (Python/Qt)**
+- **Maestro:** `flownc/ui/main_window.py` — instancia rail/topo/telas/modais, conecta os sinais e
+  troca a tela ativa. Não contém lógica de conteúdo de tela.
+- **QStackedWidget:** empilhador de telas do Qt em que **só uma** fica visível por vez; o rail
+  escolhe qual mostrar. É o que troca entre Lote/Editor/Códigos/Histórico.
+- **QSplitter:** divisor de painéis redimensionável do Qt (era a base do layout v2 de 2 colunas;
+  será removido como estrutura raiz no v4).
+- **Sinais/slots (Qt):** mecanismo do Qt em que um widget "emite um sinal" (ex.: botão clicado) e
+  um método conectado ("slot") responde. As telas avisam o maestro por sinais; o maestro reage.
+- **Tokens:** constantes de estilo (cores, fontes, espaçamentos) definidas em `flownc/ui/theme.py`
+  e usadas no `flownc/ui/style.qss`, para não espalhar valores fixos pelo código.
