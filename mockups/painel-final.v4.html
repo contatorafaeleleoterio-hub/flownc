@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowNC — Painel v4 · refinamento</title>
+<!--
+  Mockup v4 (painel-final.v4.html) — REFINAMENTO do v3 (que permanece intacto).
+  Data: 2026-06-10. Paleta "Precisão Laranja" e fontes IBM Plex mantidas (continuidade com o app).
+
+  ═══ AS 5 MUDANÇAS DO v4 (anotações ✦ AZUIS dentro da tela, no lugar onde cada uma vive) ═══
+  1. COMPOSITOR ÚNICO COM ABAS (tela Lote) — "Trocar código" e "➕ Inserir bloco" viraram abas do
+     MESMO compositor, com um só botão "+ Adicionar ao lote" (o v3 tinha dois botões de adicionar
+     lado a lado — o defeito que ele criticava no v2) e prévia real inline, sem modal.
+     Bônus: o botão só habilita com origem E destino escolhidos — esquecer o destino não cai mais
+     no fluxo de remover; remover é escolha explícita (✕ no dropdown), sem modal extra.
+  2. SALVAR NO CABEÇALHO DO ARQUIVO (tela Editor) — Salvar/Salvar como saíram do meio da toolbar
+     de localizar/substituir e moram ao lado do nome + aviso "salva direto, sem cópia";
+     a toolbar ficou em 3 grupos (localizar · substituir · inserir).
+  3. CONFERÊNCIA COM HIERARQUIA DE DECISÃO — total geral em destaque no TOPO do modal (tipografia
+     display), programas com 0 ocorrência recolhidos numa linha por edição, e veredito repetido no
+     rodapé fixo: com conflito no lote, o botão vira "Publicar mesmo assim" (âmbar).
+  4. TOPO SEM AÇÃO DUPLICADA — o botão "Salvar configuração" fazia o MESMO que "+ Nova
+     configuração…" do menu ao lado; agora a ação mora só no menu ("💾 Salvar lote atual como…").
+     E carregar uma configuração com lote montado pede confirmação (antes apagava sem aviso).
+  5. CONTAGEM AUTOMÁTICA NO EDITOR — escolher o código, abrir o arquivo ou digitar já reconta as
+     ocorrências; a lupa 🔍 e o estado parado "— encontrados" foram aposentados.
+
+  ═══ CORREÇÕES DE HONESTIDADE/SEGURANÇA (bugs reais do v3, sem mudança visual) ═══
+  a. O Conferir agora simula o MESMO pipeline da publicação (regras em cadeia, por programa) —
+     no v3 a contagem era contra o arquivo original e podia divergir do que o Publicar gravava.
+  b. Duplicar (⧉) clonava só code/dst — corrompia blocos ("→ undefined") e escapava do aviso de
+     conflito. Agora clona a edição inteira.
+  c. Inserir bloco no Editor com âncora inexistente inseria em silêncio no FIM do arquivo
+     (e o salvar grava sem cópia); agora avisa na prévia e bloqueia o botão, como no lote.
+
+  PRINCÍPIOS HERDADOS DO v3 (continuam valendo; anotações 🛈 laranja):
+  1. UMA VERDADE POR NÚMERO — nenhum contador estimado. O v2 mostrava "Alterações = regras × programas"
+     (número inventado). Aqui, números só aparecem depois de uma varredura real, no "Conferir".
+  2. UM CAMINHO, UMA LISTA — a edição montada cai DIRETO no lote. Acabou o estágio intermediário
+     "Edições montadas" e os dois botões "adicionar" quase iguais do v2.
+  3. NOME DO BOTÃO = EFEITO DO BOTÃO — "Conferir lote" só confere (nada é gravado);
+     "Publicar" grava com backup. O v2 dizia "Executar" num botão que não executava.
+  4. LUGARES, NÃO MODOS — barra lateral com 4 lugares fixos (Lote · Editor · Códigos · Histórico).
+     O editor ganha tela própria (linhas de NC são longas); a Biblioteca deixa de ser modal.
+  5. TODA GRAVAÇÃO TEM VOLTA — Histórico com "restaurar originais" (usa o backup versionado que o
+     app já cria) e "Desfazer" após salvar no editor (compensa o salvar-sem-cópia, que é decisão mantida).
+
+  As anotações dentro da tela explicam cada decisão no lugar onde ela vive:
+  🛈 laranja = intenção herdada do v3 · ✦ azul = mudança do v4.
+  Botão "🛈 Anotações" (canto superior direito) liga/desliga as duas.
+  Nada é gravado de verdade — é mockup; a varredura do "Conferir" é real sobre os arquivos de exemplo.
+-->
+<style>
+  /* ===== FONTES IBM Plex — embutidas localmente (OFFLINE, sem CDN) ===== */
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:400;font-display:swap;src:url("assets/fonts/IBMPlexSans-Regular.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/IBMPlexSans-SemiBold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:700;font-display:swap;src:url("assets/fonts/IBMPlexSans-Bold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url("assets/fonts/IBMPlexMono-Medium.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/IBMPlexMono-SemiBold.ttf") format("truetype");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:700;font-display:swap;src:url("assets/fonts/IBMPlexMono-Bold.ttf") format("truetype");}
+
+  :root{
+    /* ===== ESPAÇAMENTO (grade 2x) ===== */
+    --sp-2:2px; --sp-4:4px; --sp-8:8px; --sp-12:12px; --sp-16:16px;
+    --sp-24:24px; --sp-32:32px; --sp-40:40px; --sp-48:48px;
+
+    /* ===== FONTES ===== */
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+    --t-label:700 10px/1.4 var(--sans);
+    --t-caption:600 12px/1.4 var(--sans);
+    --t-ui:600 13px/1 var(--sans);
+    --t-body:400 14px/1.5 var(--sans);
+    --t-body-strong:600 14px/1.5 var(--sans);
+    --t-heading:700 15px/1.2 var(--sans);
+    --t-display:600 16px/1 var(--sans);
+    --t-mono-sm:600 12px/1.4 var(--mono);
+    --t-mono-md:600 14px/1 var(--mono);
+    --t-mono-lg:600 16px/1 var(--mono);
+    --t-mono-display:700 24px/1 var(--mono);
+
+    /* ===== COR — Paleta "Precisão Laranja" (mesma do v2/app) ===== */
+    --color-bg-base:#FFFFFF;
+    --color-bg-subtle:#FFFFFF;
+    --color-bg-rail:#DDE3EE;
+    --color-bg-surface:#F7F9FC;
+    --color-white:#FFFFFF;
+    --color-panel-left:#EDF0F5;
+    --color-panel-right:#E5EAF2;
+    --color-text-primary:#1A2533;
+    --color-text-secondary:#4E6278;
+    --color-text-tertiary:#8FA5C2;
+    --color-border:#CCD4E0;
+    --color-border-strong:#B8C6D6;
+    --color-interactive:#2B3A4A;
+    --color-interactive-hv:#1F2C39;
+    --color-interactive-bg:#E5EAF2;
+    --color-slate-2:#3A4F63;
+    --color-success:#2D6B2D;
+    --color-success-bg:#EAF5EA;
+    --color-success-border:#8FC98F;
+    --color-warning:#A16207;
+    --color-warning-bg:#FFF8E1;
+    --color-warning-border:#D4A840;
+    --color-danger:#D93025;
+    --color-danger-bg:#FEECEB;
+    --color-danger-border:#F0948D;
+    --color-cta-start:#E85D04;
+    --color-cta-end:#E85D04;
+    --color-cta-text:#FFFFFF;
+    --color-cta-text-soft:#FFE3D1;
+    --color-accent:#E85D04;
+    --color-accent-hv:#C94E00;
+    --color-accent-active:#A83E00;
+    --color-accent-bg:#FFF3ED;
+    --color-accent-border:#F0A87A;
+    --color-btn-disabled-bg:#EEF1F5;
+    --color-btn-disabled-text:#B0BFD0;
+    --color-overlay:rgba(15,20,25,.55);
+    --color-code-bg:#EDF0F5;
+    --color-modal-footer:#E5EAF2;
+    --color-disabled-bg:#EEF1F5;
+    --color-spinner-track:#DDE3EE;
+    --color-head:#2B3A4A;
+    --color-head-border:#1F2C39;
+    --color-editor-gutter:#EEF1F4;
+    --color-editor-gutter-text:#9aa3ad;
+    --color-occurrence:#FAEED5;
+    --color-occurrence-current:#FBD46A;
+    --ed-fz:13px; --ed-lh:21px;
+
+    /* ===== RAIO / ALTURAS / DIMENSÕES ===== */
+    --radius-xs:2px; --radius-sm:4px; --radius-md:6px; --radius-pill:20px;
+    --h-cta:56px; --h-btn:44px; --h-ghost:32px; --h-field:44px;
+    --dim-top:56px; --dim-rail:84px; --dim-gutter:48px; --dim-strip:216px;
+    --app-min:1180px; --app-max:1800px;
+    /* grade da lista de programas: chk | Nome | Modificado | Tamanho | abrir | ✕
+       (coluna "Tipo" do v2 removida: era sempre "NC" — não diferenciava nada) */
+    --file-cols:20px minmax(120px,1.8fr) 1fr .7fr auto auto;
+
+    --border-width:1px;
+    --focus-ring:0 0 0 3px rgba(43,58,74,.28);
+    --metal:inset 0 1px 0 rgba(255,255,255,.35), 0 1px 2px rgba(20,28,38,.08);
+    --shadow-screen:0 12px 32px rgba(0,0,0,.22);
+    --shadow-modal:0 16px 40px rgba(0,0,0,.30);
+  }
+
+  *{box-sizing:border-box}
+  *::-webkit-scrollbar{width:6px;height:6px}
+  *::-webkit-scrollbar-track{background:var(--color-panel-left)}
+  *::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:var(--radius-xs)}
+  *::-webkit-scrollbar-thumb:hover{background:var(--color-border-strong)}
+  body{margin:0;background:var(--color-border-strong);color:var(--color-text-primary);
+    font:var(--t-body);height:100vh;overflow:hidden;display:flex;justify-content:center;
+    padding:var(--sp-12)}
+
+  /* ====== APP = rail + main ====== */
+  .screen{width:clamp(var(--app-min),100%,var(--app-max));height:100%;background:var(--color-bg-surface);
+    border-radius:var(--radius-md);box-shadow:var(--shadow-screen);overflow:hidden;position:relative;display:flex}
+
+  /* ====== RAIL (lugares fixos) ====== */
+  .rail{width:var(--dim-rail);flex-shrink:0;background:var(--color-head);border-right:var(--border-width) solid var(--color-head-border);
+    display:flex;flex-direction:column;align-items:stretch;padding:var(--sp-12) var(--sp-8);gap:var(--sp-8)}
+  .rlogo{width:40px;height:40px;margin:0 auto var(--sp-12);border-radius:var(--radius-pill);display:grid;place-items:center;
+    color:var(--color-white);font-size:18px;background:radial-gradient(circle at 35% 30%,#2f78bd,#143f63);box-shadow:var(--metal)}
+  .ritem{position:relative;display:flex;flex-direction:column;align-items:center;gap:var(--sp-4);
+    padding:var(--sp-12) var(--sp-4);border:none;border-radius:var(--radius-sm);cursor:pointer;
+    background:transparent;color:#B9C6D6;font:var(--t-label);letter-spacing:.6px;text-transform:uppercase}
+  .ritem .ric{font-size:17px;font-family:var(--sans)}
+  .ritem:hover{background:var(--color-slate-2);color:var(--color-white)}
+  .ritem.active{background:var(--color-slate-2);color:var(--color-white);box-shadow:inset 3px 0 0 var(--color-accent)}
+  .ritem:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+  /* bolinha laranja no item Editor quando há alteração não salva */
+  .ritem.dot::after{content:"";position:absolute;top:8px;right:10px;width:8px;height:8px;border-radius:var(--radius-pill);
+    background:var(--color-accent);box-shadow:0 0 0 2px var(--color-head)}
+  .rfoot{margin-top:auto;text-align:center;color:#5E748B;font:var(--t-label)}
+
+  /* ====== MAIN = topo + view ====== */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .top{height:var(--dim-top);flex-shrink:0;display:flex;align-items:center;gap:var(--sp-12);padding:0 var(--sp-16);
+    background:var(--color-head);border-bottom:var(--border-width) solid var(--color-head-border)}
+  .brand .nm{font:var(--t-heading);color:var(--color-white)}
+  .brand .sub{font:var(--t-label);letter-spacing:2px;color:#8FA5C2;text-transform:uppercase}
+  .spacer{margin-left:auto}
+  /* seletor de configuração (receita) */
+  .cfgsel{position:relative;height:var(--h-ghost);display:flex;align-items:center;gap:var(--sp-8);padding:0 var(--sp-12);
+    border-radius:var(--radius-sm);background:var(--color-slate-2);cursor:pointer;border:var(--border-width) solid #4A6076}
+  .cfgsel:hover{background:#46607A}
+  .cfgsel .mname{font:var(--t-ui);color:var(--color-white)}
+  .cfgsel .caret{color:#B9C6D6}
+  .cfgmenu{display:none;position:absolute;top:calc(100% + var(--sp-4));left:0;z-index:50;min-width:240px;
+    background:var(--color-white);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-modal);padding:var(--sp-8);flex-direction:column;gap:var(--sp-2)}
+  .cfgsel.open .cfgmenu{display:flex}
+  .cfgitem{text-align:left;border:none;background:transparent;border-radius:var(--radius-xs);padding:var(--sp-8);
+    font:var(--t-body);color:var(--color-text-primary);cursor:pointer}
+  .cfgitem:hover{background:var(--color-interactive-bg)}
+  .cfgitem.sel{font-weight:700;color:var(--color-interactive)}
+  .cfgitem.new{border-top:var(--border-width) solid var(--color-border);color:var(--color-interactive);margin-top:var(--sp-2)}
+  .topbtn{height:var(--h-ghost);padding:0 var(--sp-12);border-radius:var(--radius-sm);border:var(--border-width) solid #4A6076;
+    font:var(--t-caption);cursor:pointer;background:transparent;color:#D7E0EA}
+  .topbtn:hover{background:var(--color-slate-2);color:var(--color-white)}
+  .topbtn.on{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-white)}
+  /* verdade global: pasta de backup sempre visível */
+  .chip-backup{height:var(--h-ghost);display:flex;align-items:center;gap:var(--sp-8);padding:0 var(--sp-12);
+    border-radius:var(--radius-sm);border:var(--border-width) solid #4A6076;background:transparent;cursor:pointer;
+    font:var(--t-caption);color:#D7E0EA}
+  .chip-backup:hover{background:var(--color-slate-2)}
+  .chip-backup code{font:var(--t-mono-sm);color:var(--color-white)}
+
+  /* ====== VIEWS ====== */
+  .view{display:none;flex:1;min-height:0;padding:var(--sp-16);gap:var(--sp-16)}
+  .view.active{display:flex}
+  .panel{background:var(--color-panel-left);border-radius:var(--radius-md);box-shadow:var(--metal);
+    padding:var(--sp-16);display:flex;flex-direction:column;min-height:0}
+  .ptitle{font:var(--t-caption);letter-spacing:1.4px;text-transform:uppercase;color:var(--color-text-secondary);
+    display:flex;align-items:center;gap:var(--sp-8)}
+  .phead{display:flex;align-items:center;gap:var(--sp-12);margin-bottom:var(--sp-12);flex-wrap:wrap}
+  .phead .ptitle{margin:0;flex-shrink:0}
+  .phead-actions{display:flex;gap:var(--sp-8);margin-left:auto;flex-shrink:0;align-items:center}
+  .chip{font:var(--t-caption);padding:var(--sp-4) var(--sp-12);border-radius:var(--radius-sm);box-shadow:var(--metal);white-space:nowrap}
+  .chip.ok{color:var(--color-success);background:var(--color-success-bg)}
+  .chip.warn{color:var(--color-warning);background:var(--color-warning-bg)}
+  .chip.mut{color:var(--color-text-secondary);background:var(--color-bg-rail)}
+
+  .ghost{height:var(--h-ghost);padding:0 var(--sp-12);border-radius:var(--radius-sm);border:none;
+    background:var(--color-bg-rail);font:var(--t-caption);color:var(--color-text-secondary);cursor:pointer;box-shadow:var(--metal)}
+  .ghost:hover{background:#CDD5E2}
+  .btn-soft{height:var(--h-ghost);padding:0 var(--sp-12);border:var(--border-width) solid var(--color-border);
+    border-radius:var(--radius-sm);background:var(--color-white);color:var(--color-interactive);
+    font:var(--t-caption);cursor:pointer;box-shadow:var(--metal);white-space:nowrap}
+  .btn-soft:hover{background:var(--color-interactive-bg)}
+  .btn-soft.sel{background:var(--color-interactive-bg);border-color:var(--color-interactive);color:var(--color-interactive);font-weight:700}
+  .iconbtn{height:var(--h-ghost);min-width:var(--h-ghost);padding:0 var(--sp-8);border:none;border-radius:var(--radius-sm);
+    background:var(--color-white);color:var(--color-text-primary);font:var(--t-ui);cursor:pointer;box-shadow:var(--metal)}
+  .iconbtn:hover{background:var(--color-interactive-bg)}
+  .ghost:focus-visible,.btn-soft:focus-visible,.iconbtn:focus-visible,.filex:focus-visible,
+  .editbtn:focus-visible,.racts span:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+
+  /* ====== VIEW LOTE — Programas (esq) | Lote de edições (dir) ====== */
+  #view-lote .panel.programas{flex:11 1 0;min-width:560px}
+  #view-lote .panel.lotep{flex:9 1 0;min-width:460px;background:var(--color-panel-right)}
+
+  .files-head{display:grid;grid-template-columns:var(--file-cols);align-items:center;gap:var(--sp-12);
+    padding:var(--sp-4) calc(var(--sp-12) + 6px) var(--sp-4) var(--sp-12);margin-bottom:var(--sp-8);
+    font:var(--t-label);letter-spacing:.6px;text-transform:uppercase;color:var(--color-text-tertiary);
+    border-bottom:var(--border-width) solid var(--color-border)}
+  .files{display:flex;flex-direction:column;gap:var(--sp-8);flex:1;overflow:auto}
+  .file{display:grid;grid-template-columns:var(--file-cols);align-items:center;gap:var(--sp-12);height:50px;cursor:pointer;
+    background:var(--color-bg-subtle);border-radius:var(--radius-sm);padding:0 var(--sp-12);box-shadow:var(--metal)}
+  .file.off{opacity:.72}
+  .file:not(.off){background:var(--color-success-bg);box-shadow:inset 3px 0 0 var(--color-success), var(--metal)}
+  .file:hover{outline:var(--border-width) solid var(--color-border-strong);outline-offset:-1px}
+  .file.editing-row{box-shadow:inset 3px 0 0 var(--color-interactive), var(--metal)}
+  .chk{width:20px;height:20px;border-radius:var(--radius-xs);flex-shrink:0;display:grid;place-items:center;cursor:pointer;
+    background:var(--color-success);color:var(--color-white);font:var(--t-caption);font-weight:700;box-shadow:var(--metal)}
+  .chk.off{background:var(--color-white);color:transparent;border:var(--border-width) solid var(--color-border-strong)}
+  .chk.off:hover{border-color:var(--color-interactive);background:var(--color-interactive-bg)}
+  .fname{font:var(--t-mono-md);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fcol{font:var(--t-caption);color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .editbtn{display:flex;align-items:center;gap:var(--sp-4);height:var(--h-ghost);padding:0 var(--sp-12);
+    border:none;border-radius:var(--radius-sm);background:var(--color-interactive-bg);color:var(--color-interactive);
+    font:var(--t-caption);cursor:pointer;box-shadow:var(--metal);white-space:nowrap}
+  .editbtn:hover{background:var(--color-interactive);color:var(--color-white)}
+  .filex{width:var(--h-ghost);height:var(--h-ghost);flex-shrink:0;border:none;border-radius:var(--radius-sm);
+    background:var(--color-bg-rail);color:var(--color-danger);font:var(--t-ui);font-weight:700;cursor:pointer;box-shadow:var(--metal)}
+  .filex:hover{background:var(--color-danger-bg)}
+  .files.is-dragover{outline:var(--border-width) dashed var(--color-interactive);outline-offset:-4px;
+    background:var(--color-interactive-bg);border-radius:var(--radius-sm)}
+  .files:focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--radius-sm)}
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-12);
+    text-align:center;border:var(--border-width) dashed var(--color-border-strong);border-radius:var(--radius-sm);
+    padding:var(--sp-32) var(--sp-16);color:var(--color-text-secondary)}
+  .empty .e-ic{font-size:32px}
+  .empty .e-t1{font:var(--t-body-strong);color:var(--color-text-primary)}
+  .empty .e-t2{font:var(--t-caption);color:var(--color-text-tertiary);max-width:340px}
+  .empty .e-cta{height:var(--h-btn);padding:0 var(--sp-16);border:none;border-radius:var(--radius-sm);
+    background:var(--color-interactive);color:var(--color-white);font:var(--t-body-strong);cursor:pointer;box-shadow:var(--metal)}
+  .empty .e-cta:hover{background:var(--color-interactive-hv)}
+
+  /* ====== compositor + lote ====== */
+  .comp-row{display:flex;align-items:flex-end;gap:var(--sp-12);flex-wrap:wrap;margin-bottom:var(--sp-12)}
+  .comp-field{display:flex;flex-direction:column;gap:var(--sp-8);flex:1;min-width:170px}
+  .label-caps{font:var(--t-label);letter-spacing:1.3px;text-transform:uppercase;color:var(--color-text-secondary)}
+  .comp-addbtn{height:var(--h-field);padding:0 var(--sp-16);border:none;border-radius:var(--radius-sm);
+    background:var(--color-interactive);color:var(--color-white);font:var(--t-body-strong);cursor:pointer;
+    white-space:nowrap;box-shadow:var(--metal)}
+  .comp-addbtn:hover{background:var(--color-interactive-hv)}
+  .comp-addbtn:disabled{background:var(--color-disabled-bg);color:var(--color-btn-disabled-text);cursor:not-allowed;box-shadow:none}
+  .insanchor{color:var(--color-text-secondary);font:var(--t-mono-sm)}
+  .lote-list{display:flex;flex-direction:column;gap:var(--sp-8);flex:1;overflow:auto;min-height:0}
+  .rcard{display:flex;flex-direction:column;gap:var(--sp-8);background:var(--color-bg-subtle);
+    border-radius:var(--radius-sm);padding:var(--sp-12);box-shadow:var(--metal)}
+  .rcard.is-warn{background:var(--color-warning-bg);box-shadow:inset 3px 0 0 var(--color-warning), var(--metal)}
+  @keyframes rflash{from{background:var(--color-accent-bg)}to{background:var(--color-bg-subtle)}}
+  .rcard.flash{animation:rflash .9s ease}
+  .rc-row{display:flex;align-items:center;gap:var(--sp-12)}
+  .ridx{font:var(--t-mono-sm);color:var(--color-text-tertiary)}
+  .rformula{font:var(--t-mono-lg);flex:1;color:var(--color-interactive)}
+  .rformula .rm{color:var(--color-danger)}
+  .racts{display:flex;gap:var(--sp-8)}
+  .racts span{width:var(--h-ghost);height:var(--h-ghost);flex-shrink:0;display:grid;place-items:center;
+    border-radius:var(--radius-sm);background:var(--color-bg-rail);color:var(--color-text-secondary);
+    font:var(--t-ui);cursor:pointer;box-shadow:var(--metal)}
+  .racts span:hover{background:var(--color-interactive-bg)}
+  .racts .del{color:var(--color-danger);font-weight:700}
+  .racts .del:hover{background:var(--color-danger-bg)}
+  .rc-conflict{display:flex;align-items:center;gap:var(--sp-8);font:var(--t-caption);color:var(--color-warning)}
+
+  .lotefoot{margin-top:var(--sp-12);flex-shrink:0;display:flex;flex-direction:column;gap:var(--sp-8)}
+  .lotefacts{display:flex;align-items:center;gap:var(--sp-8);font:var(--t-caption);color:var(--color-text-secondary);flex-wrap:wrap}
+  .cta{height:var(--h-cta);border:none;border-radius:var(--radius-md);
+    background:linear-gradient(180deg,var(--color-cta-start),var(--color-cta-end));color:var(--color-cta-text);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-2);box-shadow:var(--metal)}
+  .cta .big{font:var(--t-display);letter-spacing:1px;text-transform:uppercase}
+  .cta .small{font:var(--t-caption);color:var(--color-cta-text-soft);letter-spacing:.5px}
+  .cta:hover{background:var(--color-accent-hv)}
+  .cta:active{background:var(--color-accent-active)}
+  .cta:disabled{background:var(--color-btn-disabled-bg);color:var(--color-btn-disabled-text);cursor:not-allowed;box-shadow:none}
+  .cta:disabled .small{color:var(--color-btn-disabled-text)}
+
+  /* ====== VIEW EDITOR — faixa de arquivos (esq) + editor (dir) ====== */
+  #view-editor .strip{width:var(--dim-strip);flex-shrink:0;background:var(--color-panel-left)}
+  /* o miolo do editor "desaparece" como contêiner: seus filhos viram itens diretos do painel (flex) */
+  #edWork{display:contents}
+  #view-editor .edpanel{flex:1;min-width:0;background:var(--color-panel-right)}
+  .striprow{display:flex;align-items:center;gap:var(--sp-8);padding:var(--sp-8) var(--sp-12);border:none;width:100%;
+    background:var(--color-bg-subtle);border-radius:var(--radius-sm);cursor:pointer;box-shadow:var(--metal);
+    font:var(--t-mono-sm);color:var(--color-text-primary);text-align:left;margin-bottom:var(--sp-8)}
+  .striprow:hover{background:var(--color-interactive-bg)}
+  .striprow.cur{background:var(--color-interactive);color:var(--color-white);box-shadow:inset 3px 0 0 var(--color-accent), var(--metal)}
+  .striprow .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .striprow .dirty{width:8px;height:8px;border-radius:var(--radius-pill);background:var(--color-accent);flex-shrink:0}
+  .striplist{flex:1;overflow:auto;min-height:0}
+  .ed-head{display:flex;align-items:center;gap:var(--sp-8);margin-bottom:var(--sp-12);flex-wrap:wrap}
+  .ed-title{font:var(--t-body-strong);display:flex;align-items:center;gap:var(--sp-8)}
+  .ed-fname{font:var(--t-mono-md);color:var(--color-interactive)}
+  .ed-nobackup{display:flex;align-items:center;gap:var(--sp-4);font:var(--t-caption);
+    color:var(--color-warning);background:var(--color-warning-bg);padding:var(--sp-2) var(--sp-8);border-radius:var(--radius-sm)}
+  .ed-toolbar{display:flex;align-items:center;gap:var(--sp-8);flex-wrap:wrap;background:var(--color-bg-subtle);
+    border-radius:var(--radius-sm);padding:var(--sp-8) var(--sp-12);margin-bottom:var(--sp-12)}
+  .ed-sep{width:var(--border-width);height:22px;background:var(--color-border)}
+  .ed-count{font:var(--t-body-strong);white-space:nowrap}
+  .ed-count.stale{color:var(--color-text-tertiary)}
+  .ed-pos{font:var(--t-caption);color:var(--color-text-tertiary);min-width:34px;text-align:center}
+  .ed-rep-by{font:var(--t-caption);color:var(--color-text-secondary)}
+  .ed-save{height:var(--h-ghost);padding:0 var(--sp-16);border:none;border-radius:var(--radius-sm);
+    background:var(--color-success);color:var(--color-white);font:var(--t-body-strong);cursor:pointer;box-shadow:var(--metal)}
+  .ed-save:disabled{background:var(--color-bg-rail);color:var(--color-text-tertiary);cursor:not-allowed;box-shadow:none}
+  .ed-wrap{display:flex;flex:1;min-height:0;border-radius:var(--radius-sm);overflow:hidden;
+    border:var(--border-width) solid var(--color-border);background:var(--color-white);box-shadow:var(--metal)}
+  .ed-gutter{flex:0 0 var(--dim-gutter);width:var(--dim-gutter);overflow:hidden;background:var(--color-editor-gutter);
+    color:var(--color-editor-gutter-text);font-family:var(--mono);font-size:var(--ed-fz);line-height:var(--ed-lh);
+    font-weight:500;text-align:right;padding:var(--sp-8) var(--sp-8);white-space:pre;
+    border-right:var(--border-width) solid var(--color-border);user-select:none}
+  .ed-area{position:relative;flex:1;min-width:0;overflow:hidden}
+  .ed-hl,.ed-input{position:absolute;inset:0;margin:0;padding:var(--sp-8) var(--sp-12);border:0;
+    font-family:var(--mono);font-size:var(--ed-fz);line-height:var(--ed-lh);font-weight:500;
+    white-space:pre;overflow:auto;tab-size:2}
+  .ed-hl{z-index:1;color:var(--color-text-primary);pointer-events:none}
+  .ed-input{z-index:2;color:transparent;background:transparent;caret-color:var(--color-text-primary);resize:none}
+  .ed-input:focus{outline:none}
+  .ed-input::selection{background:#1f5f9e33}
+  .occ{background:var(--color-occurrence);border-radius:var(--radius-xs)}
+  .occ.current{background:var(--color-occurrence-current);box-shadow:0 0 0 1px var(--color-warning)}
+  .stepbar{display:none;align-items:center;gap:var(--sp-8);margin-top:var(--sp-12);background:var(--color-warning-bg);
+    border-radius:var(--radius-sm);padding:var(--sp-8) var(--sp-12);box-shadow:var(--metal)}
+  .stepbar.show{display:flex}
+  .stepbar-txt{flex:1;font:var(--t-caption);color:var(--color-warning)}
+  .stepbar-txt b{font-family:var(--mono)}
+  .btn-soft.ghosty{color:var(--color-text-secondary)}
+
+  /* ====== VIEW CÓDIGOS (biblioteca como página) ====== */
+  #view-biblioteca .panel{flex:1;max-width:860px;margin:0 auto;width:100%}
+  .lib-head{display:flex;gap:var(--sp-8);align-items:center;margin-bottom:var(--sp-8)}
+  .lib-head .ac-input{flex:1}
+  .lib-count{font:var(--t-caption);color:var(--color-text-tertiary);margin-bottom:var(--sp-8)}
+  .lib-list{flex:1;overflow:auto;border:var(--border-width) solid var(--color-border);
+    border-radius:var(--radius-sm);background:var(--color-white);min-height:0}
+  .lib-row{display:flex;align-items:center;gap:var(--sp-12);padding:var(--sp-8) var(--sp-12);
+    border-bottom:var(--border-width) solid var(--color-bg-subtle)}
+  .lib-row:last-child{border-bottom:none}
+  .lib-row .code{font:var(--t-mono-md);min-width:72px}
+  .lib-row .desc{font:var(--t-body);color:var(--color-text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lib-row .blk{font:var(--t-label);color:var(--color-accent);text-transform:uppercase;letter-spacing:.5px}
+  .lib-row.empty{justify-content:center;color:var(--color-text-tertiary)}
+
+  /* ====== VIEW HISTÓRICO ====== */
+  #view-historico .panel{flex:1;max-width:980px;margin:0 auto;width:100%}
+  .histlist{flex:1;overflow:auto;display:flex;flex-direction:column;gap:var(--sp-8);min-height:0}
+  .histrow{display:flex;align-items:center;gap:var(--sp-16);background:var(--color-bg-subtle);
+    border-radius:var(--radius-sm);padding:var(--sp-12);box-shadow:var(--metal);flex-wrap:wrap}
+  .histrow .hw{font:var(--t-body-strong);min-width:110px}
+  .histrow .hfacts{font:var(--t-caption);color:var(--color-text-secondary);flex:1;min-width:220px}
+  .histrow .hfacts code{font:var(--t-mono-sm);background:var(--color-code-bg);padding:1px var(--sp-8);border-radius:var(--radius-xs)}
+  .histrow .hcfg{font:var(--t-caption);color:var(--color-text-tertiary)}
+
+  /* ====== dropdown pesquisável da biblioteca ====== */
+  .libdrop{position:relative}
+  .libdrop-btn{height:var(--h-ghost);min-width:96px;display:flex;align-items:center;gap:var(--sp-8);
+    padding:0 var(--sp-8) 0 var(--sp-12);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    background:var(--color-white);cursor:pointer;box-shadow:var(--metal)}
+  .libdrop-btn .code{font:var(--t-mono-md)}
+  .libdrop-btn .caret{margin-left:auto;color:var(--color-text-secondary);transition:transform .15s ease}
+  .libdrop.open .libdrop-btn .caret{transform:rotate(180deg)}
+  .libdrop-btn.is-empty .code{font:var(--t-body);color:var(--color-text-tertiary)}
+  .libdrop-btn.is-remove .code{color:var(--color-danger);font:var(--t-body-strong)}
+  .libdrop-pop{display:none;position:absolute;top:calc(var(--h-ghost) + var(--sp-4));left:0;z-index:30;width:240px;
+    background:var(--color-white);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-modal);padding:var(--sp-8);flex-direction:column;gap:var(--sp-8)}
+  .libdrop.open .libdrop-pop{display:flex}
+  .libdrop.big .libdrop-btn{height:var(--h-field);width:100%}
+  .libdrop.big .libdrop-btn .code{font:var(--t-mono-lg)}
+  .libdrop.big .libdrop-pop{width:100%;min-width:240px;top:calc(var(--h-field) + var(--sp-4))}
+  .libdrop-search{height:var(--h-ghost);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    padding:0 var(--sp-8);font:var(--t-caption);color:var(--color-text-primary);background:var(--color-bg-base)}
+  .libdrop-search:focus{outline:none;box-shadow:var(--focus-ring)}
+  .libdrop-list{display:flex;flex-direction:column;gap:var(--sp-2);max-height:200px;overflow:auto}
+  .libdrop-hint{font:var(--t-label);letter-spacing:.5px;text-transform:uppercase;color:var(--color-text-tertiary);padding:var(--sp-2)}
+  .libitem{display:flex;gap:var(--sp-8);text-align:left;border:none;background:transparent;
+    border-radius:var(--radius-xs);padding:var(--sp-8);font:var(--t-mono-sm);color:var(--color-text-primary);cursor:pointer}
+  .libitem:hover{background:var(--color-interactive-bg)}
+  .libitem.remove .code{color:var(--color-danger)}
+  .libitem.empty{color:var(--color-text-tertiary);font:var(--t-caption);cursor:default}
+  .libitem.empty:hover{background:transparent}
+
+  /* ====== OVERLAYS / MODAIS ====== */
+  .overlay{position:absolute;inset:0;background:var(--color-overlay);display:none;place-items:center;z-index:40}
+  .overlay.show{display:grid}
+  .modal{background:var(--color-bg-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-modal);overflow:hidden;max-width:94%}
+  .mh{padding:var(--sp-16);font:var(--t-heading);color:var(--color-white);display:flex;justify-content:space-between;align-items:center;gap:var(--sp-16);
+    background:var(--color-head);border-bottom:var(--border-width) solid var(--color-head-border)}
+  .mh .x{cursor:pointer;color:var(--color-text-tertiary)}
+  .mb{padding:var(--sp-16);background:var(--color-bg-base);max-height:64vh;overflow:auto}
+  .mf{display:flex;justify-content:flex-end;gap:var(--sp-8);padding:var(--sp-16);align-items:center;
+    background:var(--color-modal-footer);border-top:var(--border-width) solid var(--color-border)}
+  .mf .mfacts{margin-right:auto;font:var(--t-caption);color:var(--color-text-secondary)}
+  .mbtn{height:var(--h-btn);padding:0 var(--sp-16);border:none;border-radius:var(--radius-sm);
+    font:var(--t-body-strong);cursor:pointer;box-shadow:var(--metal)}
+  .mbtn.ghost{background:var(--color-white);color:var(--color-text-primary)}
+  .mbtn.save{background:var(--color-success);color:var(--color-white)}
+  .mbtn.save:disabled{background:var(--color-btn-disabled-bg);color:var(--color-btn-disabled-text);cursor:not-allowed;box-shadow:none}
+  .mbtn.warn{background:var(--color-warning);color:var(--color-white)}
+  .mbtn.orange{background:var(--color-accent);color:var(--color-white)}
+  .mbtn.orange:hover{background:var(--color-accent-hv)}
+  .run{width:480px;text-align:center}
+  .res{width:700px}
+  .confirm{width:460px}
+  .confirm-txt{font:var(--t-body);color:var(--color-text-secondary);margin:0 0 var(--sp-8);line-height:1.5}
+  .confirm-txt b{color:var(--color-text-primary);font-family:var(--mono)}
+  .bigspin{width:44px;height:44px;border:5px solid var(--color-spinner-track);border-top-color:var(--color-accent);
+    border-radius:var(--radius-pill);margin:var(--sp-8) auto var(--sp-16);animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .step{font:var(--t-body);color:var(--color-text-secondary);margin:var(--sp-8) 0}
+  .step.act{color:var(--color-text-primary);font-weight:700}
+  .step.mono{font:var(--t-mono-sm);color:var(--color-text-secondary)}
+  .saved-ic{font-size:40px;margin:var(--sp-4) 0 var(--sp-8);color:var(--color-success)}
+  .saved-actions{margin-top:var(--sp-12);display:flex;gap:var(--sp-8);justify-content:center}
+  .progress{height:8px;background:var(--color-spinner-track);border-radius:var(--radius-pill);overflow:hidden;margin:var(--sp-12) 0 var(--sp-4)}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--color-cta-start),var(--color-accent-hv));transition:width .2s ease}
+  .progress-pct{font:var(--t-caption);color:var(--color-text-secondary)}
+  .ac-input{width:100%;height:var(--h-field);border:var(--border-width) solid var(--color-border-strong);
+    border-radius:var(--radius-sm);padding:0 var(--sp-12);font:var(--t-body);color:var(--color-text-primary);
+    background:var(--color-white)}
+  .ac-input:focus{outline:none;box-shadow:var(--focus-ring)}
+  .sa-group{display:flex;flex-wrap:wrap;gap:var(--sp-8);margin:var(--sp-8) 0 var(--sp-12)}
+  .ins-text{width:100%;min-height:96px;border:var(--border-width) solid var(--color-border-strong);border-radius:var(--radius-sm);
+    padding:var(--sp-8) var(--sp-12);font:var(--t-mono-sm);line-height:1.5;color:var(--color-text-primary);background:var(--color-white);resize:vertical}
+  .ins-text:focus{outline:none;box-shadow:var(--focus-ring)}
+  .ins-pos{display:flex;flex-direction:column;gap:var(--sp-8);margin-top:var(--sp-8)}
+  .ins-pos label{display:flex;align-items:center;gap:var(--sp-8);font:var(--t-body);color:var(--color-text-primary);flex-wrap:wrap}
+  .ins-num{width:80px;height:var(--h-ghost)}
+  .ins-chip{height:var(--h-ghost);padding:0 var(--sp-12);border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    background:var(--color-white);color:var(--color-interactive);font:var(--t-caption);cursor:pointer;box-shadow:var(--metal)}
+  .ins-chip:hover{background:var(--color-interactive-bg)}
+  .ins-chip.empty{color:var(--color-text-tertiary);cursor:default}
+  .ins-preview{margin:0;padding:var(--sp-12);font:var(--t-mono-sm);line-height:1.5;color:var(--color-text-primary);white-space:pre;overflow:auto;max-height:160px;background:var(--color-white)}
+  .preview{margin-top:var(--sp-12);background:var(--color-white);border-radius:var(--radius-sm);box-shadow:var(--metal);overflow:hidden}
+  .pvh{padding:var(--sp-8) var(--sp-12);font:var(--t-label);letter-spacing:1px;text-transform:uppercase;
+    color:var(--color-text-secondary);background:var(--color-bg-subtle);border-bottom:var(--border-width) solid var(--color-border)}
+
+  /* conferência (modal) — números reais */
+  .confcard{border:var(--border-width) solid var(--color-border);border-radius:var(--radius-sm);
+    background:var(--color-white);margin-bottom:var(--sp-12);overflow:hidden}
+  .confcard.zero{border-color:var(--color-warning-border)}
+  .conf-h{display:flex;align-items:center;gap:var(--sp-12);padding:var(--sp-8) var(--sp-12);
+    background:var(--color-bg-subtle);border-bottom:var(--border-width) solid var(--color-border)}
+  .conf-h .f{font:var(--t-mono-md);color:var(--color-interactive)}
+  .conf-h .f .rm{color:var(--color-danger)}
+  .conf-h .tot{margin-left:auto;font:var(--t-caption);color:var(--color-success)}
+  .confcard.zero .conf-h .tot{color:var(--color-warning)}
+  .confprog{display:flex;align-items:center;gap:var(--sp-8);padding:var(--sp-4) var(--sp-12);font:var(--t-mono-sm)}
+  .confprog .cf-name{color:var(--color-text-primary)}
+  .confprog .cf-n{margin-left:auto;color:var(--color-text-secondary);font:var(--t-caption)}
+  .confprog.zero .cf-n,.confprog.zero .cf-name{color:var(--color-text-tertiary)}
+  .confex{display:flex;align-items:center;gap:var(--sp-8);padding:var(--sp-8) var(--sp-12);font:var(--t-mono-sm);
+    border-top:var(--border-width) dashed var(--color-border);flex-wrap:wrap}
+  .confex .tag{font:var(--t-label);text-transform:uppercase;padding:var(--sp-2) var(--sp-8);border-radius:var(--radius-xs);
+    background:var(--color-interactive-bg);color:var(--color-interactive)}
+  .confex .old{color:var(--color-text-tertiary);text-decoration:line-through}
+  .confex .new{color:var(--color-success);font-weight:600}
+  .confex .where{font:var(--t-caption);color:var(--color-text-tertiary)}
+  .confwarn{display:flex;align-items:center;gap:var(--sp-8);padding:var(--sp-8) var(--sp-12);font:var(--t-caption);
+    color:var(--color-warning);background:var(--color-warning-bg);border-radius:var(--radius-sm);margin-bottom:var(--sp-8)}
+  .backup-line{display:flex;align-items:center;gap:var(--sp-8);flex-wrap:wrap;padding:var(--sp-8) var(--sp-12);
+    background:var(--color-success-bg);border-radius:var(--radius-sm);font:var(--t-caption);color:var(--color-success)}
+  .backup-line code{font:var(--t-mono-sm);color:var(--color-text-secondary)}
+
+  /* toast (com botão de ação opcional, ex.: Desfazer) */
+  .toast{position:absolute;left:50%;bottom:var(--sp-24);transform:translateX(-50%) translateY(8px);
+    background:var(--color-interactive);color:var(--color-white);padding:var(--sp-8) var(--sp-16);border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-modal);font:var(--t-body-strong);opacity:0;pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;z-index:60;max-width:80%;text-align:center;
+    display:flex;align-items:center;gap:var(--sp-12)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  .toast.ok{background:var(--color-success)}
+  .toast.warn{background:var(--color-warning)}
+  .t-act{height:26px;padding:0 var(--sp-12);border:var(--border-width) solid #ffffff88;border-radius:var(--radius-sm);
+    background:transparent;color:var(--color-white);font:var(--t-caption);cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+  .t-act:hover{background:#ffffff22}
+
+  /* ====== ANOTAÇÕES DE INTENÇÃO (camada do mockup, não faz parte do produto) ====== */
+  .note{font:var(--t-caption);color:var(--color-accent-active);background:var(--color-accent-bg);
+    border:var(--border-width) dashed var(--color-accent-border);border-radius:var(--radius-sm);
+    padding:var(--sp-8) var(--sp-12);margin:var(--sp-8) 0;line-height:1.5}
+  .note b{color:var(--color-accent-active)}
+  /* anotações ✦ das MUDANÇAS DO v4 — azul-ardósia para distinguir das intenções herdadas do v3 (laranja) */
+  .note.nv4{color:var(--color-interactive);background:var(--color-interactive-bg);border-color:var(--color-border-strong)}
+  .note.nv4 b{color:var(--color-interactive)}
+  .note.nv4.banner{margin:var(--sp-12) var(--sp-16) 0;flex-shrink:0}
+  body.no-notes .note{display:none}
+
+  /* ====== v4: peças novas ====== */
+  /* MUDANÇA 1 — compositor com abas (um só botão de adicionar p/ os dois tipos de edição) */
+  .comp-tabs{display:inline-flex;align-self:flex-start;background:var(--color-bg-rail);border-radius:var(--radius-sm);
+    padding:var(--sp-2);gap:var(--sp-2);margin-bottom:var(--sp-8);box-shadow:var(--metal)}
+  .ctab{height:28px;padding:0 var(--sp-12);border:none;border-radius:var(--radius-xs);background:transparent;
+    font:var(--t-caption);color:var(--color-text-secondary);cursor:pointer}
+  .ctab:hover{color:var(--color-text-primary)}
+  .ctab.sel{background:var(--color-white);color:var(--color-interactive);font-weight:700;box-shadow:var(--metal)}
+  .ctab:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+  .ins-mini{min-height:64px}
+  #compIns .preview{margin-top:var(--sp-8)}
+  #compIns .ins-preview{max-height:120px}
+  /* MUDANÇA 2 — editor: Salvar mora no cabeçalho do arquivo, não no meio do localizar/substituir */
+  .ed-head-actions{margin-left:auto;display:flex;gap:var(--sp-8);align-items:center}
+  /* MUDANÇA 3 — conferência: o total da decisão em destaque no topo do modal */
+  .conf-sum{display:flex;align-items:center;gap:var(--sp-16);padding:var(--sp-12) var(--sp-16);
+    background:var(--color-success-bg);border:var(--border-width) solid var(--color-success-border);
+    border-radius:var(--radius-sm);margin-bottom:var(--sp-12)}
+  .conf-sum .cs-n{font:var(--t-mono-display);color:var(--color-success)}
+  .conf-sum .cs-t{font:var(--t-body-strong)}
+  .conf-sum .cs-sub{font:var(--t-caption);color:var(--color-text-secondary);margin-top:var(--sp-2)}
+  .conf-sum.zero{background:var(--color-warning-bg);border-color:var(--color-warning-border)}
+  .conf-sum.zero .cs-n{color:var(--color-warning)}
+  .cf-warnfoot{color:var(--color-warning);font-weight:700}
+
+  .gone{display:none!important}
+
+  /* responsividade: compacto ≤1440 (mesma regra do v2/RESPONSIVIDADE.md) */
+  @media (max-width:1440px){
+    .view{gap:var(--sp-12);padding:var(--sp-12)}
+    .panel{padding:var(--sp-12)}
+  }
+</style>
+</head>
+<body>
+
+<div class="screen">
+  <!-- ===== RAIL: lugares fixos ===== -->
+  <nav class="rail">
+    <div class="rlogo">◉</div>
+    <button class="ritem active" id="nav-lote" onclick="go('lote')"><span class="ric">▦</span>Lote</button>
+    <button class="ritem" id="nav-editor" onclick="go('editor')"><span class="ric">✎</span>Editor</button>
+    <button class="ritem" id="nav-biblioteca" onclick="go('biblioteca')"><span class="ric">🏷</span>Códigos</button>
+    <button class="ritem" id="nav-historico" onclick="go('historico')"><span class="ric">🕘</span>Histórico</button>
+    <div class="rfoot">v4</div>
+  </nav>
+
+  <div class="main">
+    <!-- ===== TOPO: verdades globais ===== -->
+    <div class="top">
+      <div class="brand"><div class="nm">FlowNC</div><div class="sub">Editor de Lotes</div></div>
+      <div class="cfgsel" id="cfgCtl" onclick="toggleCfg(event)" title="Configuração (receita) ativa — carregar uma preenche o lote inteiro">
+        <span class="mname" id="cfgName">Máquina 01</span><span class="caret">▾</span>
+        <div class="cfgmenu" id="cfgMenu"></div>
+      </div>
+      <!-- v4: botão "Salvar configuração" removido do topo — fazia o MESMO que o item
+           "+ Nova configuração…" do menu ao lado (dois controles, uma ação). Agora a ação
+           mora só no menu da receita, com nome claro: "Salvar lote atual como…". -->
+      <span class="spacer"></span>
+      <button class="chip-backup" onclick="changeBackup()" title="Pasta onde os originais são guardados a cada publicação — clique para trocar">📁 backup: <code id="bkPath">D:\CNC\backup\</code> · mudar</button>
+      <button class="topbtn on" id="noteBtn" onclick="toggleNotes()">🛈 Anotações</button>
+    </div>
+
+    <div class="note nv4 banner">✦ <b>v4 — 5 mudanças sobre o v3</b>, anotadas em azul no lugar onde vivem:
+      ① compositor único com abas (Lote) · ② Salvar no cabeçalho do arquivo (Editor) · ③ conferência com o total
+      da decisão em destaque · ④ topo sem ação duplicada ("Salvar configuração" virou item do menu de receitas,
+      e carregar receita com lote montado agora confirma) · ⑤ contagem automática no Editor (lupa aposentada).
+      Anotações 🛈 laranja = intenções herdadas do v3. Por baixo, 3 bugs do v3 corrigidos: contagem do Conferir
+      igual à publicação, duplicar (⧉) sem corromper a edição, e bloco sem âncora não entra mais no fim do arquivo.</div>
+
+    <!-- ============ VIEW: LOTE ============ -->
+    <section class="view active" id="view-lote">
+      <!-- PROGRAMAS -->
+      <div class="panel programas">
+        <div class="phead">
+          <div class="ptitle">Programas</div>
+          <span class="chip mut" id="progChip">0 de 0 marcados</span>
+          <div class="phead-actions">
+            <button class="ghost" id="selAllBtn" onclick="toggleSelAll()">Marcar todos</button>
+            <button class="ghost" onclick="addProgs()">+ Adicionar programa(s)…</button>
+          </div>
+        </div>
+        <div class="note">🛈 <b>Intenção:</b> "Marcar todos / Desmarcar todos" — essencial numa ferramenta de lote (faltava no v2).
+          A coluna "Tipo" foi removida: era sempre "NC", não diferenciava nada. Clicar em qualquer ponto da linha marca/desmarca.</div>
+        <div class="files-head" id="filesHead">
+          <span></span><span>Nome</span><span>Modificado</span><span>Tamanho</span><span></span><span></span>
+        </div>
+        <div class="files" id="files" tabindex="0" ondragover="fzOver(event)" ondragleave="fzLeave(event)" ondrop="fzDrop(event)" onkeydown="fzKey(event)"></div>
+      </div>
+
+      <!-- LOTE DE EDIÇÕES -->
+      <div class="panel lotep">
+        <div class="phead">
+          <div class="ptitle">Lote de edições</div>
+          <span class="chip mut" id="loteChip">vazio</span>
+        </div>
+        <div class="comp-tabs" role="tablist">
+          <button class="ctab sel" id="ctabSwap" onclick="setCompMode('swap')">Trocar código</button>
+          <button class="ctab" id="ctabIns" onclick="setCompMode('ins')">➕ Inserir bloco</button>
+        </div>
+        <div class="note nv4">✦ <b>Mudança v4:</b> os dois tipos de edição viraram <b>abas do mesmo compositor</b>, com um
+          único botão <b>"+ Adicionar ao lote"</b>. O v3 tinha dois botões de adicionar lado a lado (o mesmo defeito que
+          ele criticava no v2) e o bloco era montado num <b>modal</b>, fora do funil. Agora os dois caminhos têm o mesmo
+          gesto — e a prévia real do bloco aparece aqui mesmo, sem janela por cima. <b>Também:</b> o botão só habilita
+          com origem <b>e</b> destino escolhidos — esquecer o destino não cai mais no fluxo de remover; remover é escolha
+          explícita (✕ no dropdown, estado vermelho), sem modal de confirmação extra (o Conferir é a trava real).</div>
+        <div id="compSwap">
+          <div class="comp-row">
+            <div class="comp-field"><span class="label-caps">Código de origem</span>
+              <div class="libdrop big" id="pickSrc" data-role="src" data-val="">
+                <button class="libdrop-btn is-empty" onclick="toggleLib(this)"><span class="code">Selecione o código</span><span class="caret">▾</span></button>
+                <div class="libdrop-pop">
+                  <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+                  <div class="libdrop-list"></div>
+                </div>
+              </div>
+            </div>
+            <div class="comp-field"><span class="label-caps">Trocar por</span>
+              <div class="libdrop big" id="pickDst" data-role="dst" data-val="">
+                <button class="libdrop-btn is-empty" onclick="toggleLib(this)"><span class="code">Selecione o destino</span><span class="caret">▾</span></button>
+                <div class="libdrop-pop">
+                  <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+                  <div class="libdrop-list"></div>
+                </div>
+              </div>
+            </div>
+            <button class="comp-addbtn" id="addBtn" onclick="addToLote()" disabled title="Escolha o código de origem para habilitar">+ Adicionar ao lote</button>
+          </div>
+        </div>
+        <div id="compIns" class="gone">
+          <div class="comp-row">
+            <div class="comp-field" style="flex:2;min-width:220px"><span class="label-caps">Bloco a inserir (uma instrução por linha)</span>
+              <textarea class="ins-text ins-mini" id="ilText" oninput="ilPreview()" placeholder="ex.:&#10;G68 R90.&#10;G54"></textarea>
+            </div>
+            <div class="comp-field"><span class="label-caps">Posição em cada programa</span>
+              <div class="ins-pos">
+                <label><input type="radio" name="ilPos" value="code" checked onchange="ilPreview()"> Abaixo da 1ª ocorrência de
+                  <div class="libdrop" id="ilCode" data-role="illote" data-val="G54">
+                    <button class="libdrop-btn" onclick="toggleLib(this)"><span class="code">G54</span><span class="caret">▾</span></button>
+                    <div class="libdrop-pop">
+                      <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+                      <div class="libdrop-list"></div>
+                    </div>
+                  </div>
+                </label>
+                <label title="A linha pode variar entre programas — prefira a opção por código"><input type="radio" name="ilPos" value="line" onchange="ilPreview()"> Abaixo da linha Nº <input class="ac-input ins-num" id="ilLine" type="number" min="1" value="1" oninput="ilPreview()"></label>
+              </div>
+            </div>
+            <button class="comp-addbtn" id="ilOk" onclick="ilConfirm()">+ Adicionar ao lote</button>
+          </div>
+          <div class="sa-group" id="ilBlocks"></div>
+          <div class="preview"><div class="pvh" id="ilPvh">Prévia</div><pre class="ins-preview" id="ilPreviewBox">—</pre></div>
+        </div>
+        <div class="note">🛈 <b>Intenção (funil unificado):</b> a edição montada cai <b>direto</b> no lote, aqui embaixo.
+          No v2 existiam duas listas ("Edições montadas" + Resumo) e dois botões "adicionar" — um passo a mais e o risco
+          de montar a edição e esquecer de mandá-la ao lote. Agora é 1 lista, 1 botão.
+          <b>Novo:</b> o lote aceita <b>dois tipos</b> de edição — trocar código e <b>➕ inserir bloco</b>
+          (ex.: códigos de rotação abaixo de um ponto específico, em todas as peças de uma vez — e dá pra
+          combinar com uma troca de G54 no mesmo lote).</div>
+        <div class="lote-list" id="loteList"></div>
+        <div class="lotefoot">
+          <div class="note">🛈 <b>Intenção (números honestos):</b> sem contador "Alterações" estimado — o v2 mostrava
+            regras × programas, um número inventado. Aqui o número real aparece no <b>Conferir</b>, que varre os arquivos
+            de verdade (mesma borda CNC do app: M8 ≠ M80). E o botão diz o que faz: conferir <b>não grava nada</b>.</div>
+          <div class="lotefacts" id="loteFacts">0 edições · 0 programas marcados</div>
+          <button class="cta" id="ctaConf" onclick="conferir()" disabled>
+            <span class="big">Conferir lote →</span>
+            <span class="small">varre os programas e mostra os números reais — nada é gravado</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: EDITOR ============ -->
+    <section class="view" id="view-editor">
+      <div class="panel strip">
+        <div class="phead"><div class="ptitle">Arquivos</div></div>
+        <div class="note">🛈 <b>Intenção:</b> trocar de arquivo sem sair do editor. Bolinha laranja = alteração não salva.
+          Voltar ao Lote (barra lateral) não fecha nem perde nada.</div>
+        <div class="striplist" id="striplist"></div>
+      </div>
+      <div class="panel edpanel">
+        <!-- estado vazio -->
+        <div class="empty" id="edEmpty">
+          <div class="e-ic">✎</div>
+          <div><div class="e-t1">Nenhum arquivo aberto</div>
+          <div class="e-t2">Escolha um programa na lista ao lado, ou abra pelo ✎ na tela Lote.</div></div>
+        </div>
+        <!-- editor -->
+        <div class="gone" id="edWork">
+          <div class="ed-head">
+            <span class="ed-title">Editando <span class="ed-fname" id="edFname">—</span></span>
+            <span class="ed-nobackup" title="Salvar sobrescreve o original na pasta de origem, sem criar cópia.">⚠ salva direto, sem cópia</span>
+            <span class="ed-head-actions">
+              <button class="btn-soft" id="edSaveAsBtn" onclick="saveAsOpen()" disabled>Salvar como…</button>
+              <button class="ed-save" id="edSaveBtn" onclick="edSave()" disabled>Salvar</button>
+            </span>
+          </div>
+          <div class="note nv4">✦ <b>Mudança v4:</b> <b>Salvar</b> e <b>Salvar como…</b> subiram para o cabeçalho do arquivo,
+            ao lado do nome e do aviso "salva direto" — salvar é decisão sobre o <b>arquivo</b>, não parte do
+            localizar/substituir. A toolbar abaixo ficou só com as ferramentas de edição, em 3 grupos
+            (localizar · substituir · inserir).</div>
+          <div class="note">🛈 <b>Intenção (tela própria + rede de segurança):</b> linhas de NC são longas — o editor em tela
+            cheia substitui a coluna espremida do v2 (e a barra de ferramentas cabe numa linha). O salvar continua direto,
+            sem cópia (decisão mantida), mas o aviso de "Salvo" agora é um toast com <b>Desfazer</b> — um clique a menos
+            que o modal do v2 e uma volta possível.</div>
+          <div class="ed-toolbar">
+            <span class="label-caps">Localizar</span>
+            <div class="libdrop" id="libFind" data-role="find" data-val="M8">
+              <button class="libdrop-btn" onclick="toggleLib(this)" title="Liga refrigeração"><span class="code">M8</span><span class="caret">▾</span></button>
+              <div class="libdrop-pop">
+                <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+                <div class="libdrop-list"></div>
+              </div>
+            </div>
+            <span class="ed-count stale" id="edCount">— encontrados</span>
+            <span class="ed-pos" id="edPos">0/0</span>
+            <button class="iconbtn" title="Ocorrência anterior" onclick="nav(-1)">↑</button>
+            <button class="iconbtn" title="Próxima ocorrência" onclick="nav(1)">↓</button>
+            <span class="ed-sep"></span>
+            <span class="ed-rep-by">por</span>
+            <div class="libdrop" id="libRepl" data-role="replace" data-val="M08">
+              <button class="libdrop-btn" onclick="toggleLib(this)" title="Refrigeração (normalizado)"><span class="code">M08</span><span class="caret">▾</span></button>
+              <div class="libdrop-pop">
+                <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+                <div class="libdrop-list"></div>
+              </div>
+            </div>
+            <button class="btn-soft" onclick="replaceAll()">Substituir todos</button>
+            <button class="btn-soft" onclick="startStep()">Um a um</button>
+            <span class="ed-sep"></span>
+            <button class="btn-soft" onclick="insOpen()" title="Inserir um bloco de linhas em posição específica">➕ Inserir bloco</button>
+          </div>
+          <div class="note nv4">✦ <b>Mudança v4:</b> a contagem é <b>automática</b> — escolher o código, abrir o arquivo
+            ou digitar já reconta as ocorrências; a lupa 🔍 e o estado parado "— encontrados" foram aposentados.
+            Número na tela = verdade do arquivo ("uma verdade por número", princípio nº 1 do redesign).</div>
+          <div class="ed-wrap">
+            <div class="ed-gutter" id="edGutter">1</div>
+            <div class="ed-area">
+              <pre class="ed-hl" id="edHl" aria-hidden="true"></pre>
+              <textarea class="ed-input" id="edInput" spellcheck="false" oninput="onEdit()" onscroll="syncScroll()"></textarea>
+            </div>
+          </div>
+          <div class="stepbar" id="stepbar">
+            <span class="stepbar-txt" id="stepTxt">—</span>
+            <button class="btn-soft" onclick="stepReplace()">Substituir</button>
+            <button class="btn-soft" onclick="stepSkip()">Pular →</button>
+            <button class="btn-soft ghosty" onclick="stepEnd()">Concluir</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: CÓDIGOS (biblioteca) ============ -->
+    <section class="view" id="view-biblioteca">
+      <div class="panel">
+        <div class="phead">
+          <div class="ptitle">Biblioteca de Códigos</div>
+          <div class="phead-actions"><button class="btn-soft" onclick="openAddCode()">+ Adicionar código</button></div>
+        </div>
+        <div class="note">🛈 <b>Intenção:</b> a biblioteca virou um lugar, não um modal — com 247 códigos no app real,
+          gerenciar dentro de uma janelinha era apertado. Código com <b>bloco</b> vira modelo do "Inserir bloco" do editor.</div>
+        <div class="lib-head">
+          <input class="ac-input" id="libSearch" placeholder="Procurar código ou descrição…" oninput="renderLibrary()">
+        </div>
+        <div class="lib-count" id="libCount"></div>
+        <div class="lib-list" id="libList"></div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: HISTÓRICO ============ -->
+    <section class="view" id="view-historico">
+      <div class="panel">
+        <div class="phead"><div class="ptitle">Histórico de publicações</div></div>
+        <div class="note">🛈 <b>Intenção (toda gravação tem volta):</b> o app já cria backup versionado por data/hora a cada
+          publicação — mas ele era invisível. Agora cada publicação tem rosto e um <b>Restaurar originais</b> de 1 clique.
+          Isso transforma o backup de "promessa" em segurança que o operador consegue ver e usar.</div>
+        <div class="histlist" id="histlist"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ OVERLAYS ============ -->
+
+  <!-- CONFERIR: varredura real antes de publicar -->
+  <div class="overlay" id="ovConf"><div class="modal res">
+    <div class="mh">Conferência do lote — números reais <span class="x" onclick="hide('ovConf')">✕</span></div>
+    <div class="mb" id="confBody"></div>
+    <div class="mf">
+      <span class="mfacts" id="confFacts"></span>
+      <button class="mbtn ghost" onclick="hide('ovConf')">Voltar</button>
+      <button class="mbtn orange" id="pubBtn" onclick="publicar()">Publicar</button>
+    </div>
+  </div></div>
+
+  <!-- PUBLICANDO / PUBLICADO -->
+  <div class="overlay" id="ovPub"><div class="modal run">
+    <div class="mh" id="pubH">Publicando…</div>
+    <div class="mb" id="pubBody"></div>
+  </div></div>
+
+  <!-- v4: o modal "Confirmar remoção" (ovRemove) foi REMOVIDO — remover agora exige escolha
+       explícita do "✕ Remover" no dropdown (estado vermelho), e o Conferir é a trava real. -->
+
+  <!-- v4: trocar de configuração com lote montado pede confirmação (no v3 apagava sem aviso) -->
+  <div class="overlay" id="ovCfgLoad"><div class="modal confirm">
+    <div class="mh">Carregar configuração <span class="x" onclick="hide('ovCfgLoad')">✕</span></div>
+    <div class="mb"><p class="confirm-txt">Carregar <b id="clName">—</b> substitui as <b id="clCount">0</b> edições do lote atual. Continuar?</p></div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovCfgLoad')">Cancelar</button><button class="mbtn warn" onclick="cfgLoadConfirm()">Substituir lote</button></div>
+  </div></div>
+
+  <!-- editor: alterações não salvas ao trocar de arquivo -->
+  <div class="overlay" id="ovSwitch"><div class="modal confirm">
+    <div class="mh">Alterações não salvas <span class="x" onclick="cancelSwitch()">✕</span></div>
+    <div class="mb"><p class="confirm-txt">Há alterações não salvas em <b id="switchFrom">arquivo</b>. O editor grava <b>sem backup</b>. O que deseja fazer?</p></div>
+    <div class="mf"><button class="mbtn ghost" onclick="cancelSwitch()">Cancelar</button><button class="mbtn warn" onclick="discardSwitch()">Descartar</button><button class="mbtn save" onclick="saveSwitch()">Salvar e continuar</button></div>
+  </div></div>
+
+  <!-- editor: Salvar como… -->
+  <div class="overlay" id="ovSaveAs"><div class="modal confirm">
+    <div class="mh">Salvar como… <span class="x" onclick="hide('ovSaveAs')">✕</span></div>
+    <div class="mb">
+      <p class="confirm-txt">Salvar uma nova cópia de <b id="saFrom">arquivo.NC</b>. O <b>Salvar</b> normal preserva o tipo de entrada; aqui você escolhe outro.</p>
+      <span class="label-caps">Tipo / extensão</span>
+      <div class="sa-group" id="saExt">
+        <button class="btn-soft sel" onclick="saPick(this)">.nc</button>
+        <button class="btn-soft" onclick="saPick(this)">.txt</button>
+        <button class="btn-soft" onclick="saPick(this)">.tap</button>
+        <button class="btn-soft" onclick="saPick(this)">.iso</button>
+        <button class="btn-soft" onclick="saPick(this)">.min</button>
+        <button class="btn-soft" onclick="saPick(this)">.mpf</button>
+      </div>
+      <span class="label-caps">Codificação</span>
+      <div class="sa-group" id="saEnc">
+        <button class="btn-soft sel" onclick="saPick(this)">UTF-8</button>
+        <button class="btn-soft" onclick="saPick(this)">UTF-8 c/ BOM</button>
+        <button class="btn-soft" onclick="saPick(this)">ANSI (cp1252)</button>
+      </div>
+      <span class="label-caps">Quebra de linha</span>
+      <div class="sa-group" id="saEol">
+        <button class="btn-soft sel" onclick="saPick(this)">CRLF (Windows)</button>
+        <button class="btn-soft" onclick="saPick(this)">LF (Unix)</button>
+      </div>
+      <p class="confirm-txt"><span class="label-caps">Prévia</span> &nbsp; <b id="saPreview">arquivo.nc · UTF-8 · CRLF</b></p>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovSaveAs')">Cancelar</button><button class="mbtn save" onclick="saveAsConfirm()">Salvar como…</button></div>
+  </div></div>
+
+  <!-- editor: inserir bloco multi-linha -->
+  <div class="overlay" id="ovInsert"><div class="modal res">
+    <div class="mh">Inserir bloco de linhas em <span class="ed-fname" id="insFname">arquivo</span> <span class="x" onclick="hide('ovInsert')">✕</span></div>
+    <div class="mb">
+      <span class="label-caps">Modelos salvos</span>
+      <div class="sa-group" id="insBlocks"></div>
+      <span class="label-caps">Bloco a inserir (uma instrução por linha)</span>
+      <div class="sa-group"><textarea class="ins-text" id="insText" oninput="insPreview()" placeholder="ex.:&#10;G43 H01&#10;M8"></textarea></div>
+      <span class="label-caps">Posição</span>
+      <div class="ins-pos">
+        <label><input type="radio" name="insPos" value="line" checked onchange="insPreview()"> Abaixo da linha Nº <input class="ac-input ins-num" id="insLine" type="number" min="1" value="1" oninput="insPreview()"></label>
+        <label><input type="radio" name="insPos" value="code" onchange="insPreview()"> Abaixo da 1ª ocorrência do código
+          <div class="libdrop" id="insCode" data-role="inscode" data-val="M8">
+            <button class="libdrop-btn" onclick="toggleLib(this)"><span class="code">M8</span><span class="caret">▾</span></button>
+            <div class="libdrop-pop">
+              <input class="libdrop-search" placeholder="Procurar código…" oninput="filterLib(this)" onclick="event.stopPropagation()">
+              <div class="libdrop-list"></div>
+            </div>
+          </div>
+        </label>
+      </div>
+      <div class="preview"><div class="pvh">Prévia do resultado</div><pre class="ins-preview" id="insPreviewBox">—</pre></div>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovInsert')">Cancelar</button><button class="mbtn save" id="insOkBtn" onclick="insConfirm()">Inserir bloco</button></div>
+  </div></div>
+
+  <!-- v4: o modal "Inserir bloco nos programas marcados" (ovInsLote) foi REMOVIDO —
+       o bloco agora é montado inline, na aba "➕ Inserir bloco" do compositor do lote. -->
+
+  <!-- biblioteca: adicionar código -->
+  <div class="overlay" id="ovAddCode"><div class="modal confirm">
+    <div class="mh">Adicionar código à biblioteca <span class="x" onclick="hide('ovAddCode')">✕</span></div>
+    <div class="mb">
+      <span class="label-caps">Código</span>
+      <div class="sa-group"><input class="ac-input" id="acCode" placeholder="ex.: M08" onkeydown="if(event.key==='Enter')addCodeConfirm()"></div>
+      <span class="label-caps">Descrição</span>
+      <div class="sa-group"><input class="ac-input" id="acDesc" placeholder="ex.: Liga refrigeração" onkeydown="if(event.key==='Enter')addCodeConfirm()"></div>
+      <span class="label-caps">Bloco de linhas (opcional)</span>
+      <div class="sa-group"><textarea class="ins-text" id="acBlock" placeholder="Várias linhas viram um modelo reutilizável em “Inserir bloco”.&#10;ex.:&#10;G43 H01&#10;M8"></textarea></div>
+      <p class="confirm-txt">O código fica disponível nos menus de origem/destino e no editor. Se preencher o bloco, ele vira um <b>modelo multi-linha</b>.</p>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovAddCode')">Cancelar</button><button class="mbtn save" onclick="addCodeConfirm()">Salvar código</button></div>
+  </div></div>
+
+  <!-- salvar configuração (receita) -->
+  <div class="overlay" id="ovCfg"><div class="modal confirm">
+    <div class="mh">Salvar configuração <span class="x" onclick="hide('ovCfg')">✕</span></div>
+    <div class="mb">
+      <p class="confirm-txt">Guarda o lote de edições atual e as preferências (pasta de backup) com um nome, para reutilizar depois — sua "receita" de correções.</p>
+      <span class="label-caps">Nome da configuração</span>
+      <div class="sa-group"><input class="ac-input" id="cfgInput" placeholder="ex.: Máquina 03 — turno noite" onkeydown="if(event.key==='Enter')saveConfigConfirm()"></div>
+      <span class="label-caps">Pasta de backup (lembrada e fixa até você trocar)</span>
+      <div class="sa-group"><code id="cfgBackup">D:\CNC\backup\</code> <button class="btn-soft" onclick="changeBackup()">Mudar</button></div>
+    </div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovCfg')">Cancelar</button><button class="mbtn save" onclick="saveConfigConfirm()">Salvar</button></div>
+  </div></div>
+
+  <!-- histórico: restaurar originais -->
+  <div class="overlay" id="ovRestore"><div class="modal confirm">
+    <div class="mh">Restaurar originais <span class="x" onclick="hide('ovRestore')">✕</span></div>
+    <div class="mb"><p class="confirm-txt">Os arquivos da publicação de <b id="rsWhen">—</b> serão substituídos pelas cópias do backup <b id="rsPath">—</b>. Os arquivos atuais serão preservados num novo backup antes da troca. Continuar?</p></div>
+    <div class="mf"><button class="mbtn ghost" onclick="hide('ovRestore')">Cancelar</button><button class="mbtn warn" onclick="restoreConfirm()">Restaurar</button></div>
+  </div></div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+  /* ============ utilidades ============ */
+  function $(id){return document.getElementById(id);}
+  function show(id){$(id).classList.add('show');}
+  function hide(id){$(id).classList.remove('show');}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function reEscape(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+  /* borda CNC (mesma regra do app): M8 não casa dentro de M80 nem de T1.0 */
+  function cncRe(code){return new RegExp('(^|[^A-Za-z0-9.])('+reEscape(code)+')(?![A-Za-z0-9.])','gm');}
+  function findAll(text,code){
+    var re=cncRe(code),m,out=[];
+    while((m=re.exec(text))){ var s=m.index+m[1].length; out.push({start:s,end:s+m[2].length});
+      if(re.lastIndex===m.index) re.lastIndex++; }
+    return out;
+  }
+  function spliceAll(text,ms,repl){
+    var out=text;
+    for(var i=ms.length-1;i>=0;i--){ out=out.slice(0,ms[i].start)+repl+out.slice(ms[i].end); }
+    return out;
+  }
+  /* aplica uma regra num texto; destino vazio remove o código e apaga linhas que ficarem vazias */
+  function applyRule(text,code,dst){
+    var ms=findAll(text,code); if(!ms.length) return {text:text,n:0};
+    var out=spliceAll(text,ms,dst);
+    if(dst===''){
+      out=out.split('\n').map(function(l){return l.replace(/\s{2,}/g,' ').replace(/\s+$/,'');})
+             .filter(function(l){return l!=='';}).join('\n');
+    }
+    return {text:out,n:ms.length};
+  }
+
+  /* ============ dados de exemplo ============ */
+  var LIB=[
+    ['M3','Liga eixo-árvore (horário)'],['M5','Para eixo-árvore'],['M6','Troca de ferramenta'],
+    ['M8','Liga refrigeração'],['M08','Refrigeração (normalizado)'],['M9','Desliga refrigeração'],
+    ['M30','Fim de programa'],['G54','Origem de peça 1'],['G55','Origem de peça 2'],
+    ['G43','Compensação de altura'],['T1','Ferramenta 1'],['T01','Ferramenta 1 (normalizado)'],
+    ['T1.0','Ferramenta 1 (decimal)'],['S1200','Rotação 1200 rpm'],['F150','Avanço 150 mm/min']
+  ];
+  var FREQ=['M8','M08','G54','G55','M6','T1','T01'];
+  var BLOCKS=[];
+  var FILES={
+    'O1001_FLANGE.NC':'%\nO1001 (FLANGE 120MM)\nN10 G21 G90 G54\nN20 T1 M6\nN30 S1200 M3\nN40 G0 X0 Y0 Z5\nN50 M8\nN60 G1 Z-2 F150\nN70 X50\nN80 Y50\nN90 M9\nN100 M8\nN110 G1 X0\nN120 Z5 M9\nN130 G0 X100 M8\nN140 M5\nN150 M30\n%',
+    'O1002_EIXO_REV2.NC':'%\nO1002 (EIXO REV2)\nN10 G21 G90 G54\nN20 T2 M6\nN30 S900 M3\nN40 M8\nN50 G1 Z-5 F120\nN60 X80\nN70 M9\nN80 M5\nN90 M30\n%',
+    'O1003_TAMPA.NC':'%\nO1003 (TAMPA)\nN10 G21 G90 G55\nN20 T3 M6\nN30 S1500 M3\nN40 M8\nN50 G1 Z-1 F100\nN60 X20\nN70 Y20\nN80 M8\nN90 G2 X40 Y40 R20\nN100 M8\nN110 M9\nN120 M8\nN130 M5\nN140 M9\nN150 M30\n%',
+    'O1004_SUPORTE.NC':'%\nO1004 (SUPORTE)\nN10 G21 G90 G54\nN20 T1 M6\nN30 S1100 M3\nN40 M8\nN50 G1 Z-3 F140\nN60 X60\nN70 M9\nN80 M5\nN90 M30\n%',
+    'O1005_BUCHA_A.NC':'%\nO1005 (BUCHA A)\nN10 G21 G90 G54\nN20 T4 M6\nN30 S2000 M3\nN40 G1 Z-1 F90\nN50 X10\nN60 M5\nN70 M30\n%',
+    'O1006_BUCHA_B.NC':'%\nO1006 (BUCHA B)\nN10 G21 G90 G54\nN20 T4 M6\nN30 S2000 M3\nN40 M8\nN50 G1 Z-1 F90\nN60 X10\nN70 M9\nN80 M5\nN90 M30\n%'
+  };
+  var PROGS=[
+    {name:'O1001_FLANGE.NC',mod:'hoje 08:14',size:'12,4 KB',sel:false},
+    {name:'O1002_EIXO_REV2.NC',mod:'hoje 08:02',size:'8,1 KB',sel:false},
+    {name:'O1003_TAMPA.NC',mod:'ontem',size:'21,7 KB',sel:false},
+    {name:'O1004_SUPORTE.NC',mod:'ontem',size:'5,9 KB',sel:false},
+    {name:'O1005_BUCHA_A.NC',mod:'30/05',size:'3,2 KB',sel:false},
+    {name:'O1006_BUCHA_B.NC',mod:'30/05',size:'3,2 KB',sel:false}
+  ];
+  var lote=[];                                   /* [{code,dst}] — A lista única */
+  var HIST=[                                     /* exemplos pré-carregados p/ demonstrar a tela */
+    {when:'09/06 16:41',cfg:'Máquina 01',edits:2,progs:5,swaps:11,ins:0,backup:'D:\\CNC\\backup\\2026-06-09_1641\\'},
+    {when:'05/06 09:12',cfg:'Máquina 02',edits:1,progs:3,swaps:0, ins:3,backup:'D:\\CNC\\backup\\2026-06-05_0912\\'}
+  ];
+  var savedConfigs=['Máquina 01','Máquina 02'], activeConfig='Máquina 01';
+  var backupFolders=['D:\\CNC\\backup\\','E:\\backups\\cnc\\','\\\\servidor\\cnc\\backup\\'];
+  var bki=0, backupFolder=backupFolders[0];
+
+  /* ============ navegação (lugares) ============ */
+  function go(v){
+    ['lote','editor','biblioteca','historico'].forEach(function(k){
+      $('view-'+k).classList.toggle('active',k===v);
+      $('nav-'+k).classList.toggle('active',k===v);
+    });
+    if(v==='editor') renderStrip();
+    if(v==='biblioteca') renderLibrary();
+    if(v==='historico') renderHist();
+  }
+
+  /* ============ anotações ============ */
+  function toggleNotes(){
+    var off=document.body.classList.toggle('no-notes');
+    $('noteBtn').classList.toggle('on',!off);
+  }
+
+  /* ============ toast (com ação opcional) ============ */
+  var _toastT=null,_toastFn=null;
+  function toast(msg,kind,act){
+    var t=$('toast');
+    t.className='toast '+(kind||'')+' show';
+    t.innerHTML=esc(msg)+(act?' <button class="t-act" onclick="toastAct()">'+esc(act.label)+'</button>':'');
+    _toastFn=act?act.fn:null;
+    if(_toastT) clearTimeout(_toastT);
+    _toastT=setTimeout(function(){ t.classList.remove('show'); _toastFn=null; }, act?5200:1900);
+  }
+  function toastAct(){ var f=_toastFn; _toastFn=null; $('toast').classList.remove('show'); if(f)f(); }
+
+  /* ============ topo: configurações (receitas) + backup ============ */
+  function renderCfgMenu(){
+    $('cfgMenu').innerHTML=savedConfigs.map(function(n){
+      return '<button class="cfgitem'+(n===activeConfig?' sel':'')+'" data-n="'+esc(n)+'" onclick="pickConfig(event,this.dataset.n)">'+esc(n)+'</button>';
+    }).join('')+'<button class="cfgitem new" onclick="newConfig(event)">💾 Salvar lote atual como…</button>';
+  }
+  function toggleCfg(ev){ if(ev)ev.stopPropagation(); $('cfgCtl').classList.toggle('open'); }
+  function closeCfg(){ $('cfgCtl').classList.remove('open'); }
+  /* v4 (correção de segurança): no v3, clicar numa configuração APAGAVA o lote montado sem aviso —
+     agora, com lote não vazio, pede confirmação antes de substituir. */
+  var pendingCfg=null;
+  function pickConfig(ev,n){
+    ev.stopPropagation(); closeCfg();
+    if(lote.length){ pendingCfg=n; $('clName').textContent=n; $('clCount').textContent=lote.length; show('ovCfgLoad'); return; }
+    applyConfig(n);
+  }
+  function cfgLoadConfirm(){ hide('ovCfgLoad'); if(pendingCfg) applyConfig(pendingCfg); pendingCfg=null; }
+  function applyConfig(n){
+    activeConfig=n; $('cfgName').textContent=n; renderCfgMenu();
+    /* carregar uma receita preenche o lote (demonstração) */
+    if(n==='Máquina 02'){ lote=[{type:'swap',code:'M8',dst:'M08'},{type:'ins',text:'G68 R90.',mode:'code',code:'G54',line:1}]; }
+    else{ lote=[]; }
+    renderLote();
+    toast('Configuração “'+n+'” carregada'+(lote.length?(' — '+lote.length+' edições no lote'):''),'ok');
+  }
+  function newConfig(ev){ ev.stopPropagation(); closeCfg(); openSaveConfig(); }
+  function openSaveConfig(){ $('cfgInput').value=''; show('ovCfg'); setTimeout(function(){$('cfgInput').focus();},50); }
+  function saveConfigConfirm(){
+    var n=$('cfgInput').value.trim(); if(!n){ $('cfgInput').focus(); return; }
+    if(savedConfigs.indexOf(n)<0) savedConfigs.push(n);
+    activeConfig=n; $('cfgName').textContent=n; renderCfgMenu(); hide('ovCfg');
+    toast('Configuração “'+n+'” salva','ok');
+  }
+  function changeBackup(){
+    bki=(bki+1)%backupFolders.length; backupFolder=backupFolders[bki]; reflectBackup();
+    toast('Pasta de backup: '+backupFolder,'');
+  }
+  function reflectBackup(){
+    ['bkPath','cfgBackup'].forEach(function(id){ var el=$(id); if(el) el.textContent=backupFolder; });
+  }
+
+  /* ============ PROGRAMAS ============ */
+  function selProgs(){ return PROGS.filter(function(p){return p.sel;}); }
+  function renderProgs(){
+    var f=$('files'), head=$('filesHead');
+    if(!PROGS.length){
+      head.classList.add('gone');
+      f.innerHTML='<div class="empty"><div class="e-ic">📂</div>'
+        +'<div><div class="e-t1">Nenhum programa carregado</div>'
+        +'<div class="e-t2">Arraste arquivos aqui ou use o botão abaixo.</div></div>'
+        +'<button class="e-cta" onclick="addProgs()">+ Adicionar programas</button></div>';
+    } else {
+      head.classList.remove('gone');
+      f.innerHTML=PROGS.map(function(p,i){
+        var open=(p.name===currentFile && currentFile!==null);
+        return '<div class="file'+(p.sel?'':' off')+(open?' editing-row':'')+'" data-i="'+i+'">'
+          +'<span class="chk'+(p.sel?'':' off')+'" onclick="toggleProg(event,'+i+')">✓</span>'
+          +'<span class="fname">'+esc(p.name)+'</span>'
+          +'<span class="fcol">'+esc(p.mod)+'</span><span class="fcol">'+esc(p.size)+'</span>'
+          +'<button class="editbtn" onclick="openFromLote(event,'+i+')" title="Abrir no editor (tela Editor)">✎ Abrir</button>'
+          +'<button class="filex" onclick="removeProg(event,'+i+')" title="Remover da lista">✕</button></div>';
+      }).join('');
+    }
+    var n=selProgs().length, tot=PROGS.length;
+    var chip=$('progChip');
+    chip.textContent = tot? (n+' de '+tot+' marcado'+(n===1?'':'s')) : 'nenhum programa';
+    chip.className='chip '+(n>0?'ok':'mut');
+    $('selAllBtn').textContent=(tot && n===tot)?'Desmarcar todos':'Marcar todos';
+    refreshCta();
+  }
+  function toggleProg(ev,i){ if(ev)ev.stopPropagation(); PROGS[i].sel=!PROGS[i].sel; renderProgs(); }
+  function toggleSelAll(){
+    var all=PROGS.length && PROGS.every(function(p){return p.sel;});
+    PROGS.forEach(function(p){p.sel=!all;}); renderProgs();
+  }
+  function removeProg(ev,i){ if(ev)ev.stopPropagation(); PROGS.splice(i,1); renderProgs(); renderStrip(); }
+  function defaultNC(name){
+    return '%\n'+name.replace(/\..*$/,'')+' (NOVO)\nN10 G21 G90 G54\nN20 T1 M6\nN30 S1000 M3\nN40 M8\nN50 G1 Z-2 F100\nN60 X30\nN70 M9\nN80 M5\nN90 M30\n%';
+  }
+  var newSeq=0;
+  function addProgs(){
+    /* a seleção real é OS-nativa; aqui entram exemplos */
+    newSeq++;
+    var nm='O20'+('0'+newSeq).slice(-2)+'_NOVO.NC';
+    PROGS.push({name:nm,mod:'agora',size:(3+newSeq)+',0 KB',sel:true});
+    FILES[nm]=defaultNC(nm);
+    renderProgs(); renderStrip();
+    toast('Programa adicionado: '+nm,'ok');
+  }
+  function fzOver(e){ e.preventDefault(); $('files').classList.add('is-dragover'); }
+  function fzLeave(){ $('files').classList.remove('is-dragover'); }
+  function fzDrop(e){ e.preventDefault(); $('files').classList.remove('is-dragover'); addProgs(); }
+  function fzKey(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); addProgs(); } }
+  /* clicar na linha (fora dos botões) marca/desmarca */
+  document.addEventListener('click',function(ev){
+    var row=ev.target.closest('#files .file');
+    if(!row) return;
+    if(ev.target.closest('.editbtn')||ev.target.closest('.filex')||ev.target.closest('.chk')) return;
+    toggleProg(null,parseInt(row.dataset.i,10));
+  });
+
+  /* ============ COMPOSITOR → LOTE (lista única) ============ */
+  var srcVal='', dstVal='', dstIsRemove=false;
+  function libDesc(code){ for(var i=0;i<LIB.length;i++){ if(LIB[i][0]===code) return LIB[i][1]; } return ''; }
+  /* v4 (correção de segurança): o botão só habilita com origem E destino escolhidos.
+     No v3, esquecer o destino empurrava o operador direto para o fluxo de REMOÇÃO (o estado
+     mais destrutivo como caminho padrão). Remover agora é só escolha explícita (✕ no dropdown)
+     — e sem modal de confirmação extra: o estado vermelho + o cartão "→ remover" + o Conferir
+     já são três travas antes de qualquer gravação. */
+  function refreshAddBtn(){
+    var ok=!!srcVal && (dstVal!=='' || dstIsRemove);
+    $('addBtn').disabled=!ok;
+    $('addBtn').title = ok ? 'Adicionar esta edição ao lote'
+      : (!srcVal ? 'Escolha o código de origem'
+                 : 'Escolha o destino — ou ✕ Remover para apagar o código');
+  }
+  function setSrc(code,desc){
+    srcVal=code||'';
+    var btn=$('pickSrc').querySelector('.libdrop-btn'), cd=btn.querySelector('.code');
+    if(!srcVal){ btn.classList.add('is-empty'); cd.textContent='Selecione o código'; btn.title=''; }
+    else{ btn.classList.remove('is-empty'); cd.textContent=srcVal; btn.title=desc||libDesc(code); }
+    refreshAddBtn();
+  }
+  function setDst(code,desc,isRemove){
+    dstVal=code||''; dstIsRemove=(!!isRemove && dstVal==='');
+    var btn=$('pickDst').querySelector('.libdrop-btn'), cd=btn.querySelector('.code');
+    btn.classList.remove('is-empty','is-remove');
+    if(dstVal===''){
+      if(dstIsRemove){ btn.classList.add('is-remove'); cd.textContent='✕ remover'; btn.title='Remove o código nos programas marcados'; }
+      else{ btn.classList.add('is-empty'); cd.textContent='Selecione o destino'; btn.title=''; }
+    } else { cd.textContent=dstVal; btn.title=desc||libDesc(code); }
+    refreshAddBtn();
+  }
+  function clearComposer(){ setSrc(''); setDst(''); }
+  function addToLote(){
+    if(!srcVal || (dstVal==='' && !dstIsRemove)) return;
+    commitAdd();
+  }
+  function commitAdd(){
+    lote.push({type:'swap',code:srcVal,dst:dstVal});
+    clearComposer(); renderLote(true);
+    toast('Edição adicionada ao lote','ok');
+  }
+  function loteConflicts(){
+    var origin={}; lote.forEach(function(r){ if(r.type!=='swap') return; origin[r.code]=(origin[r.code]||0)+1; });
+    return origin;
+  }
+  function renderLote(flash){
+    var box=$('loteList'), origin=loteConflicts();
+    if(!lote.length){
+      box.innerHTML='<div class="empty"><div class="e-ic">📋</div>'
+        +'<div><div class="e-t1">Lote vazio</div>'
+        +'<div class="e-t2">Monte uma edição acima — troca de código ou bloco a inserir — e clique em “+ Adicionar ao lote”. Ou carregue uma configuração salva no topo.</div></div></div>';
+    } else {
+      box.innerHTML=lote.map(function(r,i){
+        var idx=('0'+(i+1)).slice(-2), warn=(r.type==='swap'&&origin[r.code]>1);
+        var formula;
+        if(r.type==='ins'){
+          var nl=r.text.split('\n').length;
+          var anchor=r.mode==='code'?'após '+esc(r.code):'após a linha '+r.line;
+          formula='➕ bloco · '+nl+' linha'+(nl>1?'s':'')+' <span class="insanchor">'+anchor+'</span>';
+        } else {
+          formula = r.dst==='' ? esc(r.code)+' → <span class="rm">remover</span>' : esc(r.code)+' → '+esc(r.dst);
+        }
+        var conf = warn ? '<div class="rc-conflict"><span>▲</span> Conflito: <b>'+esc(r.code)+'</b> é alterado por mais de uma edição.</div>' : '';
+        return '<div class="rcard'+(warn?' is-warn':'')+'">'
+          +'<div class="rc-row"><span class="ridx">'+idx+'</span>'
+          +'<span class="rformula">'+formula+'</span>'
+          +'<span class="racts"><span title="Editar (volta ao compositor)" onclick="editRule('+i+')">✎</span>'
+          +'<span title="Duplicar" onclick="dupRule('+i+')">⧉</span>'
+          +'<span class="del" title="Remover do lote" onclick="delRule('+i+')">✕</span></span></div>'+conf+'</div>';
+      }).join('');
+      if(flash && box.lastElementChild){ box.lastElementChild.classList.add('flash'); box.lastElementChild.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+    }
+    var chip=$('loteChip');
+    if(!lote.length){ chip.textContent='vazio'; chip.className='chip mut'; }
+    else{
+      var nConf=lote.filter(function(r){return r.type==='swap'&&origin[r.code]>1;}).length;
+      if(nConf){ chip.textContent='⚠ '+nConf+' conflito'+(nConf>1?'s':''); chip.className='chip warn'; }
+      else{ chip.textContent=lote.length+' edição'+(lote.length>1?'ões':''); chip.className='chip ok'; }
+    }
+    refreshCta();
+  }
+  function delRule(i){ lote.splice(i,1); renderLote(); toast('Edição removida do lote','warn'); }
+  /* v4 (correção): duplicar preservava só code/dst — perdia o type ('swap'/'ins') e quebrava
+     a contagem de conflitos e a duplicação de blocos. Agora copia o objeto inteiro. */
+  function dupRule(i){ lote.splice(i+1,0,JSON.parse(JSON.stringify(lote[i]))); renderLote(); toast('Edição duplicada','ok'); }
+  function editRule(i){
+    var r=lote[i]; lote.splice(i,1); renderLote();
+    if(r.type==='ins'){ loadInsRule(r); return; }
+    setCompMode('swap');
+    setSrc(r.code,libDesc(r.code)); setDst(r.dst,libDesc(r.dst),r.dst==='');
+  }
+  function refreshCta(){
+    var n=lote.length, p=selProgs().length;
+    $('loteFacts').textContent=n+' edição'+(n===1?'':'ões')+' · '+p+' programa'+(p===1?'':'s')+' marcado'+(p===1?'':'s');
+    var cta=$('ctaConf');
+    cta.disabled=(n===0||p===0);
+    cta.title = n===0 ? 'Adicione ao menos 1 edição ao lote'
+              : p===0 ? 'Marque ao menos 1 programa'
+              : 'Varre os programas marcados e mostra a conferência';
+  }
+
+  /* ============ INSERIR BLOCO EM LOTE (2º tipo de edição) ============ */
+  /* calcula onde o bloco entraria num texto; mode 'code' = abaixo da 1ª ocorrência do código âncora */
+  function insertAt(text,rule){
+    var lines=text.split('\n'), at=-1;
+    if(rule.mode==='code'){
+      for(var i=0;i<lines.length;i++){ if(findAll(lines[i],rule.code).length){ at=i+1; break; } }
+      if(at<0) return {ok:false,text:text,at:-1};
+    } else {
+      at=Math.min(Math.max(1,rule.line||1),lines.length);
+    }
+    return {ok:true,text:lines.slice(0,at).concat(rule.text.split('\n')).concat(lines.slice(at)).join('\n'),at:at};
+  }
+  /* v4: compositor com abas — o bloco é montado inline, sem modal */
+  var compMode='swap';
+  function setCompMode(m){
+    compMode=m;
+    $('ctabSwap').classList.toggle('sel',m==='swap');
+    $('ctabIns').classList.toggle('sel',m==='ins');
+    $('compSwap').classList.toggle('gone',m!=='swap');
+    $('compIns').classList.toggle('gone',m!=='ins');
+    if(m==='ins'){ renderIlBlocks(); ilPreview(); }
+  }
+  function renderIlBlocks(){
+    var box=$('ilBlocks');
+    if(!BLOCKS.length){ box.innerHTML='<span class="ins-chip empty">Nenhum modelo salvo — crie um em “+ Adicionar código” (tela Códigos).</span>'; return; }
+    box.innerHTML=BLOCKS.map(function(b,i){ return '<button class="ins-chip" onclick="ilUseBlock('+i+')" title="'+esc(b.desc)+'">'+esc(b.name)+'</button>'; }).join('');
+  }
+  function ilUseBlock(i){ var b=BLOCKS[i]; if(!b)return; $('ilText').value=b.text; ilPreview(); }
+  function setIlCode(code,desc){ var dd=$('ilCode'); dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc||''; }
+  /* editar um bloco do lote = carregar de volta no compositor (mesmo gesto da troca) */
+  function loadInsRule(r){
+    setCompMode('ins');
+    $('ilText').value=r.text;
+    if(r.mode==='line'){ document.querySelector('input[name="ilPos"][value="line"]').checked=true; $('ilLine').value=r.line; }
+    else{ document.querySelector('input[name="ilPos"][value="code"]').checked=true; setIlCode(r.code,libDesc(r.code)); }
+    ilPreview();
+  }
+  function ilPosMode(){ var r=document.querySelector('input[name="ilPos"]:checked'); return r?r.value:'code'; }
+  function ilRule(){
+    return {type:'ins',text:($('ilText').value||'').replace(/\s+$/,''),mode:ilPosMode(),
+            code:$('ilCode').dataset.val||'',line:parseInt($('ilLine').value,10)||1};
+  }
+  /* prévia honesta: mostra o resultado no 1º programa marcado que recebe o bloco */
+  function ilPreview(){
+    var box=$('ilPreviewBox'), r=ilRule();
+    $('ilPvh').textContent='Prévia';
+    if(!r.text){ box.textContent='(digite o bloco para ver a prévia)'; return; }
+    var sel=selProgs();
+    if(!sel.length){ box.textContent='(marque programas à esquerda para ver a prévia)'; return; }
+    var tgt=null, at=-1;
+    for(var i=0;i<sel.length;i++){
+      var t=insertAt(FILES[sel[i].name]||'',r);
+      if(t.ok){ tgt=sel[i].name; at=t.at; break; }
+    }
+    if(!tgt){ box.textContent='Nenhum programa marcado tem '+r.code+' — nada seria inserido.'; return; }
+    $('ilPvh').textContent='Prévia real — '+tgt;
+    var lines=(FILES[tgt]||'').split('\n'), out=[];
+    for(var a=Math.max(0,at-2);a<at;a++){ if(lines[a]!==undefined) out.push('   '+(a+1)+'  '+lines[a]); }
+    r.text.split('\n').forEach(function(l){ out.push(' + ▶  '+l); });
+    for(var b=at;b<Math.min(lines.length,at+2);b++){ out.push('   '+(b+1)+'  '+lines[b]); }
+    box.textContent=out.join('\n');
+  }
+  function ilConfirm(){
+    var r=ilRule();
+    if(!r.text){ $('ilText').focus(); return; }
+    if(r.mode==='code'&&!r.code){ toast('Escolha o código de referência','warn'); return; }
+    lote.push(r); $('ilText').value=''; ilPreview();
+    renderLote(true); toast('Bloco adicionado ao lote','ok');
+  }
+
+  /* ============ CONFERIR (varredura real) → PUBLICAR ============ */
+  var lastScan=null;
+  /* v4 (correção de honestidade): a varredura agora simula o MESMO pipeline da publicação —
+     regras aplicadas EM CADEIA, por programa, na ordem do lote. No v3 cada regra era contada
+     contra o arquivo original: com [M8→M08, M08→M9] o modal somava trocas que se encadeiam,
+     e um bloco ancorado num código já trocado dizia "insere" mas a publicação não inseria. */
+  function scanLote(){
+    var sel=selProgs();
+    var res=lote.map(function(r){ return {rule:r,per:[],total:0}; });
+    sel.forEach(function(p){
+      var txt=FILES[p.name]||'';
+      lote.forEach(function(r,i){
+        if(r.type==='ins'){
+          var t=insertAt(txt,r);
+          res[i].per.push({name:p.name,n:t.ok?1:0,at:t.at});
+          if(t.ok) txt=t.text;
+        } else {
+          var a=applyRule(txt,r.code,r.dst);
+          res[i].per.push({name:p.name,n:a.n});
+          txt=a.text;
+        }
+      });
+    });
+    res.forEach(function(r){ r.total=r.per.reduce(function(a,b){return a+b.n;},0); });
+    return res;
+  }
+  /* monta o texto "X trocas · bloco em Y programas" só com as partes que existem */
+  function pubFacts(sw,ins){
+    var parts=[];
+    if(sw) parts.push(sw+' troca'+(sw===1?'':'s'));
+    if(ins) parts.push('bloco em '+ins+' programa'+(ins===1?'':'s'));
+    return parts.length?parts.join(' · '):'nada a alterar';
+  }
+  function exampleFor(r){
+    var sel=selProgs();
+    for(var i=0;i<sel.length;i++){
+      var lines=(FILES[sel[i].name]||'').split('\n');
+      for(var j=0;j<lines.length;j++){
+        var ms=findAll(lines[j],r.code);
+        if(ms.length){
+          var neu=spliceAll(lines[j],ms,r.dst).replace(/\s{2,}/g,' ').replace(/\s+$/,'');
+          return {file:sel[i].name,no:j+1,old:lines[j],neu:(neu===''?null:neu)};
+        }
+      }
+    }
+    return null;
+  }
+  function conferir(){
+    if(!lote.length||!selProgs().length) return;
+    lastScan=scanLote();
+    var origin=loteConflicts();
+    var totSwap=0, totIns=0;
+    lastScan.forEach(function(r){ if(r.rule.type==='ins') totIns+=r.total; else totSwap+=r.total; });
+    var totAll=totSwap+totIns;
+    var nSel=selProgs().length;
+    var nHit=selProgs().filter(function(p){ return lastScan.some(function(r){ return r.per.some(function(q){return q.name===p.name&&q.n>0;}); }); }).length;
+    /* v4: o número da decisão abre o modal — antes o total ficava miúdo no rodapé */
+    var html='<div class="note nv4">✦ <b>Mudança v4:</b> o total da decisão agora abre o modal em destaque, e os programas com 0 ocorrência ficam recolhidos numa linha por edição — antes cada edição listava todos os programas e os zeros afogavam o que de fato muda. O rodapé fixo repete o veredito: com conflito no lote, o botão vira <b>"Publicar mesmo assim"</b> (âmbar), para o aviso não sumir rolando a lista. E a contagem agora simula o mesmo encadeamento da publicação — número conferido = número gravado.</div>';
+    html+='<div class="conf-sum'+(totAll===0?' zero':'')+'"><span class="cs-n">'+totAll+'</span>'
+      +'<div class="cs-t">'+(totAll===0
+        ? 'nenhuma alteração encontrada nos programas marcados'
+        : 'alteraç'+(totAll===1?'ão':'ões')+' em <b>'+nHit+' de '+nSel+'</b> programas marcados')
+      +'<div class="cs-sub">'+pubFacts(totSwap,totIns)+' · nada foi gravado ainda</div></div></div>';
+    /* avisos primeiro: conflito e zero-ocorrência */
+    Object.keys(origin).filter(function(k){return origin[k]>1;}).forEach(function(k){
+      html+='<div class="confwarn">▲ Conflito: <b>'+esc(k)+'</b> é alterado por mais de uma edição — revise antes de publicar.</div>';
+    });
+    lastScan.forEach(function(r){
+      if(r.total!==0) return;
+      if(r.rule.type==='ins'){
+        html+='<div class="confwarn">⚠ Bloco sem destino: '+(r.rule.mode==='code'
+          ? 'o código <b>'+esc(r.rule.code)+'</b> não aparece em nenhum programa marcado'
+          : 'nenhum programa marcado recebe a posição')+' — nada será inserido.</div>';
+      } else {
+        html+='<div class="confwarn">⚠ <b>'+esc(r.rule.code)+'</b> não aparece em nenhum programa marcado — esta edição não vai trocar nada.</div>';
+      }
+    });
+    html+=lastScan.map(function(r,i){
+      var idx=('0'+(i+1)).slice(-2);
+      /* edição do tipo "inserir bloco" */
+      if(r.rule.type==='ins'){
+        var nl=r.rule.text.split('\n').length;
+        var anchor=r.rule.mode==='code'?'após '+esc(r.rule.code):'após a linha '+r.rule.line;
+        var fI='➕ bloco · '+nl+' linha'+(nl>1?'s':'')+' <span class="insanchor">'+anchor+'</span>';
+        /* v4: só os programas que recebem o bloco são listados; os demais viram uma linha recolhida */
+        var hitsI=r.per.filter(function(p){return p.n>0;}), zerosI=r.per.length-hitsI.length;
+        var perI=hitsI.map(function(p){
+          return '<div class="confprog"><span class="cf-name">'+esc(p.name)+'</span>'
+            +'<span class="cf-n">insere após a linha '+p.at+'</span></div>';
+        }).join('');
+        if(zerosI) perI+='<div class="confprog zero"><span class="cf-name">+ '+zerosI+' programa'+(zerosI>1?'s':'')
+          +(r.rule.mode==='code'?' sem '+esc(r.rule.code):'')+'</span><span class="cf-n">não recebe'+(zerosI>1?'m':'')+' o bloco</span></div>';
+        var exhI='<div class="confex"><span class="tag">bloco</span><span class="new">'+esc(r.rule.text.split('\n').join('  ⏎  '))+'</span></div>';
+        return '<div class="confcard'+(r.total===0?' zero':'')+'">'
+          +'<div class="conf-h"><span class="ridx">'+idx+'</span><span class="f">'+fI+'</span>'
+          +'<span class="tot">'+(r.total===0?'não insere':'insere em '+r.total+' de '+r.per.length+' programa'+(r.per.length>1?'s':''))+'</span></div>'
+          +perI+exhI+'</div>';
+      }
+      /* edição do tipo "trocar código" */
+      var f = r.rule.dst==='' ? esc(r.rule.code)+' → <span class="rm">remover</span>' : esc(r.rule.code)+' → '+esc(r.rule.dst);
+      /* v4: zeros recolhidos — o olho cai só no que muda */
+      var hits=r.per.filter(function(p){return p.n>0;}), hit=hits.length, zeros=r.per.length-hit;
+      var per=hits.map(function(p){
+        return '<div class="confprog"><span class="cf-name">'+esc(p.name)+'</span>'
+          +'<span class="cf-n">'+p.n+' ocorrência'+(p.n>1?'s':'')+'</span></div>';
+      }).join('');
+      if(zeros) per+='<div class="confprog zero"><span class="cf-name">+ '+zeros+' programa'+(zeros>1?'s':'')+' sem '+esc(r.rule.code)+'</span><span class="cf-n">nada muda</span></div>';
+      var ex=exampleFor(r.rule), exh='';
+      if(ex){
+        var neu = ex.neu===null ? '<span class="new">(linha removida)</span>' : '<span class="new">'+esc(ex.neu)+'</span>';
+        exh='<div class="confex"><span class="tag">exemplo real</span><span class="old">'+esc(ex.old)+'</span><span>→</span>'+neu
+           +'<span class="where">'+esc(ex.file)+' · linha '+ex.no+'</span></div>';
+      }
+      return '<div class="confcard'+(r.total===0?' zero':'')+'">'
+        +'<div class="conf-h"><span class="ridx">'+idx+'</span><span class="f">'+f+'</span>'
+        +'<span class="tot">'+(r.total===0?'0 trocas':r.total+' troca'+(r.total>1?'s':'')+' em '+hit+' programa'+(hit>1?'s':''))+'</span></div>'
+        +per+exh+'</div>';
+    }).join('');
+    html+='<div class="backup-line">🛡 Ao publicar: originais vão para <code>'+esc(backupFolder)+'</code> (versionado por data/hora) '
+        +'· gravação na pasta original com conferência dupla <button class="btn-soft" onclick="changeBackup();conferir()">Mudar pasta</button></div>';
+    $('confBody').innerHTML=html;
+    /* v4: o veredito mora no rodapé FIXO (que não rola) — com conflito, o botão muda de cara
+       ("Publicar mesmo assim", âmbar) para o aviso não sumir na hora exata da decisão */
+    var nConf=Object.keys(origin).filter(function(k){return origin[k]>1;}).length;
+    $('confFacts').innerHTML = totAll===0 ? 'nada a publicar'
+      : (nConf?'<span class="cf-warnfoot">▲ '+nConf+' conflito'+(nConf>1?'s':'')+' no lote</span> · ':'')
+        +'nada foi gravado — “Publicar” aplica e guarda os originais no backup';
+    var pb=$('pubBtn');
+    pb.disabled=(totAll===0);
+    pb.textContent = totAll===0 ? 'Nada a publicar' : (nConf?'Publicar mesmo assim — ':'Publicar — ')+pubFacts(totSwap,totIns);
+    pb.className='mbtn '+(totAll===0?'ghost':(nConf?'warn':'orange'));
+    show('ovConf');
+  }
+  function two(n){return ('0'+n).slice(-2);}
+  function publicar(){
+    if(!lastScan) return;
+    hide('ovConf'); show('ovPub');
+    $('pubH').textContent='Publicando…';
+    $('pubBody').innerHTML='<div class="bigspin"></div>'
+      +'<div class="step act">Backup dos originais → grava na pasta original → conferência SHA-256…</div>'
+      +'<div class="progress"><div class="progress-fill" id="pubFill"></div></div><div class="progress-pct" id="pubPct">0%</div>';
+    var pct=0;
+    var iv=setInterval(function(){
+      pct+=Math.max(6,(100-pct)*0.16); if(pct>100)pct=100;
+      $('pubFill').style.width=pct+'%'; $('pubPct').textContent=Math.round(pct)+'%';
+      if(pct>=100){ clearInterval(iv); setTimeout(finishPub,300); }
+    },180);
+  }
+  function finishPub(){
+    /* aplica de verdade nos arquivos de exemplo (realismo: o editor passa a mostrar o resultado);
+       as regras rodam na ordem do lote — uma troca antes pode mudar a âncora de um bloco depois */
+    var totSwap=0, totIns=0, sel=selProgs();
+    sel.forEach(function(p){
+      var txt=FILES[p.name]||'';
+      lote.forEach(function(r){
+        if(r.type==='ins'){ var t=insertAt(txt,r); if(t.ok){ txt=t.text; totIns++; } }
+        else { var res=applyRule(txt,r.code,r.dst); txt=res.text; totSwap+=res.n; }
+      });
+      FILES[p.name]=txt;
+    });
+    var d=new Date();
+    var when=two(d.getDate())+'/'+two(d.getMonth()+1)+' '+two(d.getHours())+':'+two(d.getMinutes());
+    var stamp=d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate())+'_'+two(d.getHours())+two(d.getMinutes());
+    HIST.unshift({when:when,cfg:activeConfig,edits:lote.length,progs:sel.length,swaps:totSwap,ins:totIns,backup:backupFolder+stamp+'\\'});
+    $('pubH').textContent='Publicado ✓';
+    $('pubBody').innerHTML='<div class="saved-ic">✓</div>'
+      +'<div class="step act">'+pubFacts(totSwap,totIns)+' — gravado em '+sel.length+' programa'+(sel.length===1?'':'s')+' · originais no backup · conferência dupla OK</div>'
+      +'<div class="step mono">backup: '+esc(HIST[0].backup)+'</div>'
+      +'<div class="saved-actions"><button class="mbtn ghost" onclick="hide(\'ovPub\');go(\'historico\')">Ver no Histórico</button> '
+      +'<button class="mbtn save" onclick="novoLote()">OK — novo lote</button></div>';
+    lote=[]; lastScan=null; renderLote();
+    if(currentFile){ edInput.value=FILES[currentFile]||''; renderPlain(); runScan(); }
+  }
+  function novoLote(){ hide('ovPub'); go('lote'); }
+
+  /* ============ HISTÓRICO ============ */
+  var restoreIdx=-1;
+  function renderHist(){
+    var box=$('histlist');
+    if(!HIST.length){
+      box.innerHTML='<div class="empty"><div class="e-ic">🕘</div>'
+        +'<div><div class="e-t1">Nenhuma publicação ainda</div>'
+        +'<div class="e-t2">Cada “Publicar” aparece aqui, com o backup dos originais e a opção de restaurar.</div></div></div>';
+      return;
+    }
+    box.innerHTML=HIST.map(function(h,i){
+      return '<div class="histrow"><span class="hw">'+esc(h.when)+'</span>'
+        +'<span class="hfacts">'+h.edits+' edição'+(h.edits>1?'ões':'')+' · '+pubFacts(h.swaps,h.ins||0)+' em '+h.progs+' programa'+(h.progs>1?'s':'')
+        +' · backup <code>'+esc(h.backup)+'</code></span>'
+        +'<span class="hcfg">'+esc(h.cfg)+'</span>'
+        +'<button class="btn-soft" onclick="openRestore('+i+')">↩ Restaurar originais</button></div>';
+    }).join('');
+  }
+  function openRestore(i){
+    restoreIdx=i;
+    $('rsWhen').textContent=HIST[i].when;
+    $('rsPath').textContent=HIST[i].backup;
+    show('ovRestore');
+  }
+  function restoreConfirm(){
+    hide('ovRestore');
+    toast('Originais de '+HIST[restoreIdx].when+' restaurados (simulação)','ok');
+    restoreIdx=-1;
+  }
+
+  /* ============ BIBLIOTECA (página) ============ */
+  function renderLibrary(){
+    var q=($('libSearch').value||'').toLowerCase();
+    var items=LIB.filter(function(c){ return c[0].toLowerCase().indexOf(q)>=0 || c[1].toLowerCase().indexOf(q)>=0; });
+    $('libCount').textContent=LIB.length+' código'+(LIB.length===1?'':'s')+' cadastrado'+(LIB.length===1?'':'s')+(q?(' · '+items.length+' no filtro'):'');
+    $('libList').innerHTML = items.length ? items.map(function(c){
+      var hasBlk=BLOCKS.some(function(b){return b.name===c[0];});
+      return '<div class="lib-row"><span class="code">'+esc(c[0])+'</span><span class="desc">'+esc(c[1])+'</span>'
+        +(hasBlk?'<span class="blk">bloco</span>':'')
+        +'<button class="filex" data-c="'+esc(c[0])+'" onclick="removeLibCode(this.dataset.c)" title="Remover da biblioteca">✕</button></div>';
+    }).join('') : '<div class="lib-row empty">Nenhum código encontrado.</div>';
+  }
+  function removeLibCode(code){
+    for(var i=0;i<LIB.length;i++){ if(LIB[i][0]===code){ LIB.splice(i,1); break; } }
+    buildLibLists(); renderLibrary(); toast('“'+code+'” removido da biblioteca','warn');
+  }
+  function openAddCode(){
+    $('acCode').value=''; $('acDesc').value=''; $('acBlock').value='';
+    show('ovAddCode'); setTimeout(function(){$('acCode').focus();},50);
+  }
+  function addCodeConfirm(){
+    var c=$('acCode').value.trim(), d=$('acDesc').value.trim(), blk=$('acBlock').value.replace(/\s+$/,'');
+    if(!c){ $('acCode').focus(); return; }
+    if(LIB.some(function(x){return x[0].toLowerCase()===c.toLowerCase();})){
+      toast('“'+c+'” já existe na biblioteca','warn'); $('acCode').focus(); return;
+    }
+    LIB.unshift([c,d||'(sem descrição)']);
+    if(blk) BLOCKS.unshift({name:c,desc:d||c,text:blk});
+    buildLibLists(); renderLibrary(); hide('ovAddCode');
+    toast('Código “'+c+'” adicionado'+(blk?' (com bloco)':''),'ok');
+  }
+
+  /* ============ EDITOR ============ */
+  var currentFile=null, dirty=false;
+  var matches=[], current=-1;
+  var findCode='M8', replCode='M08';
+  var pendingTarget=null, stepMode=false, prevSaved=null;
+
+  function renderStrip(){
+    var box=$('striplist');
+    box.innerHTML=PROGS.map(function(p){
+      var cur=(p.name===currentFile);
+      return '<button class="striprow'+(cur?' cur':'')+'" data-n="'+esc(p.name)+'" onclick="openEditor(this.dataset.n)">'
+        +'<span class="nm">'+esc(p.name)+'</span>'+(cur&&dirty?'<span class="dirty" title="Alteração não salva"></span>':'')+'</button>';
+    }).join('') || '<div class="empty"><div class="e-t2">Adicione programas na tela Lote.</div></div>';
+  }
+  function openFromLote(ev,i){ if(ev)ev.stopPropagation(); go('editor'); openEditor(PROGS[i].name); }
+  function openEditor(fname){
+    if(currentFile===fname) return;
+    if(dirty && currentFile){ pendingTarget=fname; $('switchFrom').textContent=currentFile; show('ovSwitch'); return; }
+    loadFile(fname);
+  }
+  function loadFile(fname){
+    currentFile=fname; $('edFname').textContent=fname;
+    $('edEmpty').classList.add('gone'); $('edWork').classList.remove('gone');
+    edInput.value=FILES[fname]||''; dirty=false; prevSaved=null; stepEnd();
+    renderPlain(); runScan(); updateSaveBtn();
+    edInput.scrollTop=0; syncScroll();
+    renderStrip(); renderProgs();
+  }
+  function applyPending(){
+    var t=pendingTarget; pendingTarget=null; hide('ovSwitch');
+    if(t) loadFile(t);
+  }
+  function cancelSwitch(){ pendingTarget=null; hide('ovSwitch'); }
+  function discardSwitch(){ dirty=false; updateSaveBtn(); applyPending(); }
+  function saveSwitch(){ doSave(false); applyPending(); }
+
+  /* v4: digitar reconta na hora (arquivo NC é pequeno; no app real, com debounce) */
+  function onEdit(){ renderPlain(); markDirty(); runScan(); }
+  function renderPlain(){ edHl.innerHTML=esc(edInput.value); syncGutter(); syncScroll(); }
+  function syncGutter(){
+    var n=edInput.value.split('\n').length, s='';
+    for(var i=1;i<=n;i++) s+=i+(i<n?'\n':'');
+    edGutter.textContent=s;
+  }
+  function syncScroll(){ edHl.scrollTop=edInput.scrollTop; edHl.scrollLeft=edInput.scrollLeft; edGutter.scrollTop=edInput.scrollTop; }
+  function markDirty(){ if(!dirty){ dirty=true; updateSaveBtn(); renderStrip(); } }
+  function updateSaveBtn(){
+    $('edSaveBtn').disabled=!dirty;
+    $('edSaveAsBtn').disabled=(currentFile===null);
+    $('nav-editor').classList.toggle('dot',dirty);
+  }
+
+  /* v4: resetCount() foi aposentada — a varredura roda automática em todo ponto que antes
+     só zerava a contagem (abrir arquivo, digitar, trocar o código do Localizar, desfazer). */
+  function runScan(){
+    if(stepMode) stepEnd();
+    matches=findAll(edInput.value,findCode);
+    current=matches.length?0:-1;
+    paintMatches();
+    $('edCount').classList.toggle('stale',matches.length===0);
+    $('edCount').textContent=matches.length+' encontrado'+(matches.length===1?'':'s');
+    updatePos();
+  }
+  function paintMatches(){
+    var val=edInput.value, html='', last=0;
+    matches.forEach(function(mt,i){
+      html+=esc(val.slice(last,mt.start));
+      html+='<mark class="occ'+(i===current?' current':'')+'">'+esc(val.slice(mt.start,mt.end))+'</mark>';
+      last=mt.end;
+    });
+    html+=esc(val.slice(last));
+    edHl.innerHTML=html; syncScroll();
+  }
+  function updatePos(){ $('edPos').textContent=(matches.length?(current+1):0)+'/'+matches.length; }
+  function nav(dir){
+    if(!matches.length) return;
+    current=(current+dir+matches.length)%matches.length;
+    paintMatches(); updatePos(); scrollToCurrent();
+  }
+  function scrollToCurrent(){
+    var el=edHl.querySelector('.occ.current'); if(!el) return;
+    edInput.scrollTop=Math.max(0,el.offsetTop-(edInput.clientHeight/2)+el.offsetHeight); syncScroll();
+  }
+  function replaceAll(){
+    if(!matches.length){ runScan(); if(!matches.length) return; }
+    edInput.value=spliceAll(edInput.value,matches,replCode);
+    markDirty(); runScan();
+  }
+  function startStep(){
+    if(!matches.length){ runScan(); }
+    if(!matches.length) return;
+    stepMode=true; current=0; paintMatches(); updatePos(); scrollToCurrent();
+    $('stepbar').classList.add('show'); refreshStep();
+  }
+  function refreshStep(){
+    $('stepTxt').innerHTML='Ocorrência '+(current+1)+'/'+matches.length+' — substituir <b>'+esc(findCode)+'</b> → <b>'+esc(replCode)+'</b>?';
+  }
+  function stepReplace(){
+    if(current<0||!matches.length) return;
+    var mt=matches[current];
+    edInput.value=edInput.value.slice(0,mt.start)+replCode+edInput.value.slice(mt.end);
+    markDirty();
+    var keep=current;
+    matches=findAll(edInput.value,findCode);
+    $('edCount').classList.toggle('stale',matches.length===0);
+    $('edCount').textContent=matches.length+' encontrado'+(matches.length===1?'':'s');
+    if(!matches.length){ paintMatches(); updatePos(); stepEnd(); return; }
+    current=Math.min(keep,matches.length-1); paintMatches(); updatePos(); scrollToCurrent(); refreshStep();
+  }
+  function stepSkip(){
+    if(!matches.length){ stepEnd(); return; }
+    current=(current+1)%matches.length; paintMatches(); updatePos(); scrollToCurrent(); refreshStep();
+  }
+  function stepEnd(){ stepMode=false; $('stepbar').classList.remove('show'); }
+
+  /* salvar direto (sem cópia) — com Desfazer no toast */
+  function edSave(){ if(!dirty) return; doSave(true); }
+  function doSave(withToast){
+    prevSaved=FILES[currentFile];
+    FILES[currentFile]=edInput.value;
+    dirty=false; updateSaveBtn(); renderStrip();
+    if(withToast) toast('Salvo em '+currentFile+' — direto na pasta de origem, sem cópia','ok',{label:'Desfazer',fn:undoSave});
+  }
+  function undoSave(){
+    if(prevSaved===null||!currentFile) return;
+    FILES[currentFile]=prevSaved; edInput.value=prevSaved; prevSaved=null;
+    dirty=false; updateSaveBtn(); renderPlain(); runScan(); renderStrip();
+    toast('Salvamento desfeito — arquivo voltou ao conteúdo anterior','warn');
+  }
+
+  /* Salvar como… */
+  function saPick(btn){
+    btn.parentNode.querySelectorAll('.btn-soft').forEach(function(b){b.classList.remove('sel');});
+    btn.classList.add('sel'); saPreviewUpdate();
+  }
+  function saSel(gid){ var el=document.querySelector('#'+gid+' .btn-soft.sel'); return el?el.textContent.trim():''; }
+  function saPreviewUpdate(){
+    var base=currentFile?currentFile.replace(/\.[^.]+$/,''):'arquivo';
+    $('saPreview').textContent=base+saSel('saExt')+' · '+saSel('saEnc')+' · '+saSel('saEol').replace(/ .*$/,'');
+  }
+  function saveAsOpen(){
+    if(currentFile===null) return;
+    $('saFrom').textContent=currentFile; saPreviewUpdate(); show('ovSaveAs');
+  }
+  function saveAsConfirm(){ hide('ovSaveAs'); toast('Cópia salva: '+$('saPreview').textContent,'ok'); }
+
+  /* Inserir bloco */
+  function renderInsBlocks(){
+    var box=$('insBlocks');
+    if(!BLOCKS.length){ box.innerHTML='<span class="ins-chip empty">Nenhum modelo salvo — crie um em “+ Adicionar código” (tela Códigos).</span>'; return; }
+    box.innerHTML=BLOCKS.map(function(b,i){ return '<button class="ins-chip" onclick="useBlock('+i+')" title="'+esc(b.desc)+'">'+esc(b.name)+'</button>'; }).join('');
+  }
+  function useBlock(i){ var b=BLOCKS[i]; if(!b) return; $('insText').value=b.text; insPreview(); }
+  function insOpen(){
+    if(currentFile===null) return;
+    $('insFname').textContent=currentFile;
+    renderInsBlocks(); insPreview(); show('ovInsert');
+  }
+  function insPosMode(){ var r=document.querySelector('input[name="insPos"]:checked'); return r?r.value:'line'; }
+  /* v4 (correção de segurança): no v3, âncora inexistente inseria o bloco SILENCIOSAMENTE no fim
+     do arquivo (e o salvar grava sem cópia). Agora vale a mesma regra do lote: âncora ausente =
+     não insere, com aviso na prévia e botão bloqueado. */
+  function insComputeLines(){
+    var lines=((edInput&&edInput.value)||'').split('\n'), at, ok=true, code='';
+    if(insPosMode()==='line'){
+      var n=parseInt($('insLine').value,10); if(isNaN(n)||n<1)n=1;
+      at=Math.min(n,lines.length);
+    } else {
+      code=$('insCode').dataset.val||'';
+      at=-1;
+      for(var i=0;i<lines.length;i++){ if(findAll(lines[i],code).length){ at=i+1; break; } }
+      if(at<0){ ok=false; at=0; }
+    }
+    return {lines:lines,at:at,ok:ok,code:code};
+  }
+  function insPreview(){
+    var box=$('insPreviewBox');
+    var blk=($('insText').value||'').replace(/\s+$/,'');
+    var info=insComputeLines(), lines=info.lines, at=info.at, btn=$('insOkBtn');
+    if(!blk){ box.textContent='(digite o bloco para ver a prévia)'; btn.disabled=true; return; }
+    if(!info.ok){ box.textContent='O código '+info.code+' não aparece neste arquivo — nada será inserido.'; btn.disabled=true; return; }
+    btn.disabled=false;
+    var out=[];
+    for(var i=Math.max(0,at-2);i<at;i++){ if(lines[i]!==undefined) out.push('   '+(i+1)+'  '+lines[i]); }
+    blk.split('\n').forEach(function(l){ out.push(' + ▶  '+l); });
+    for(var j=at;j<Math.min(lines.length,at+2);j++){ out.push('   '+(j+1)+'  '+lines[j]); }
+    box.textContent=out.join('\n');
+  }
+  function insConfirm(){
+    var blk=($('insText').value||'').replace(/\s+$/,'');
+    if(!blk){ $('insText').focus(); return; }
+    var info=insComputeLines(), lines=info.lines, at=info.at;
+    if(!info.ok) return;
+    edInput.value=lines.slice(0,at).concat(blk.split('\n')).concat(lines.slice(at)).join('\n');
+    markDirty(); renderPlain(); runScan(); hide('ovInsert');
+    toast('Bloco inserido no editor','ok');
+  }
+
+  /* ============ dropdown pesquisável da biblioteca ============ */
+  function buildLibLists(){
+    document.querySelectorAll('.libdrop-list').forEach(function(list){ renderLib(list,''); });
+  }
+  function rowsLib(arr){
+    return arr.map(function(c){
+      return '<button class="libitem" onclick="pickLib(this)" data-code="'+esc(c[0])+'" title="'+esc(c[1])+'"><span class="code">'+esc(c[0])+'</span></button>';
+    }).join('');
+  }
+  function renderLib(list,q){
+    q=(q||'').toLowerCase();
+    var dd=list.closest('.libdrop'), role=dd?dd.dataset.role:'';
+    var head=(role==='dst'&&!q)
+      ? '<button class="libitem remove" onclick="pickLib(this)" data-code="" title="Destino vazio = remover o código"><span class="code">✕ Remover (sem código)</span></button>'
+      : '';
+    if(!q){
+      var freq=LIB.filter(function(c){return FREQ.indexOf(c[0])>=0;});
+      list.innerHTML=head
+        +'<div class="libdrop-hint">★ Frequentes</div>'+rowsLib(freq)
+        +'<div class="libdrop-hint">Todos · '+LIB.length+'</div>'+rowsLib(LIB);
+      return;
+    }
+    var items=LIB.filter(function(c){return c[0].toLowerCase().indexOf(q)>=0||c[1].toLowerCase().indexOf(q)>=0;});
+    list.innerHTML=head+(items.length?rowsLib(items):'<div class="libitem empty">Nenhum código</div>');
+  }
+  function toggleLib(btn){
+    var dd=btn.closest('.libdrop'), wasOpen=dd.classList.contains('open');
+    document.querySelectorAll('.libdrop').forEach(function(d){d.classList.remove('open');});
+    if(!wasOpen){
+      dd.classList.add('open');
+      var s=dd.querySelector('.libdrop-search');
+      if(s){ s.value=''; renderLib(dd.querySelector('.libdrop-list'),''); s.focus(); }
+    }
+  }
+  function filterLib(input){ var dd=input.closest('.libdrop'); renderLib(dd.querySelector('.libdrop-list'),input.value); }
+  function pickLib(item){
+    var dd=item.closest('.libdrop'), code=item.dataset.code, role=dd.dataset.role, desc=item.getAttribute('title')||'';
+    if(role==='src'){ setSrc(code,desc); }
+    else if(role==='dst'){ setDst(code,desc,code===''); }
+    else if(role==='inscode'){ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; insPreview(); }
+    else if(role==='illote'){ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; ilPreview(); }
+    else if(role==='find'){ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; findCode=code; if(currentFile) runScan(); }
+    else{ dd.dataset.val=code; dd.querySelector('.libdrop-btn .code').textContent=code; dd.querySelector('.libdrop-btn').title=desc; replCode=code; if(stepMode)refreshStep(); }
+    dd.classList.remove('open');
+  }
+
+  /* ============ fechar dropdowns/modais ============ */
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.libdrop')) document.querySelectorAll('.libdrop').forEach(function(d){d.classList.remove('open');});
+    if(!e.target.closest('#cfgCtl')) closeCfg();
+    if(e.target.classList&&e.target.classList.contains('overlay')&&e.target.id!=='ovPub'){
+      e.target.classList.remove('show');
+    }
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      if($('ovSwitch').classList.contains('show')){ cancelSwitch(); return; }
+      var open=document.querySelector('.overlay.show'); if(open&&open.id!=='ovPub'){ open.classList.remove('show'); }
+    }
+  });
+
+  /* ============ init ============ */
+  renderProgs();
+  clearComposer();
+  renderLote();
+  renderCfgMenu();
+  reflectBackup();
+  buildLibLists();
+  renderLibrary();
+  renderHist();
+  renderStrip();
+</script>
+</body>
+</html>
