@@ -1,24 +1,21 @@
-# Handoff — FlowNC — 2026-06-10 (sessão 10)
-Status: Mockup `painel-final.v2.html` — 17 itens + **rodada de revisão do Mestre** aplicada. Em revisão interativa.
+# Handoff — FlowNC — 2026-06-10 (sessão 11)
+Status: Redesign proposto — mockup **v3** criado (`mockups/painel-final.v3.html`); v2 intacto. Em revisão do Mestre.
 
->> AÇÃO DA PRÓXIMA SESSÃO: o Mestre continua revisando o protótipo no navegador
->> (`mockups/painel-final.v2.html`, F5 para recarregar — tudo já está salvo no arquivo).
->> Aplicar os ajustes que ele apontar (um a um, no mesmo arquivo). Quando ele aprovar
->> ("é esse"), **portar para o app Python** (FASE 2). Checklist 17 ✅ em `docs/CORRECOES_MOCKUP.md`.
+>> AÇÃO DA PRÓXIMA SESSÃO: Mestre revisa o v3 no navegador (F5 recarrega; anotações 🛈 ligam/desligam no topo).
+>> Aplicar ajustes um a um. Se ele aprovar o v3 como design alvo, atualizar CLAUDE.md/PRD/PLAN
+>> (alvo passa de v2 → v3) ANTES de iniciar o porte ao app Python.
 
 Feito nesta sessão:
-- Implementados os 17 itens (Sprints 1–3) e removidas as 2 variantes — commit `9823745`.
-- Rodada de revisão (pós-commit, neste commit): borda no ✓ desmarcado; "Editar"→"✕ Voltar"
-  na linha do programa aberto + realce; **cabeçalho do app limpo** (config selector + Salvar
-  configuração + Adicionar código movidos para o bloco "1 Configurações"; seletor ao lado do
-  título, sem "Config." redundante); **Biblioteca de Códigos** funcional (lista+busca+remover);
-  Adicionar código limpa/foca/anti-duplicado/feedback; **toasts** de feedback; "+ Adicionar
-  programa(s)" sempre adiciona; **seleção de programa por linha + cor + contadores ao vivo**
-  (Programas/Alterações/escopo/nota "X de Y") + trava Executar sem programa; destino "✕ remover"
-  explícito; fechar modal clicando no fundo; botão "+ Adicionar edição" com estado desabilitado.
+- Diagnóstico UX do v2 (contador "Alterações" inventado; funil duplo de listas; CTA "Executar" que não executa).
+- Mockup v3 do zero (Mestre escolheu liberdade total): rail c/ 4 telas (Lote/Editor/Códigos/Histórico),
+  lista única do lote, "Conferir lote" c/ varredura real (borda CNC M8≠M80) + "Publicar — X trocas",
+  Histórico c/ restaurar backup, editor tela cheia c/ Desfazer pós-salvar, marcar todos, paleta/fontes do v2.
+- Pedido do Mestre: "Inserir bloco" também em LOTE → 2º tipo de edição (âncora por código ou linha,
+  prévia real no 1º programa marcado; conferência/publicação contam "trocas · bloco em N programas").
+- JS validado com node --check a cada rodada.
 
-Onde parou: protótipo refinado; sintaxe JS validada (node --check). Aguardando próxima leva de revisão.
-Próximo passo: aplicar ajustes do Mestre OU, se aprovado, iniciar a portabilidade ao app (FASE 2).
-Blockers: nenhum. Verificação visual é do Mestre (Chrome MCP é Mac-only; screenshot proibido).
-Arquivos tocados: mockups/painel-final.v2.html, HANDOFF.md, LESSONS.md.
-Retomar com: "continuar".
+Onde parou: v3 completo e aberto no navegador; aguardando próxima leva de revisão.
+Próximo passo: ajustes do Mestre no v3 OU decisão v2×v3 como alvo da FASE 2 (porte ao app).
+Blockers: nenhum.
+Arquivos tocados: mockups/painel-final.v3.html (novo), HANDOFF.md.
+Retomar com: "continuar"
