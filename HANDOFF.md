@@ -1,23 +1,26 @@
 # Handoff — FlowNC — 2026-06-12
-Status: Fase 2 em execução — Blocos 1, 2 e 3 concluídos e verdes (16/64 tarefas da change v4).
+Status: Fase 2 — Blocos 1-7 e 10 concluídos e verdes; loop autônomo em execução até o fim do plano + EXE + GitHub.
 
-Feito nesta sessão:
-- **Bloco 1 (fundação visual v4):** `theme.py` paleta "Precisão Laranja" (CTA `#E85D04`, rail/topo
-  `#2B3A4A`) + `render_qss()`; `style.qss` virou template 100% tokenizado (sem hex literal) com
-  `QTabWidget`/`QDialog`.
-- **Bloco 2 (estrutura raiz):** `rail.py` + `top_bar.py` + `screens/` (4 telas); `main_window`
-  reescrito como maestro (topo + rail + `QStackedWidget`) com navegação.
-- **Bloco 3 (painel Programas):** `program_list_v4.py` (lista marcável, chip "N de M", marcar
-  todos, arrastar-e-soltar, estado vazio) integrado na `LoteScreen`.
-- **Limpeza v4 (ordem do Mestre):** v4 é a única versão; componentes/mockups/docs de versões
-  antigas → `_descarte/`; PLAN/HANDOFF/CLAUDE/spec/testes sem rastros. Memória reforçada (não perguntar).
+Feito nesta sessão (loop autônomo):
+- **Bloco 4** (compositor com abas, lote de cartões, conflito âmbar, CTA) — concluído.
+- **Bloco 5** (modal Conferência) — `ui/modals/conferencia_modal.py`; varredura real via novo
+  `ui/lote_scan.py` (encadeia edições por programa, mesmo boundary CNC do core).
+- **Bloco 6** (modal Publicação) — `ui/modals/publicacao_modal.py`; gravação REAL (backup
+  versionado + `core.inplace_save.salvar_no_lugar` por arquivo, SHA-256), não fecha durante o
+  progresso, tela de resultado, encadeado da Conferência.
+- **Bloco 7** (tela Editor) — `ui/screens/editor_screen.py` reusa `editor_panel`; faixa de
+  arquivos, guarda Salvar/Descartar/Cancelar, toast Desfazer, bolinha no rail. (Falta 7.4
+  "Salvar como…".)
+- **Bloco 10** (Histórico) — `ui/screens/historico_screen.py` (lista, vazio, restaurar c/ confirmação).
+- Maestro liga Conferência→Publicação→Histórico, biblioteca→compositor/editor, programas→faixa.
 
-Onde parou: Bloco 3 concluído e verde; tela Lote com Programas à esquerda, navegável.
-Próximo passo: **Bloco 4 — Compositor com abas + Lote de edições + CTA "Conferir lote →"** via
-  `/opsx:apply plano-execucao-mockup-v4`.
-Blockers: nenhum.
-Arquivos tocados: `flownc/ui/{theme.py,style.qss,main_window.py,editor_panel.py}`,
-  `components/{rail,top_bar,program_list_v4}.py`, `screens/*`, `tests/test_ui_smoke.py`;
-  `PLAN.md`, `CLAUDE.md`, `openspec/specs/fundacao-visual/spec.md`, `tasks.md`; moves p/ `_descarte/`.
-Verificação: pytest **142 verde**; mypy 2 (pré-existentes); ruff 7 (pré-existentes).
+Onde parou: 161 testes verdes; ruff limpo; mypy limpo em ui/ exceto overrides Qt de editor_panel.
+Próximo passo (continuar o loop): **Bloco 8** (toolbar 3 grupos + 8.7 Inserir bloco no editor),
+  **7.4** Salvar como…, **Bloco 9** (tela Códigos), **Bloco 11** (topo: receitas/backup),
+  **Bloco 12** (pytest/mypy/ruff + smoke v4 + build EXE PyInstaller + criar repo GitHub `flownc`
+  com textos otimizados p/ IA + commit). EXE é o entregável inegociável.
+Blockers: GitHub — se não houver `gh` autenticado, deixar em pausa e seguir (ordem do Mestre).
+Arquivos novos: `ui/lote_scan.py`, `ui/modals/{__init__,conferencia_modal,publicacao_modal}.py`,
+  `ui/components/compositor_v4.py`, reescritos `ui/screens/{lote_screen,editor_screen,historico_screen}.py`,
+  `ui/main_window.py`, `ui/style.qss`; testes em `tests/test_ui_smoke.py`.
 Retomar com: "continuar"

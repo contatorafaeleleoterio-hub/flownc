@@ -40,67 +40,67 @@
 
 ## 4. Tela Lote · Compositor com abas e Lote de edições
 
-- [ ] 4.1 Criar `flownc/ui/components/compositor_v4.py` (`QTabWidget` 2 abas + botão único "+ Adicionar ao lote")
-- [ ] 4.2 Aba "Trocar código": 2 dropdowns pesquisáveis (busca + "★ Frequentes", só código, descrição no tooltip)
-- [ ] 4.3 Opção "✕ Remover (sem código)" no dropdown de destino (visual vermelho)
-- [ ] 4.4 Habilitar "+ Adicionar ao lote" só com origem E destino preenchidos
-- [ ] 4.5 Aba "➕ Inserir bloco" (textarea, posição com aviso, chips de modelos, prévia do 1º programa marcado)
-- [ ] 4.6 Lista de edições (cartões numerados) na `LoteScreen`
-- [ ] 4.7 Editar/duplicar/excluir do cartão (✎ recarrega na aba certa, ⧉ duplica, ✕ remove e renumera)
-- [ ] 4.8 Detectar conflito (mesma origem): cartão âmbar + chip "⚠ N conflitos"
-- [ ] 4.9 CTA "Conferir lote →" (desabilita sem edição ou sem programa marcado, com tooltip)
+- [x] 4.1 Criar `flownc/ui/components/compositor_v4.py` (`QTabWidget` 2 abas + botão único "+ Adicionar ao lote")
+- [x] 4.2 Aba "Trocar código": 2 dropdowns pesquisáveis (busca + "★ Frequentes", só código, descrição no tooltip)
+- [x] 4.3 Opção "✕ Remover (sem código)" no dropdown de destino (visual vermelho)
+- [x] 4.4 Habilitar "+ Adicionar ao lote" só com origem E destino preenchidos
+- [x] 4.5 Aba "➕ Inserir bloco" (textarea, posição com aviso, chips de modelos, prévia do 1º programa marcado)
+- [x] 4.6 Lista de edições (cartões numerados) na `LoteScreen`
+- [x] 4.7 Editar/duplicar/excluir do cartão (✎ recarrega na aba certa, ⧉ duplica, ✕ remove e renumera)
+- [x] 4.8 Detectar conflito (mesma origem): cartão âmbar + chip "⚠ N conflitos"
+- [x] 4.9 CTA "Conferir lote →" (desabilita sem edição ou sem programa marcado, com tooltip)
 
 ## 5. Modal Conferência
 
-- [ ] 5.1 Criar o pacote `flownc/ui/modals/` (com `__init__.py`) + `conferencia_modal.py` (`QDialog` bloqueante: faixa de total, avisos, cartões, linha de backup, rodapé fixo)
-- [ ] 5.2 Preencher o modal com dados de exemplo (valores fixos na UI)
-- [ ] 5.3 Rodapé conforme estado (laranja sem conflito, âmbar com conflito, desabilitado com total 0)
-- [ ] 5.4 Ligar CTA "Conferir lote →" para abrir o modal
+- [x] 5.1 Criar o pacote `flownc/ui/modals/` (com `__init__.py`) + `conferencia_modal.py` (`QDialog` bloqueante: faixa de total, avisos, cartões, linha de backup, rodapé fixo)
+- [x] 5.2 Preencher o modal com dados de exemplo (valores fixos na UI)
+- [x] 5.3 Rodapé conforme estado (laranja sem conflito, âmbar com conflito, desabilitado com total 0)
+- [x] 5.4 Ligar CTA "Conferir lote →" para abrir o modal
 
 ## 6. Modal Publicação
 
-- [ ] 6.1 Criar `flownc/ui/modals/publicacao_modal.py` (barra de progresso backup→gravação→SHA-256; não fecha durante o progresso)
-- [ ] 6.2 Tela de resultado ("Publicado ✓", caminho do backup, "Ver no Histórico" / "OK — novo lote")
-- [ ] 6.3 "OK — novo lote" limpa a lista de edições da `LoteScreen`
-- [ ] 6.4 "Ver no Histórico" navega à tela Histórico
-- [ ] 6.5 Encadear Conferência → Publicação
+- [x] 6.1 Criar `flownc/ui/modals/publicacao_modal.py` (barra de progresso backup→gravação→SHA-256; não fecha durante o progresso)
+- [x] 6.2 Tela de resultado ("Publicado ✓", caminho do backup, "Ver no Histórico" / "OK — novo lote")
+- [x] 6.3 "OK — novo lote" limpa a lista de edições da `LoteScreen`
+- [x] 6.4 "Ver no Histórico" navega à tela Histórico
+- [x] 6.5 Encadear Conferência → Publicação
 
 ## 7. Tela Editor
 
-- [ ] 7.1 Criar `flownc/ui/screens/editor_screen.py` reaproveitando o `editor_panel` existente (NÃO alterar `core/inplace_save.py` nem `core/file_handler.py`)
-- [ ] 7.2 Faixa de arquivos à esquerda (clicar troca o arquivo aberto)
-- [ ] 7.3 [CRÍTICO] Guarda de alterações ao trocar/sair (Salvar / Descartar / Cancelar)
-- [ ] 7.4 Cabeçalho ("Editando NOME.NC", aviso "⚠ salva direto, sem cópia", botões "Salvar como…" / "Salvar")
-- [ ] 7.5 Toast "Desfazer" após salvar
-- [ ] 7.6 Bolinha de alteração na faixa e no botão Editor do rail
+- [x] 7.1 Criar `flownc/ui/screens/editor_screen.py` reaproveitando o `editor_panel` existente (NÃO alterar `core/inplace_save.py` nem `core/file_handler.py`)
+- [x] 7.2 Faixa de arquivos à esquerda (clicar troca o arquivo aberto)
+- [x] 7.3 [CRÍTICO] Guarda de alterações ao trocar/sair (Salvar / Descartar / Cancelar)
+- [x] 7.4 Cabeçalho ("Editando NOME.NC", aviso "⚠ salva direto, sem cópia", botões "Salvar como…" / "Salvar")
+- [x] 7.5 Toast "Desfazer" após salvar
+- [x] 7.6 Bolinha de alteração na faixa e no botão Editor do rail
 
 ## 8. Toolbar do Editor (3 grupos)
 
-- [ ] 8.1 Toolbar em 3 grupos com separadores (Localizar | Substituir | Inserir bloco)
-- [ ] 8.2 Contagem automática (recalcula ao trocar código, trocar arquivo ou editar o texto)
-- [ ] 8.3 Navegação ↑/↓ circular + realce da ocorrência corrente
-- [ ] 8.4 Realce de todas as ocorrências (`QSyntaxHighlighter`)
-- [ ] 8.5 "Substituir todos"
-- [ ] 8.6 "Um a um" como stepbar inline (sem `QMessageBox`)
-- [ ] 8.7 [CRÍTICO] "➕ Inserir bloco" no editor com proteção de âncora inexistente
+- [x] 8.1 Toolbar em 3 grupos com separadores (Localizar | Substituir | Inserir bloco)
+- [x] 8.2 Contagem automática (recalcula ao trocar código, trocar arquivo ou editar o texto)
+- [x] 8.3 Navegação ↑/↓ circular + realce da ocorrência corrente
+- [x] 8.4 Realce de todas as ocorrências (`QSyntaxHighlighter`)
+- [x] 8.5 "Substituir todos"
+- [x] 8.6 "Um a um" como stepbar inline (sem `QMessageBox`)
+- [x] 8.7 [CRÍTICO] "➕ Inserir bloco" no editor com proteção de âncora inexistente
 
 ## 9. Tela Códigos
 
-- [ ] 9.1 Criar `flownc/ui/screens/codigos_screen.py` (lista código+descrição, busca, contador "N cadastrados")
-- [ ] 9.2 "+ Adicionar código" (com bloco opcional) via `core/library_store.py`
-- [ ] 9.3 Tag "bloco" nos códigos com bloco + expô-los como chips nos inseridores
+- [x] 9.1 Criar `flownc/ui/screens/codigos_screen.py` (lista código+descrição, busca, contador "N cadastrados")
+- [x] 9.2 "+ Adicionar código" (com bloco opcional) via `core/library_store.py`
+- [x] 9.3 Tag "bloco" nos códigos com bloco + expô-los como chips nos inseridores
 
 ## 10. Tela Histórico
 
-- [ ] 10.1 Criar `flownc/ui/screens/historico_screen.py` (lista cronológica reversa: quando/resumo/backup/configuração)
-- [ ] 10.2 Estado vazio (ícone + texto-guia)
-- [ ] 10.3 "↩ Restaurar originais" por linha (confirmação; desabilita se backup não existe). Restauração real = Fase 3 [CRÍTICO lá]
+- [x] 10.1 Criar `flownc/ui/screens/historico_screen.py` (lista cronológica reversa: quando/resumo/backup/configuração)
+- [x] 10.2 Estado vazio (ícone + texto-guia)
+- [x] 10.3 "↩ Restaurar originais" por linha (confirmação; desabilita se backup não existe). Restauração real = Fase 3 [CRÍTICO lá]
 
 ## 11. Topo global (receitas + backup)
 
-- [ ] 11.1 Seleção de receita no combo (lote vazio carrega direto; lote cheio pede confirmação)
-- [ ] 11.2 "💾 Salvar lote atual como…" (diálogo de nome; gravação real via `preset_store` = Fase 3)
-- [ ] 11.3 Chip de backup clicável (`QFileDialog`; atualiza o caminho exibido)
+- [x] 11.1 Seleção de receita no combo (lote vazio carrega direto; lote cheio pede confirmação)
+- [x] 11.2 "💾 Salvar lote atual como…" (diálogo de nome; gravação real via `preset_store` = Fase 3)
+- [x] 11.3 Chip de backup clicável (`QFileDialog`; atualiza o caminho exibido)
 
 ## 12. Verificação da Fase 2
 

@@ -14,7 +14,12 @@ from datetime import datetime
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QDragEnterEvent, QDropEvent, QMouseEvent
+from PySide6.QtGui import (
+    QDragEnterEvent,
+    QDragLeaveEvent,
+    QDropEvent,
+    QMouseEvent,
+)
 from PySide6.QtWidgets import (
     QFileDialog,
     QFrame,
@@ -270,6 +275,9 @@ class ProgramListV4(QWidget):
     def get_marcados(self) -> list[Path]:
         return [r.path for r in self._rows if r.marcado]
 
+    def get_paths(self) -> list[Path]:
+        return list(self._paths)
+
     # ============ interno ============
     def _rebuild_rows(self) -> None:
         for row in self._rows:
@@ -337,7 +345,7 @@ class ProgramListV4(QWidget):
         else:
             event.ignore()
 
-    def dragLeaveEvent(self, event) -> None:  # noqa: N802, ANN001
+    def dragLeaveEvent(self, event: QDragLeaveEvent) -> None:  # noqa: N802
         self.setProperty("dragover", False)
         _repolish(self)
         super().dragLeaveEvent(event)

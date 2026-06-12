@@ -316,6 +316,371 @@ QDialog QFrame[modalFooter="true"] {
     border-top: 1px solid ${COLOR_BORDER};
 }
 
+#ModalHead {
+    background-color: ${COLOR_HEAD};
+    color: ${COLOR_WHITE};
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 20px;
+}
+
+/* Faixa de resumo da Conferência */
+#ConfSum {
+    background-color: ${COLOR_SUCCESS_BG};
+    border: 1px solid ${COLOR_SUCCESS_BORDER};
+    border-radius: 6px;
+}
+
+#ConfSum[zero="true"] {
+    background-color: ${COLOR_WARNING_BG};
+    border: 1px solid ${COLOR_WARNING_BORDER};
+}
+
+#ConfSumN {
+    font-family: ${FONT_MONO};
+    font-size: 24px;
+    font-weight: 700;
+    color: ${COLOR_SUCCESS};
+}
+
+#ConfSum[zero="true"] #ConfSumN {
+    color: ${COLOR_WARNING};
+}
+
+#ConfSumT {
+    font-size: 14px;
+    font-weight: 600;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#ConfSumSub {
+    font-size: 12px;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+#ConfWarn {
+    background-color: ${COLOR_WARNING_BG};
+    color: ${COLOR_WARNING};
+    border: 1px solid ${COLOR_WARNING_BORDER};
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#ConfCard {
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 6px;
+}
+
+#ConfCard[zero="true"] {
+    background-color: ${COLOR_BG_SURFACE};
+}
+
+#ConfFormula {
+    font-family: ${FONT_MONO};
+    font-size: 15px;
+    font-weight: 600;
+    color: ${COLOR_INTERACTIVE};
+}
+
+#ConfTot {
+    font-size: 12px;
+    font-weight: 700;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+#CfName {
+    font-family: ${FONT_MONO};
+    font-size: 13px;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#CfN {
+    font-size: 12px;
+    font-weight: 600;
+    color: ${COLOR_SUCCESS};
+}
+
+#CfNameZero,
+#CfNZero {
+    font-size: 12px;
+    color: ${COLOR_TEXT_TERTIARY};
+}
+
+#ConfTag {
+    background-color: ${COLOR_ACCENT_BG};
+    color: ${COLOR_ACCENT};
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+#ConfExOld {
+    font-family: ${FONT_MONO};
+    font-size: 12px;
+    color: ${COLOR_DANGER};
+}
+
+#ConfExNew {
+    font-family: ${FONT_MONO};
+    font-size: 12px;
+    color: ${COLOR_SUCCESS};
+}
+
+#ConfExWhere {
+    font-size: 11px;
+    color: ${COLOR_TEXT_TERTIARY};
+}
+
+#BackupLine {
+    background-color: ${COLOR_BG_SURFACE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+}
+
+#BackupLineTxt {
+    font-size: 12px;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+#ConfFacts {
+    font-size: 12px;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+/* Botão de publicar (estados: orange / warn / ghost) */
+QPushButton#PubBtn {
+    border: none;
+    border-radius: 4px;
+    min-height: 44px;
+    padding: 0px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: ${COLOR_WHITE};
+    background-color: ${COLOR_CTA};
+}
+
+QPushButton#PubBtn[estado="orange"] {
+    background-color: ${COLOR_CTA};
+    color: ${COLOR_WHITE};
+}
+
+QPushButton#PubBtn[estado="orange"]:hover {
+    background-color: ${COLOR_ACCENT_HV};
+}
+
+QPushButton#PubBtn[estado="warn"] {
+    background-color: ${COLOR_WARNING};
+    color: ${COLOR_WHITE};
+}
+
+QPushButton#PubBtn[estado="ghost"] {
+    background-color: ${COLOR_BTN_DISABLED_BG};
+    color: ${COLOR_BTN_DISABLED_TEXT};
+}
+
+/* Modal de Publicação */
+#PubStep {
+    font-size: 14px;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#PubMono {
+    font-family: ${FONT_MONO};
+    font-size: 12px;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+#SavedIcon {
+    font-size: 40px;
+    color: ${COLOR_SUCCESS};
+    font-weight: 700;
+}
+
+#ErrIcon {
+    font-size: 40px;
+    color: ${COLOR_DANGER};
+}
+
+QProgressBar#PubProgress {
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 6px;
+    background-color: ${COLOR_SPINNER_TRACK};
+    min-height: 12px;
+    max-height: 12px;
+    text-align: center;
+}
+
+QProgressBar#PubProgress::chunk {
+    background-color: ${COLOR_CTA};
+    border-radius: 6px;
+}
+
+/* -----------------------------------------------------------------------
+   Tela Histórico
+   ----------------------------------------------------------------------- */
+#HistRow {
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+}
+
+#HistWhen {
+    font-size: 13px;
+    font-weight: 700;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#HistFacts {
+    font-size: 12px;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+#HistCfg {
+    background-color: ${COLOR_INTERACTIVE_BG};
+    color: ${COLOR_INTERACTIVE};
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* -----------------------------------------------------------------------
+   Tela Editor (faixa de arquivos + cabeçalho + toast)
+   ----------------------------------------------------------------------- */
+#EdStrip {
+    background-color: ${COLOR_PANEL_LEFT};
+    border-radius: 6px;
+}
+
+#StripRow {
+    background-color: ${COLOR_WHITE};
+    border-radius: 4px;
+    border-left: 3px solid transparent;
+}
+
+#StripRow:hover {
+    border: 1px solid ${COLOR_BORDER_STRONG};
+}
+
+#StripRow[ativo="true"] {
+    background-color: ${COLOR_INTERACTIVE_BG};
+    border-left: 3px solid ${COLOR_ACCENT};
+}
+
+#StripName {
+    font-family: ${FONT_MONO};
+    font-size: 13px;
+    font-weight: 600;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#StripDot {
+    color: ${COLOR_ACCENT};
+    font-size: 12px;
+}
+
+#EdFileName {
+    font-family: ${FONT_MONO};
+    font-size: 15px;
+    font-weight: 700;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#EdNoBackup {
+    color: ${COLOR_WARNING};
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#EdToastBtn {
+    background-color: transparent;
+    color: ${COLOR_CTA_TEXT};
+    border: 1px solid ${COLOR_CTA_TEXT_SOFT};
+    border-radius: 4px;
+    min-height: 28px;
+    padding: 0px 12px;
+    font-weight: 700;
+}
+
+#EdToast {
+    background-color: ${COLOR_HEAD};
+    border-radius: 6px;
+}
+
+#EdToastMsg {
+    color: ${COLOR_WHITE};
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#StepBar {
+    background-color: ${COLOR_ACCENT_BG};
+    border: 1px solid ${COLOR_ACCENT_BORDER};
+    border-radius: 4px;
+}
+
+#EdGroup {
+    color: ${COLOR_TEXT_SECONDARY};
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#EdSep {
+    background-color: ${COLOR_BORDER};
+}
+
+QPushButton#EdInsertBtn {
+    background-color: ${COLOR_ACCENT_BG};
+    color: ${COLOR_ACCENT};
+    border: 1px solid ${COLOR_ACCENT_BORDER};
+    border-radius: 4px;
+    min-height: 32px;
+    padding: 0px 12px;
+    font-weight: 600;
+}
+
+QPushButton#EdInsertBtn:hover {
+    background-color: ${COLOR_ACCENT};
+    color: ${COLOR_WHITE};
+}
+
+/* -----------------------------------------------------------------------
+   Tela Códigos (biblioteca)
+   ----------------------------------------------------------------------- */
+#LibRow {
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+}
+
+#LibCode {
+    font-family: ${FONT_MONO};
+    font-size: 14px;
+    font-weight: 700;
+    color: ${COLOR_INTERACTIVE};
+}
+
+#LibDesc {
+    font-size: 13px;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+#LibBlk {
+    background-color: ${COLOR_ACCENT_BG};
+    color: ${COLOR_ACCENT};
+    border: 1px solid ${COLOR_ACCENT_BORDER};
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
 /* -----------------------------------------------------------------------
    Rail — barra lateral escura com os 4 botões-lugar (RailWidget)
    ----------------------------------------------------------------------- */
@@ -592,4 +957,344 @@ QPushButton#EmptyCTA {
 
 QPushButton#EmptyCTA:hover {
     background-color: ${COLOR_INTERACTIVE_HV};
+}
+
+/* -----------------------------------------------------------------------
+   Tela Lote · Compositor com abas (compositor_v4)
+   ----------------------------------------------------------------------- */
+#LabelCaps {
+    color: ${COLOR_TEXT_SECONDARY};
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Dropdown pesquisável da biblioteca (LibDropdown) */
+QPushButton#LibDropBtn {
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+    padding: 0px;
+    text-align: left;
+}
+
+QPushButton#LibDropBtn:hover {
+    border-color: ${COLOR_BORDER_STRONG};
+}
+
+#LibDropCode {
+    font-family: ${FONT_MONO};
+    font-size: 16px;
+    font-weight: 600;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#LibDropCode[empty="true"] {
+    font-family: ${FONT_SANS};
+    font-size: 14px;
+    font-weight: 400;
+    color: ${COLOR_TEXT_TERTIARY};
+}
+
+#LibDropCode[remove="true"] {
+    font-family: ${FONT_SANS};
+    font-size: 14px;
+    font-weight: 600;
+    color: ${COLOR_DANGER};
+}
+
+#LibDropCaret {
+    color: ${COLOR_TEXT_SECONDARY};
+    font-size: 12px;
+}
+
+#LibPop {
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER_STRONG};
+    border-radius: 6px;
+}
+
+QLineEdit#LibSearch {
+    min-height: 32px;
+    font-size: 13px;
+}
+
+#LibHint {
+    color: ${COLOR_TEXT_TERTIARY};
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px;
+}
+
+QPushButton#LibItem {
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 8px;
+    min-height: 24px;
+    text-align: left;
+    font-family: ${FONT_MONO};
+    font-size: 14px;
+    font-weight: 600;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+QPushButton#LibItem:hover {
+    background-color: ${COLOR_INTERACTIVE_BG};
+}
+
+QPushButton#LibItem[remove="true"] {
+    font-family: ${FONT_SANS};
+    font-weight: 600;
+    color: ${COLOR_DANGER};
+}
+
+QPushButton#LibItem[remove="true"]:hover {
+    background-color: ${COLOR_DANGER_BG};
+}
+
+/* Botão único "+ Adicionar ao lote" */
+QPushButton#CompAddBtn {
+    background-color: ${COLOR_INTERACTIVE};
+    color: ${COLOR_WHITE};
+    border: none;
+    border-radius: 4px;
+    min-height: 44px;
+    padding: 0px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton#CompAddBtn:hover {
+    background-color: ${COLOR_INTERACTIVE_HV};
+}
+
+QPushButton#CompAddBtn:disabled {
+    background-color: ${COLOR_DISABLED_BG};
+    color: ${COLOR_BTN_DISABLED_TEXT};
+}
+
+/* Aba "➕ Inserir bloco" */
+QPlainTextEdit#InsText {
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_TEXT_PRIMARY};
+    border: 1px solid ${COLOR_BORDER_STRONG};
+    border-radius: 4px;
+    padding: 8px;
+    font-family: ${FONT_MONO};
+    font-size: 12px;
+}
+
+QPlainTextEdit#InsText:focus {
+    border-color: ${COLOR_ACCENT};
+}
+
+QRadioButton {
+    color: ${COLOR_TEXT_PRIMARY};
+    font-size: 13px;
+    spacing: 8px;
+}
+
+QRadioButton::indicator {
+    width: 14px;
+    height: 14px;
+    border: 1px solid ${COLOR_BORDER_STRONG};
+    border-radius: 8px;
+    background-color: ${COLOR_WHITE};
+}
+
+QRadioButton::indicator:checked {
+    background-color: ${COLOR_INTERACTIVE};
+    border: 2px solid ${COLOR_WHITE};
+}
+
+QSpinBox#InsLineNum {
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+    min-height: 28px;
+    min-width: 64px;
+    padding: 0px 8px;
+    font-size: 13px;
+}
+
+#InsWarnLine {
+    color: ${COLOR_WARNING};
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#InsChip {
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_INTERACTIVE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+    min-height: 32px;
+    padding: 0px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#InsChip:hover {
+    background-color: ${COLOR_INTERACTIVE_BG};
+}
+
+#InsChipEmpty {
+    color: ${COLOR_TEXT_TERTIARY};
+    font-size: 12px;
+}
+
+#PreviewBox {
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+    background-color: ${COLOR_WHITE};
+}
+
+#PvHead {
+    color: ${COLOR_TEXT_TERTIARY};
+    background-color: ${COLOR_PANEL_LEFT};
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 8px 12px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+#InsPreview {
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_TEXT_PRIMARY};
+    font-family: ${FONT_MONO};
+    font-size: 12px;
+    padding: 12px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* -----------------------------------------------------------------------
+   Tela Lote · Lote de edições (cartões + chip + CTA)
+   ----------------------------------------------------------------------- */
+#LoteChip {
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#LoteChip[estado="mut"] {
+    color: ${COLOR_TEXT_SECONDARY};
+    background-color: ${COLOR_BG_RAIL};
+}
+
+#LoteChip[estado="ok"] {
+    color: ${COLOR_SUCCESS};
+    background-color: ${COLOR_SUCCESS_BG};
+}
+
+#LoteChip[estado="warn"] {
+    color: ${COLOR_WARNING};
+    background-color: ${COLOR_WARNING_BG};
+}
+
+#RCard {
+    background-color: ${COLOR_WHITE};
+    border-radius: 4px;
+    border-left: 3px solid transparent;
+}
+
+#RCard[warn="true"] {
+    background-color: ${COLOR_WARNING_BG};
+    border-left: 3px solid ${COLOR_WARNING};
+}
+
+#RCard[flash="true"] {
+    background-color: ${COLOR_ACCENT_BG};
+    border-left: 3px solid ${COLOR_ACCENT};
+}
+
+#RIdx {
+    font-family: ${FONT_MONO};
+    font-size: 12px;
+    font-weight: 600;
+    color: ${COLOR_TEXT_TERTIARY};
+}
+
+#RFormula {
+    font-family: ${FONT_MONO};
+    font-size: 16px;
+    font-weight: 600;
+    color: ${COLOR_INTERACTIVE};
+}
+
+QPushButton#RcAct,
+QPushButton#RcActDel {
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    color: ${COLOR_TEXT_SECONDARY};
+}
+
+QPushButton#RcAct:hover {
+    background-color: ${COLOR_INTERACTIVE_BG};
+    color: ${COLOR_INTERACTIVE};
+}
+
+QPushButton#RcActDel {
+    color: ${COLOR_DANGER};
+    font-weight: 700;
+}
+
+QPushButton#RcActDel:hover {
+    background-color: ${COLOR_DANGER_BG};
+}
+
+#RcConflict {
+    color: ${COLOR_WARNING};
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#LoteFacts {
+    color: ${COLOR_TEXT_SECONDARY};
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* CTA "Conferir lote →" (laranja, 2 linhas) */
+QPushButton#CtaConf {
+    background-color: ${COLOR_CTA};
+    border: none;
+    border-radius: 6px;
+}
+
+QPushButton#CtaConf:hover {
+    background-color: ${COLOR_ACCENT_HV};
+}
+
+QPushButton#CtaConf:pressed {
+    background-color: ${COLOR_ACCENT_ACTIVE};
+}
+
+QPushButton#CtaConf:disabled {
+    background-color: ${COLOR_BTN_DISABLED_BG};
+}
+
+#CtaBig {
+    color: ${COLOR_CTA_TEXT};
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+#CtaSmall {
+    color: ${COLOR_CTA_TEXT_SOFT};
+    font-size: 11px;
+    font-weight: 600;
+}
+
+#CtaBig[off="true"],
+#CtaSmall[off="true"] {
+    color: ${COLOR_BTN_DISABLED_TEXT};
 }

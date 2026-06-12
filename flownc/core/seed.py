@@ -47,7 +47,6 @@ def ensure_seed() -> None:
     Idempotente: se data/ ja tiver conteudo valido, nao toca em nada.
     """
     src_root = app_paths.data_default_dir()
-    dst_root = app_paths.base_dir() / "data"
 
     if not src_root.exists():
         log.warning("seed: data_default/ nao encontrado em %s — sem semente", src_root)

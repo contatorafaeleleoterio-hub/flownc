@@ -163,3 +163,340 @@ def test_lote_screen_integra_program_list(win: MainWindow) -> None:
     lote = win._stack.widget(TELA_LOTE)
     assert isinstance(lote, LoteScreen)
     assert isinstance(lote.program_list, ProgramListV4)
+
+
+# ============ tela Lote · compositor com abas (Bloco 4) ============
+
+
+def test_compositor_tem_duas_abas_e_botao_unico(app: QApplication) -> None:
+    """Compositor: 2 abas + 1 botão "Adicionar ao lote" desabilitado de início."""
+    from ui.components.compositor_v4 import CompositorV4
+
+    c = CompositorV4()
+    assert c.tabs.count() == 2
+    assert c.tabs.tabText(0) == "Trocar código"
+    assert not c.btn_add.isEnabled()  # sem campos preenchidos
+
+
+def test_compositor_swap_habilita_so_com_origem_e_destino(app: QApplication) -> None:
+    from ui.components.compositor_v4 import CompositorV4
+
+    c = CompositorV4()
+    c.drop_origem.set_value("M8")
+    assert not c.btn_add.isEnabled()  # falta destino
+    c.drop_destino.set_value("M08")
+    assert c.btn_add.isEnabled()
+
+
+def test_compositor_remover_explicito_habilita(app: QApplication) -> None:
+    from ui.components.compositor_v4 import CompositorV4
+
+    c = CompositorV4()
+    c.drop_origem.set_value("M9")
+    c.drop_destino.set_value("", remover=True)
+    assert c.drop_destino.is_remove()
+    assert c.btn_add.isEnabled()
+
+
+def test_compositor_emite_edicao_e_limpa(app: QApplication) -> None:
+    from ui.components.compositor_v4 import CompositorV4, Edicao
+
+    c = CompositorV4()
+    recebidas: list[Edicao] = []
+    c.adicionar.connect(recebidas.append)
+    c.drop_origem.set_value("M8")
+    c.drop_destino.set_value("M08")
+    c._emit_add()
+    assert len(recebidas) == 1
+    assert recebidas[0].tipo == "swap"
+    assert (recebidas[0].origem, recebidas[0].destino) == ("M8", "M08")
+    assert c.drop_origem.value() == ""  # compositor limpa após adicionar
+
+
+def test_compositor_aba_inserir_exige_texto(app: QApplication) -> None:
+    from ui.components.compositor_v4 import CompositorV4
+
+    c = CompositorV4()
+    c.tabs.setCurrentIndex(1)
+    assert not c.btn_add.isEnabled()  # textarea vazia
+    c.ins_texto.setPlainText("G68 R90.\nG54")
+    assert c.btn_add.isEnabled()  # texto + âncora G54 (padrão)
+
+
+def test_lote_screen_adicionar_cria_cartao(app: QApplication) -> None:
+    from ui.components.compositor_v4 import Edicao
+
+    lote = LoteScreen()
+    lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M08"))
+    assert len(lote._cards) == 1
+    assert len(lote.get_edicoes()) == 1
+    assert lote._chip.text() == "1 edição"
+
+
+def test_lote_screen_conflito_mesma_origem(app: QApplication) -> None:
+    from ui.components.compositor_v4 import Edicao
+
+    lote = LoteScreen()
+    lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M08"))
+    lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M09"))
+    assert lote._chip.text() == "⚠ 1 conflito"
+    assert lote._chip.property("estado") == "warn"
+    assert lote._cards[0].property("warn") is True
+    assert lote._cards[1].property("warn") is True
+
+
+def test_lote_screen_excluir_renumera(app: QApplication) -> None:
+    from ui.components.compositor_v4 import Edicao
+
+    lote = LoteScreen()
+    lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M08"))
+    lote._on_adicionar(Edicao(tipo="swap", origem="G54", destino="G55"))
+    lote._on_excluir(0)
+    assert len(lote._cards) == 1
+    assert lote.get_edicoes()[0].origem == "G54"
+
+
+def test_lote_screen_duplicar_preserva_tipo(app: QApplication) -> None:
+    from ui.components.compositor_v4 import Edicao
+
+    lote = LoteScreen()
+    lote._on_adicionar(Edicao(tipo="ins", texto="G54", modo="code", codigo="G54"))
+    lote._on_duplicar(0)
+    assert len(lote.get_edicoes()) == 2
+    assert all(e.tipo == "ins" for e in lote.get_edicoes())
+
+
+def test_lote_screen_cta_regra_habilitacao(app: QApplication, tmp_path) -> None:
+    from ui.components.compositor_v4 import Edicao
+
+    lote = LoteScreen()
+    assert not lote._cta.isEnabled()  # sem edição nem programa
+    lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M08"))
+    assert not lote._cta.isEnabled()  # tem edição, falta programa marcado
+    p = tmp_path / "O1.nc"
+    p.write_text("M8\n", encoding="utf-8")
+    lote.program_list.set_programs([p])
+    lote.program_list._rows[0].toggled.emit()
+    assert lote._cta.isEnabled()  # edição + programa marcado
+
+
+def test_lote_screen_cta_emite_conferir(app: QApplication, tmp_path) -> None:
+    from ui.components.compositor_v4 import Edicao
+
+    lote = LoteScreen()
+    disparos: list[bool] = []
+    lote.conferir_solicitado.connect(lambda: disparos.append(True))
+    lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M08"))
+    p = tmp_path / "O1.nc"
+    p.write_text("M8\n", encoding="utf-8")
+    lote.program_list.set_programs([p])
+    lote.program_list._rows[0].toggled.emit()
+    lote._cta.click()
+    assert disparos == [True]
+
+
+# ============ varredura do lote + modais (Blocos 5/6) ============
+
+
+def test_scan_lote_encadeia_e_conta(app: QApplication, tmp_path) -> None:
+    from ui.components.compositor_v4 import Edicao
+    from ui.lote_scan import scan_lote
+    from ui.modals.conferencia_modal import programas_texto
+
+    p1 = tmp_path / "O1.NC"
+    p1.write_text("N10 G54\nN20 M8\nN30 M8\nN40 M30\n", encoding="utf-8")
+    p2 = tmp_path / "O2.NC"
+    p2.write_text("N10 G55\nN20 M9\nN30 M30\n", encoding="utf-8")
+    edic = [
+        Edicao(tipo="swap", origem="M8", destino="M08"),
+        Edicao(tipo="ins", texto="G68 R90.", modo="code", codigo="G54"),
+    ]
+    scan = scan_lote(edic, programas_texto([p1, p2]))
+    assert scan.total_trocas == 2
+    assert scan.programas_com_bloco == 1
+    assert scan.programas_afetados() == 1  # só O1 muda
+    assert scan.sem_efeito() == []
+
+
+def test_conferencia_modal_botao_por_estado(app: QApplication, tmp_path) -> None:
+    from ui.components.compositor_v4 import Edicao
+    from ui.modals.conferencia_modal import ConferenciaModal, programas_texto
+
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 M8\nN20 M8\n", encoding="utf-8")
+    edic = [Edicao(tipo="swap", origem="M8", destino="M08")]
+    modal = ConferenciaModal(edic, programas_texto([p]), "D:\\bk\\")
+    assert modal._btn_pub.isEnabled()
+    assert "Publicar — 2 trocas" in modal._btn_pub.text()
+
+
+def test_conferencia_modal_total_zero_desabilita(app: QApplication, tmp_path) -> None:
+    from ui.components.compositor_v4 import Edicao
+    from ui.modals.conferencia_modal import ConferenciaModal, programas_texto
+
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 G54\n", encoding="utf-8")
+    edic = [Edicao(tipo="swap", origem="M8", destino="M08")]  # M8 não existe
+    modal = ConferenciaModal(edic, programas_texto([p]), "D:\\bk\\")
+    assert not modal._btn_pub.isEnabled()
+    assert modal._btn_pub.text() == "Nada a publicar"
+
+
+def test_publicacao_modal_grava_e_faz_backup(app: QApplication, tmp_path) -> None:
+    from ui.components.compositor_v4 import Edicao
+    from ui.lote_scan import scan_lote
+    from ui.modals.conferencia_modal import programas_texto
+    from ui.modals.publicacao_modal import PublicacaoModal
+
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 M8\nN20 M8\n", encoding="utf-8")
+    bk = tmp_path / "backup"
+    bk.mkdir()
+    edic = [Edicao(tipo="swap", origem="M8", destino="M08")]
+    scan = scan_lote(edic, programas_texto([p]))
+    modal = PublicacaoModal(scan, edic, [p], str(bk) + "\\", "cfg")
+    entrada, erros = modal._publicar()
+    assert erros == []
+    assert entrada is not None
+    assert entrada.trocas == 2
+    assert entrada.programas == 1
+    assert "M08" in p.read_text(encoding="utf-8")
+    assert "M8\n" not in p.read_text(encoding="utf-8")
+    # backup versionado preservou o original
+    backups = list(bk.glob("_backup_orig_*/O1.NC"))
+    assert len(backups) == 1
+    assert backups[0].read_text(encoding="utf-8") == "N10 M8\nN20 M8\n"
+
+
+def test_historico_screen_estado_vazio_e_linhas(app: QApplication) -> None:
+    from ui.modals.publicacao_modal import PublicacaoEntrada
+    from ui.screens import HistoricoScreen
+
+    h = HistoricoScreen()
+    assert not h._empty.isHidden()
+    h.set_historico([PublicacaoEntrada("12/06 10:00", "fanuc", 2, 3, 2, 1, "D:\\bk\\")])
+    assert len(h._rows) == 1
+    assert h._empty.isHidden()
+
+
+# ============ tela Editor (Bloco 7) ============
+
+
+def test_editor_screen_abre_arquivo(app: QApplication, tmp_path) -> None:
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 G54\nN20 M8\n", encoding="utf-8")
+    ed = EditorScreen()
+    ed.set_programs([p])
+    assert len(ed._rows) == 1
+    ed.abrir(p)
+    assert ed._atual == p
+    assert not ed.panel.isHidden()
+    assert ed._empty.isHidden()
+
+
+def test_editor_screen_dirty_emite_sinal(app: QApplication, tmp_path) -> None:
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 M8\n", encoding="utf-8")
+    ed = EditorScreen()
+    estados: list[bool] = []
+    ed.dirty_changed.connect(estados.append)
+    ed.abrir(p)
+    ed.panel.editor.setPlainText("N10 M08\n")
+    assert ed.tem_alteracao()
+    assert estados and estados[-1] is True
+
+
+def test_editor_screen_toast_desfazer_restaura(app: QApplication, tmp_path) -> None:
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 M8\n", encoding="utf-8")
+    ed = EditorScreen()
+    ed.abrir(p)
+    ed.panel.editor.setPlainText("N10 M08\n")
+    assert ed.panel.salvar() is True
+    assert "M08" in p.read_text(encoding="utf-8")
+    ed._on_desfazer()  # restaura o conteúdo anterior ao save no buffer
+    assert ed.panel.editor.toPlainText() == "N10 M8\n"
+
+
+# ============ tela Códigos (Bloco 9) ============
+
+
+def test_codigos_screen_adiciona_e_filtra(app: QApplication, tmp_path, monkeypatch) -> None:
+    import app_paths
+    from core.library_store import CodeEntry
+    from ui.screens import CodigosScreen
+
+    monkeypatch.setattr(app_paths, "library_path", lambda: tmp_path / "library.json")
+    cs = CodigosScreen()
+    cs.set_library([CodeEntry(find="G54", replace="", label="Origem 1")])
+    assert len(cs._rows) == 1
+    cs._busca.setText("zzz")
+    assert len(cs._rows) == 0
+    cs._busca.setText("")
+    assert len(cs._rows) == 1
+
+
+def test_codigos_screen_modelos_de_bloco(app: QApplication, tmp_path, monkeypatch) -> None:
+    import app_paths
+    from core.library_store import CodeEntry
+    from ui.screens import CodigosScreen
+    from ui.screens.codigos_screen import TAG_BLOCO
+
+    monkeypatch.setattr(app_paths, "library_path", lambda: tmp_path / "library.json")
+    cs = CodigosScreen()
+    cs.set_library([
+        CodeEntry(find="G54", replace="", label="Origem 1"),
+        CodeEntry(find="REFRIG", replace="M8\nG43 H01", label="Liga refrig", tags=[TAG_BLOCO]),
+    ])
+    modelos = cs.get_modelos()
+    assert modelos == [("REFRIG", "Liga refrig", "M8\nG43 H01")]
+
+
+# ============ topo · receitas (Bloco 11) ============
+
+
+def test_topo_carrega_receita_em_edicoes(win: MainWindow, tmp_path) -> None:
+    from core.models import Preset, Rule
+    from core.preset_store import save_preset
+
+    p = tmp_path / "fanuc.json"
+    save_preset(Preset(machine="fanuc", global_rules=[
+        Rule(id="r1", find="M8", replace="M08"),
+        Rule(id="r2", find="G54", replace=""),
+    ]), p)
+    win._preset_paths["fanuc"] = str(p)
+    win._on_receita_alterada("fanuc")
+    eds = win._lote.get_edicoes()
+    assert len(eds) == 2
+    assert (eds[0].origem, eds[0].destino) == ("M8", "M08")
+    assert eds[1].origem == "G54" and eds[1].remover is True
+
+
+# ============ editor · inserir bloco (Bloco 8.7) ============
+
+
+def test_editor_ponto_insercao_ancora() -> None:
+    from ui.editor_panel import ponto_insercao
+
+    texto = "N10 G54\nN20 M8\nN30 M30\n"
+    assert ponto_insercao(texto, "code", "G54", 1) == 1  # abaixo da linha do G54
+    assert ponto_insercao(texto, "code", "G99", 1) == -1  # âncora ausente
+    assert ponto_insercao(texto, "line", "", 2) == 2
+
+
+def test_editor_inserir_bloco_dialog_bloqueia_ancora_ausente(app: QApplication) -> None:
+    from core.library_store import CodeEntry
+    from ui.editor_panel import _InserirBlocoDialog
+
+    texto = "N10 G54\nN20 M8\n"
+    dlg = _InserirBlocoDialog(texto, [CodeEntry(find="G54", replace="", label="Origem")])
+    dlg.ed_block.setPlainText("G68 R90.")
+    dlg.cb_code.setCurrentText("G99")  # não existe no arquivo
+    dlg._atualizar_previa()
+    assert not dlg.btn_inserir.isEnabled()
+    dlg.cb_code.setCurrentText("G54")  # existe
+    dlg._atualizar_previa()
+    assert dlg.btn_inserir.isEnabled()
+    novo, at = dlg.resultado()
+    assert at == 1
+    assert novo.split("\n")[1] == "G68 R90."

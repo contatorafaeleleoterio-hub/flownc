@@ -1,6 +1,5 @@
 """Testes do settings_store (Sessao C)."""
 import json
-from pathlib import Path
 
 import pytest
 

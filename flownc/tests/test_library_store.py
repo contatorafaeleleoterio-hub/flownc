@@ -1,6 +1,5 @@
 """Testes do library_store (Sessao A)."""
 import json
-from pathlib import Path
 
 import pytest
 

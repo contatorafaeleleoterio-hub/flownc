@@ -1,6 +1,5 @@
 """Testes do CRUD de presets (Sessao B)."""
 import pytest
-from pathlib import Path
 
 from core.preset_store import (
     PresetError,
@@ -21,7 +20,7 @@ def test_create_cria_arquivo(tmp_path):
 
 def test_create_com_template_copia_regras(tmp_path):
     src = create_preset("ORIGEM", tmp_path)
-    from core.models import Mode, OnZeroMatches, Rule, Scope
+    from core.models import Mode, Rule, Scope
     import uuid
     preset = load_preset(src)
     preset.global_rules.append(

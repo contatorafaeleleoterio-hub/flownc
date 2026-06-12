@@ -23,12 +23,18 @@ from PySide6.QtGui import (
     QTextDocument,
 )
 from PySide6.QtWidgets import (
+    QButtonGroup,
     QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QFrame,
     QHBoxLayout,
     QLabel,
     QMessageBox,
     QPlainTextEdit,
     QPushButton,
+    QRadioButton,
+    QSpinBox,
     QVBoxLayout,
     QWidget,
 )
@@ -36,11 +42,27 @@ from PySide6.QtWidgets import (
 from core.file_handler import read_file
 from core.inplace_save import salvar_no_lugar
 from core.library_store import CodeEntry
-from core.matcher import find_matches
+from core.matcher import find_matches, find_spans
 from core.models import EncodingInfo, Mode, Rule
 from ui.components.code_combo import CodeCombo
 
 _MAX_LINES_HIGHLIGHT = 5000
+
+
+def ponto_insercao(texto: str, modo: str, codigo: str, linha: int) -> int:
+    """Índice da linha onde o bloco entraria; -1 se a âncora (código) não existe.
+
+    Função pura (testável sem GUI). Espelha a inserção do compositor do Lote, com
+    o mesmo boundary CNC: o bloco entra logo ABAIXO da 1ª ocorrência do código
+    (modo 'code') ou abaixo da linha Nº informada (modo 'line').
+    """
+    linhas = texto.split("\n")
+    if modo == "code":
+        for i, ln in enumerate(linhas):
+            if find_spans(ln, codigo, Mode.AUTO):
+                return i + 1
+        return -1
+    return min(max(1, linha), len(linhas))
 
 # ============ logica pura (testavel sem GUI) ============
 
@@ -241,6 +263,153 @@ class _StepBar(QWidget):
         self.hide()
 
 
+# ============ diálogo "Inserir bloco" do editor ============
+
+
+class _InserirBlocoDialog(QDialog):
+    """Insere um bloco no buffer do editor, com prévia e proteção de âncora.
+
+    Se o código-âncora não existir no arquivo aberto, a prévia avisa "não aparece
+    neste arquivo — nada será inserido" e o botão Inserir fica bloqueado.
+    """
+
+    def __init__(
+        self,
+        texto: str,
+        library: list[CodeEntry],
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("Inserir bloco de linhas")
+        self.setModal(True)
+        self.setMinimumWidth(460)
+        self._texto = texto
+        self._library = library
+        self._modelos = [
+            (e.find, e.label or e.find, e.replace)
+            for e in library if "bloco" in e.tags and e.replace
+        ]
+        self._build()
+        self._atualizar_previa()
+
+    def _build(self) -> None:
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(20, 20, 20, 20)
+        lay.setSpacing(12)
+
+        if self._modelos:
+            chips = QHBoxLayout()
+            chips.setSpacing(8)
+            for nome, desc, txt in self._modelos:
+                chip = QPushButton(nome)
+                chip.setObjectName("InsChip")
+                chip.setToolTip(desc)
+                chip.clicked.connect(lambda _=False, t=txt: self.ed_block.setPlainText(t))
+                chips.addWidget(chip)
+            chips.addStretch(1)
+            lay.addLayout(chips)
+
+        self.ed_block = QPlainTextEdit()
+        self.ed_block.setObjectName("InsText")
+        self.ed_block.setPlaceholderText("ex.:\nG68 R90.\nG54")
+        self.ed_block.setFixedHeight(96)
+        self.ed_block.textChanged.connect(self._atualizar_previa)
+        lay.addWidget(self.ed_block)
+
+        self._grupo = QButtonGroup(self)
+        l1 = QHBoxLayout()
+        self.rad_code = QRadioButton("Abaixo da 1ª ocorrência de")
+        self.rad_code.setChecked(True)
+        self.rad_code.toggled.connect(self._atualizar_previa)
+        self._grupo.addButton(self.rad_code)
+        l1.addWidget(self.rad_code)
+        self.cb_code = CodeCombo()
+        for e in self._library:
+            self.cb_code.addItem(e.find, e.find)
+            if e.label:
+                self.cb_code.setItemData(
+                    self.cb_code.count() - 1, e.label, Qt.ItemDataRole.ToolTipRole)
+        self.cb_code.setCurrentText("")
+        self.cb_code.currentTextChanged.connect(self._atualizar_previa)
+        l1.addWidget(self.cb_code, stretch=1)
+        lay.addLayout(l1)
+
+        l2 = QHBoxLayout()
+        self.rad_line = QRadioButton("Abaixo da linha Nº")
+        self.rad_line.toggled.connect(self._atualizar_previa)
+        self._grupo.addButton(self.rad_line)
+        l2.addWidget(self.rad_line)
+        self.sp_line = QSpinBox()
+        self.sp_line.setRange(1, 999999)
+        self.sp_line.valueChanged.connect(self._atualizar_previa)
+        l2.addWidget(self.sp_line)
+        l2.addStretch(1)
+        lay.addLayout(l2)
+
+        prev = QFrame()
+        prev.setObjectName("PreviewBox")
+        pv = QVBoxLayout(prev)
+        pv.setContentsMargins(0, 0, 0, 0)
+        cab = QLabel("Prévia")
+        cab.setObjectName("PvHead")
+        pv.addWidget(cab)
+        self.previa = QLabel("—")
+        self.previa.setObjectName("InsPreview")
+        self.previa.setWordWrap(True)
+        pv.addWidget(self.previa)
+        lay.addWidget(prev)
+
+        self._botoes = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Cancel)
+        self.btn_inserir = self._botoes.addButton(
+            "Inserir bloco", QDialogButtonBox.ButtonRole.AcceptRole)
+        self.btn_inserir.setObjectName("CompAddBtn")
+        self._botoes.accepted.connect(self.accept)
+        self._botoes.rejected.connect(self.reject)
+        lay.addWidget(self._botoes)
+
+    def _modo(self) -> str:
+        return "line" if self.rad_line.isChecked() else "code"
+
+    def _codigo(self) -> str:
+        return self.cb_code.currentText().strip()
+
+    def resultado(self) -> tuple[str, int]:
+        """(texto_resultante, indice_de_insercao) — válido só se `pode_inserir`."""
+        at = ponto_insercao(self._texto, self._modo(), self._codigo(), self.sp_line.value())
+        linhas = self._texto.split("\n")
+        bloco = self.ed_block.toPlainText().rstrip().split("\n")
+        novo = "\n".join(linhas[:at] + bloco + linhas[at:])
+        return novo, at
+
+    def _atualizar_previa(self) -> None:
+        bloco = self.ed_block.toPlainText().rstrip()
+        if not bloco:
+            self.previa.setText("(digite o bloco para ver a prévia)")
+            self.btn_inserir.setEnabled(False)
+            return
+        if self._modo() == "code" and not self._codigo():
+            self.previa.setText("Escolha o código de referência.")
+            self.btn_inserir.setEnabled(False)
+            return
+        at = ponto_insercao(self._texto, self._modo(), self._codigo(), self.sp_line.value())
+        if at < 0:
+            self.previa.setText(
+                f"“{self._codigo()}” não aparece neste arquivo — nada será inserido.")
+            self.btn_inserir.setEnabled(False)
+            return
+        linhas = self._texto.split("\n")
+        out: list[str] = []
+        for i in range(max(0, at - 2), at):
+            out.append(f"   {i + 1}  {linhas[i]}")
+        for ln in bloco.split("\n"):
+            out.append(f" + ▶  {ln}")
+        for i in range(at, min(len(linhas), at + 2)):
+            out.append(f"   {i + 1}  {linhas[i]}")
+        self.previa.setText("\n".join(out))
+        self.btn_inserir.setEnabled(True)
+
+
 # ============ painel do editor ============
 
 
@@ -249,6 +418,7 @@ class EditorPanel(QWidget):
 
     dirtyChanged = Signal(bool)
     closeRequested = Signal()
+    saved = Signal(str)  # emite o conteúdo ANTERIOR ao save (para o toast "Desfazer")
 
     def __init__(
         self,
@@ -293,6 +463,11 @@ class EditorPanel(QWidget):
         warn.setObjectName("EdNoBackup")
         head.addWidget(warn)
 
+        self.btn_save_as = QPushButton("Salvar como…")
+        self.btn_save_as.setEnabled(False)
+        self.btn_save_as.clicked.connect(self._on_save_as)
+        head.addWidget(self.btn_save_as)
+
         self.btn_save = QPushButton("💾 Salvar")
         self.btn_save.setEnabled(False)
         self.btn_save.clicked.connect(self._on_save)
@@ -300,10 +475,12 @@ class EditorPanel(QWidget):
 
         root.addLayout(head)
 
-        # toolbar de busca
+        # toolbar de busca — grupo "Localizar"
         find_row = QHBoxLayout()
         find_row.setSpacing(6)
-        find_row.addWidget(QLabel("🔍"))
+        lbl_loc = QLabel("🔍 Localizar")
+        lbl_loc.setObjectName("EdGroup")
+        find_row.addWidget(lbl_loc)
         self.cb_find = self._make_code_combo()
         self.cb_find.currentTextChanged.connect(self._on_find_text_changed)
         find_row.addWidget(self.cb_find, stretch=1)
@@ -321,10 +498,12 @@ class EditorPanel(QWidget):
         find_row.addWidget(self.btn_next)
         root.addLayout(find_row)
 
-        # toolbar de substituicao
+        # toolbar de substituicao — grupo "Substituir" | grupo "Inserir bloco"
         repl_row = QHBoxLayout()
         repl_row.setSpacing(6)
-        repl_row.addWidget(QLabel("Substituir"))
+        lbl_sub = QLabel("Substituir")
+        lbl_sub.setObjectName("EdGroup")
+        repl_row.addWidget(lbl_sub)
         self.cb_repl = self._make_code_combo()
         repl_row.addWidget(self.cb_repl, stretch=1)
         repl_row.addWidget(QLabel("por"))
@@ -336,6 +515,15 @@ class EditorPanel(QWidget):
         self.btn_one = QPushButton("Um a um")
         self.btn_one.clicked.connect(self._on_one_by_one_start)
         repl_row.addWidget(self.btn_one)
+        sep = QFrame()
+        sep.setObjectName("EdSep")
+        sep.setFrameShape(QFrame.Shape.VLine)
+        sep.setFixedWidth(1)
+        repl_row.addWidget(sep)
+        self.btn_insert = QPushButton("➕ Inserir bloco")
+        self.btn_insert.setObjectName("EdInsertBtn")
+        self.btn_insert.clicked.connect(self._on_inserir_bloco)
+        repl_row.addWidget(self.btn_insert)
         root.addLayout(repl_row)
 
         # stepbar inline (oculto por padrao)
@@ -398,6 +586,7 @@ class EditorPanel(QWidget):
         self.editor.blockSignals(True)
         self.editor.setPlainText(self._baseline)
         self.editor.blockSignals(False)
+        self.btn_save_as.setEnabled(True)
         self._reset_scan()
         self._update_dirty()
 
@@ -410,26 +599,72 @@ class EditorPanel(QWidget):
         self.dirtyChanged.emit(dirty)
 
     def _on_text_changed(self) -> None:
-        if self._spans and not self._in_scan:
-            self._count_stale = True
-            self.lbl_count.setText("contagem desatualizada — varra de novo")
+        # Contagem automática (8.2): recalcula ao editar o texto, sem mover o cursor.
+        if not self._in_scan:
+            code = self._combo_code(self.cb_find)
+            if code and self.editor.document().blockCount() <= _MAX_LINES_HIGHLIGHT:
+                self._recount_silent(code)
         self._update_dirty()
+
+    def _recount_silent(self, code: str) -> None:
+        """Recalcula contagem + realce sem reposicionar o cursor (contagem automática)."""
+        self._in_scan = True
+        try:
+            self._spans = count_matches(self.editor.toPlainText(), code, self._case_sensitive)
+            self._count_stale = False
+            n = len(self._spans)
+            if self._idx >= n:
+                self._idx = n - 1
+            self.lbl_count.setText(f"{n} encontrado(s)")
+            pos = (self._idx + 1) if (self._spans and self._idx >= 0) else 0
+            self.lbl_pos.setText(f"{pos}/{n}")
+            self._highlighter.set_term(code, self._spans, self._case_sensitive)
+            if self._spans and 0 <= self._idx < n:
+                self._highlighter.set_current(self._spans[self._idx])
+        finally:
+            self._in_scan = False
+
+    def _on_inserir_bloco(self) -> None:
+        """Abre o diálogo de inserir bloco; aplica no buffer (não salva)."""
+        if self._path is None:
+            return
+        dlg = _InserirBlocoDialog(self.editor.toPlainText(), self._library, self)
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+        novo, _at = dlg.resultado()
+        self.editor.setPlainText(novo)
 
     def salvar(self) -> bool:
         if self._path is None or self._info is None:
             return False
+        anterior = self._baseline  # conteúdo salvo antes desta gravação (p/ Desfazer)
         out = self._from_editor(self.editor.toPlainText())
         res = salvar_no_lugar(self._path, out, self._info)
         if res.ok:
             self._baseline = self.editor.toPlainText()
             self._update_dirty()
-            QMessageBox.information(self, "Salvo", res.mensagem)
+            self.saved.emit(anterior)
             return True
         QMessageBox.critical(self, "Falha ao salvar", res.mensagem)
         return False
 
     def _on_save(self) -> None:
         self.salvar()
+
+    def _on_save_as(self) -> None:
+        """Salva uma cópia em outro caminho, preservando o formato do original."""
+        if self._path is None or self._info is None:
+            return
+        from PySide6.QtWidgets import QFileDialog
+        destino, _ = QFileDialog.getSaveFileName(
+            self, "Salvar cópia como…", self._path.name,
+            "Programas CNC (*.nc *.txt *.tap *.iso *.min *.mpf);;Todos os arquivos (*.*)")
+        if not destino:
+            return
+        out = self._from_editor(self.editor.toPlainText())
+        res = salvar_no_lugar(Path(destino), out, self._info)
+        if not res.ok:
+            QMessageBox.critical(self, "Falha ao salvar como…", res.mensagem)
 
     # ---------- localizador ----------
     def _reset_scan(self) -> None:
