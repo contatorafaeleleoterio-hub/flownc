@@ -104,8 +104,8 @@
 
 ## 12. Verificação da Fase 2
 
-- [ ] 12.1 [CRÍTICO] Rodar pytest (zero regressões frente ao baseline)
-- [ ] 12.2 [CRÍTICO] Rodar mypy (sem novos erros de tipo)
-- [ ] 12.3 [CRÍTICO] Rodar ruff (sem violações)
-- [ ] 12.4 Smoke visual de todas as telas vs `mockups/painel-final.v4.html` (divergências anotadas)
+- [x] 12.1 [CRÍTICO] Rodar pytest (zero regressões frente ao baseline)
+- [x] 12.2 [CRÍTICO] Rodar mypy (sem novos erros de tipo)
+- [x] 12.3 [CRÍTICO] Rodar ruff (sem violações)
+- [x] 12.4 Smoke visual de todas as telas vs `mockups/painel-final.v4.html` (divergências anotadas)
 - [ ] 12.5 Pedir aprovação explícita do Mestre ("é esse") — gate de saída da Fase 2
