@@ -291,7 +291,7 @@ def test_lote_screen_cta_emite_conferir(app: QApplication, tmp_path) -> None:
     p.write_text("M8\n", encoding="utf-8")
     lote.program_list.set_programs([p])
     lote.program_list._rows[0].toggled.emit()
-    lote._cta.click()
+    lote._cta.clicado.emit()
     assert disparos == [True]
 
 

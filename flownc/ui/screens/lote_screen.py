@@ -29,6 +29,48 @@ def _repolish(w: QWidget) -> None:
     style.polish(w)
 
 
+class _CtaButton(QFrame):
+    """CTA de duas linhas (título + subtítulo) clicável — layout garantido.
+
+    Usa QFrame em vez de QPushButton porque empilhar dois QLabel dentro de um
+    QPushButton estilizado faz o texto se sobrepor em alguns temas do Qt.
+    """
+
+    clicado = Signal()
+
+    def __init__(self, titulo: str, subtitulo: str, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.setObjectName("CtaConf")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setMinimumHeight(64)
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(16, 10, 16, 10)
+        lay.setSpacing(4)
+        lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.big = QLabel(titulo)
+        self.big.setObjectName("CtaBig")
+        self.big.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.small = QLabel(subtitulo)
+        self.small.setObjectName("CtaSmall")
+        self.small.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(self.big)
+        lay.addWidget(self.small)
+
+    def setEnabled(self, on: bool) -> None:  # noqa: N802 (Qt-style API)
+        super().setEnabled(on)
+        self.setProperty("off", not on)
+        for lbl in (self.big, self.small):
+            lbl.setProperty("off", not on)
+            _repolish(lbl)
+        _repolish(self)
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802, ANN001
+        if self.isEnabled() and event.button() == Qt.MouseButton.LeftButton:
+            self.clicado.emit()
+        super().mousePressEvent(event)
+
+
 class _EdicaoCard(QFrame):
     """Cartão numerado de uma edição do lote (✎ editar, ⧉ duplicar, ✕ excluir)."""
 
@@ -185,24 +227,10 @@ class LoteScreen(QWidget):
         self._facts.setObjectName("LoteFacts")
         rlay.addWidget(self._facts)
 
-        self._cta = QPushButton()
-        self._cta.setObjectName("CtaConf")
-        self._cta.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._cta.setFixedHeight(56)
-        cta_lay = QVBoxLayout(self._cta)
-        cta_lay.setContentsMargins(16, 8, 16, 8)
-        cta_lay.setSpacing(2)
-        self._cta_big = QLabel("CONFERIR LOTE →")
-        self._cta_big.setObjectName("CtaBig")
-        self._cta_big.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._cta_small = QLabel(
+        self._cta = _CtaButton(
+            "CONFERIR LOTE →",
             "varre os programas e mostra os números reais — nada é gravado")
-        self._cta_small.setObjectName("CtaSmall")
-        self._cta_small.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        for lbl in (self._cta_big, self._cta_small):
-            lbl.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-            cta_lay.addWidget(lbl)
-        self._cta.clicked.connect(self.conferir_solicitado.emit)
+        self._cta.clicado.connect(self.conferir_solicitado.emit)
         rlay.addWidget(self._cta)
         return painel
 
@@ -334,6 +362,3 @@ class LoteScreen(QWidget):
             self._cta.setToolTip("Marque ao menos 1 programa")
         else:
             self._cta.setToolTip("Varre os programas marcados e mostra a conferência")
-        for lbl in (self._cta_big, self._cta_small):
-            lbl.setProperty("off", not habilita)
-            _repolish(lbl)

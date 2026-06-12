@@ -33,6 +33,16 @@ QScrollArea {
     background: transparent;
 }
 
+/* O viewport e o widget interno do scroll herdam a cor do painel (evita
+   "buracos" pretos nas áreas vazias das listas roláveis). */
+QScrollArea > QWidget {
+    background: transparent;
+}
+
+QScrollArea > QWidget > QWidget {
+    background: transparent;
+}
+
 /* -----------------------------------------------------------------------
    QPushButton — botão padrão (secundário / ghost)
    ----------------------------------------------------------------------- */
@@ -1262,22 +1272,22 @@ QPushButton#RcActDel:hover {
     font-weight: 600;
 }
 
-/* CTA "Conferir lote →" (laranja, 2 linhas) */
-QPushButton#CtaConf {
+/* CTA "Conferir lote →" (laranja, 2 linhas) — QFrame clicável */
+#CtaConf {
     background-color: ${COLOR_CTA};
     border: none;
     border-radius: 6px;
 }
 
-QPushButton#CtaConf:hover {
+#CtaConf:hover {
     background-color: ${COLOR_ACCENT_HV};
 }
 
-QPushButton#CtaConf:pressed {
-    background-color: ${COLOR_ACCENT_ACTIVE};
+#CtaConf:disabled {
+    background-color: ${COLOR_BTN_DISABLED_BG};
 }
 
-QPushButton#CtaConf:disabled {
+#CtaConf[off="true"] {
     background-color: ${COLOR_BTN_DISABLED_BG};
 }
 
