@@ -5,3 +5,9 @@ dist/
 .pytest_cache/
 __pycache__/
 *.pyc
+dist-onefile/
+build-onefile/
+flownc/dist-onefile/
+flownc/build-onefile/
+flownc/dist/
+flownc/build/
