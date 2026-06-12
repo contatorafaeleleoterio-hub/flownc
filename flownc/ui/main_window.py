@@ -183,14 +183,19 @@ class MainWindow(QMainWindow):
         self._historico_entries.insert(0, entrada)
         self._historico_screen.set_historico(self._historico_entries)
 
-    def _on_publicado_ver_historico(self, entrada: PublicacaoEntrada) -> None:
+    def _pos_publicacao(self, entrada: PublicacaoEntrada) -> None:
+        """Estado 'novo lote': registra no Histórico e zera a tela Lote."""
         self._registrar_historico(entrada)
         self._lote.limpar_edicoes()
+        self._lote.program_list.desmarcar_todos()
+        self._lote.program_list.atualizar_lista()  # data/tamanho mudaram ao gravar
+
+    def _on_publicado_ver_historico(self, entrada: PublicacaoEntrada) -> None:
+        self._pos_publicacao(entrada)
         self._ir_para_tela(TELA_HISTORICO)
 
     def _on_publicado_novo_lote(self, entrada: PublicacaoEntrada) -> None:
-        self._registrar_historico(entrada)
-        self._lote.limpar_edicoes()
+        self._pos_publicacao(entrada)
         self._ir_para_tela(TELA_LOTE)
 
     def _on_abrir_no_editor(self, caminho: str) -> None:

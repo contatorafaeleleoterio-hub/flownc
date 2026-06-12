@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
 from ui import theme
 
 # Texto do item de ação no fim do seletor de receitas.
-ITEM_SALVAR = "💾 Salvar lote atual como…"
+ITEM_SALVAR = "Salvar lote atual como…"
 
 
 class TopBar(QWidget):
@@ -92,4 +92,4 @@ class TopBar(QWidget):
 
     def set_backup_path(self, caminho: str) -> None:
         self._backup_path = caminho
-        self.btn_backup.setText(f"📁 backup: {caminho} · mudar")
+        self.btn_backup.setText(f"backup: {caminho} · mudar")

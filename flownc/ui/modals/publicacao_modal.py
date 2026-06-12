@@ -241,7 +241,7 @@ class PublicacaoModal(QDialog):
         self._publicando = False
         self._head.setText("Falha na publicação")
         self._limpar_corpo()
-        ic = QLabel("⚠")
+        ic = QLabel("!")
         ic.setObjectName("ErrIcon")
         ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._blay.addWidget(ic)
@@ -277,6 +277,11 @@ class PublicacaoModal(QDialog):
     def reject(self) -> None:
         if self._publicando:
             return  # ✕/Esc desabilitados enquanto publica
+        if self._entrada is not None:
+            # Publicou com sucesso e fechou pelo ✕/Esc: o lote FOI gravado —
+            # registra no Histórico e limpa o lote do mesmo jeito que "OK".
+            self._on_novo_lote()
+            return
         super().reject()
 
     def keyPressEvent(self, event: QKeyEvent) -> None:  # noqa: N802
@@ -289,4 +294,7 @@ class PublicacaoModal(QDialog):
         if self._publicando:
             event.ignore()
             return
+        if self._entrada is not None:
+            self.novo_lote.emit(self._entrada)
+            self._entrada = None  # evita emitir duas vezes (reject + close)
         super().closeEvent(event)

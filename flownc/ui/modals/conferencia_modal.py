@@ -41,7 +41,7 @@ def _formula(ed: Edicao) -> str:
         n = len(ed.texto.split("\n")) if ed.texto else 0
         plural = "s" if n > 1 else ""
         ancora = f"após {ed.codigo}" if ed.modo == "code" else f"após a linha {ed.linha}"
-        return f"➕ bloco · {n} linha{plural} · {ancora}"
+        return f"+ bloco · {n} linha{plural} · {ancora}"
     if ed.remover:
         return f"{ed.origem} → remover"
     return f"{ed.origem} → {ed.destino}"
@@ -161,16 +161,16 @@ class ConferenciaModal(QDialog):
         # Avisos: conflitos + sem efeito
         for c in conflitos:
             self._body.addWidget(self._aviso(
-                f"▲ Conflito: {c} é alterado por mais de uma edição — revise antes de publicar."))
+                f"Conflito: {c} é alterado por mais de uma edição — revise antes de publicar."))
         for ed in scan.sem_efeito():
             if ed.tipo == "ins":
                 if ed.modo == "code":
-                    msg = (f"⚠ Bloco sem destino: o código {ed.codigo} não aparece em "
+                    msg = (f"Bloco sem destino: o código {ed.codigo} não aparece em "
                            "nenhum programa marcado — nada será inserido.")
                 else:
-                    msg = "⚠ Bloco sem destino: nenhum programa marcado recebe a posição."
+                    msg = "Bloco sem destino: nenhum programa marcado recebe a posição."
             else:
-                msg = (f"⚠ {ed.origem} não aparece em nenhum programa marcado — "
+                msg = (f"{ed.origem} não aparece em nenhum programa marcado — "
                        "esta edição não vai trocar nada.")
             self._body.addWidget(self._aviso(msg))
 
@@ -185,7 +185,7 @@ class ConferenciaModal(QDialog):
         bl = QHBoxLayout(linha)
         bl.setContentsMargins(12, 10, 12, 10)
         txt = QLabel(
-            f"🛡 Ao publicar: originais vão para {self._backup_dir} (versionado por "
+            f"Ao publicar: originais vão para {self._backup_dir} (versionado por "
             "data/hora) · gravação na pasta original com conferência dupla")
         txt.setObjectName("BackupLineTxt")
         txt.setWordWrap(True)
@@ -204,7 +204,7 @@ class ConferenciaModal(QDialog):
             self._btn_pub.setEnabled(False)
             self._btn_pub.setProperty("estado", "ghost")
         else:
-            prefixo = (f"▲ {n_conf} conflito{'s' if n_conf > 1 else ''} no lote · "
+            prefixo = (f"! {n_conf} conflito{'s' if n_conf > 1 else ''} no lote · "
                        if n_conf else "")
             self._facts_lbl.setText(
                 prefixo

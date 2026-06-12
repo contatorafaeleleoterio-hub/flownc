@@ -239,7 +239,7 @@ def test_lote_screen_conflito_mesma_origem(app: QApplication) -> None:
     lote = LoteScreen()
     lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M08"))
     lote._on_adicionar(Edicao(tipo="swap", origem="M8", destino="M09"))
-    assert lote._chip.text() == "⚠ 1 conflito"
+    assert lote._chip.text() == "! 1 conflito"
     assert lote._chip.property("estado") == "warn"
     assert lote._cards[0].property("warn") is True
     assert lote._cards[1].property("warn") is True
@@ -482,6 +482,65 @@ def test_editor_ponto_insercao_ancora() -> None:
     assert ponto_insercao(texto, "code", "G54", 1) == 1  # abaixo da linha do G54
     assert ponto_insercao(texto, "code", "G99", 1) == -1  # âncora ausente
     assert ponto_insercao(texto, "line", "", 2) == 2
+
+
+def test_program_list_atualizar_remove_apagados(app: QApplication, tmp_path) -> None:
+    """↻ Atualizar descarta arquivos apagados do disco e preserva a marcação."""
+    pl = ProgramListV4()
+    progs = _criar_programas(tmp_path, 3)
+    pl.set_programs(progs)
+    pl._rows[0].toggled.emit()  # marca o primeiro
+    progs[2].unlink()           # apaga o terceiro fora do app
+    pl.atualizar_lista()
+    assert len(pl._rows) == 2
+    assert {p.name for p in pl.get_marcados()} == {"O0.nc"}
+
+
+def test_program_list_desmarcar_todos(app: QApplication, tmp_path) -> None:
+    pl = ProgramListV4()
+    pl.set_programs(_criar_programas(tmp_path, 2))
+    pl._toggle_all()
+    assert len(pl.get_marcados()) == 2
+    pl.desmarcar_todos()
+    assert pl.get_marcados() == []
+
+
+def test_editor_banner_alteracao_externa(app: QApplication, tmp_path) -> None:
+    """Arquivo alterado fora do app: banner aparece; Recarregar atualiza o buffer."""
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 M8\n", encoding="utf-8")
+    ed = EditorScreen()
+    ed.abrir(p)
+    assert ed._banner_ext.isHidden()
+    p.write_text("N10 M08\n", encoding="utf-8")  # mudança externa
+    ed._on_arquivo_mudou_fora(str(p))            # (gatilho direto: watcher é assíncrono)
+    assert not ed._banner_ext.isHidden()
+    ed._recarregar_do_disco()
+    assert ed.panel.editor.toPlainText() == "N10 M08\n"
+    assert ed._banner_ext.isHidden()
+
+
+def test_publicacao_fechar_pelo_x_apos_sucesso_limpa_lote(app: QApplication, tmp_path) -> None:
+    """Publicou e fechou pelo ✕ (sem clicar OK): o lote ainda assim é limpo."""
+    from ui.components.compositor_v4 import Edicao
+    from ui.lote_scan import scan_lote
+    from ui.modals.conferencia_modal import programas_texto
+    from ui.modals.publicacao_modal import PublicacaoModal
+
+    p = tmp_path / "O1.NC"
+    p.write_text("N10 M8\n", encoding="utf-8")
+    bk = tmp_path / "bk"
+    bk.mkdir()
+    edic = [Edicao(tipo="swap", origem="M8", destino="M08")]
+    scan = scan_lote(edic, programas_texto([p]))
+    modal = PublicacaoModal(scan, edic, [p], str(bk) + "\\", "cfg")
+    recebidos: list = []
+    modal.novo_lote.connect(recebidos.append)
+    entrada, erros = modal._publicar()
+    modal._publicando = False
+    modal._entrada = entrada
+    modal.reject()  # fechar pelo Esc/✕ após sucesso
+    assert len(recebidos) == 1  # ainda assim emitiu novo_lote (lote será limpo)
 
 
 def test_editor_inserir_bloco_dialog_bloqueia_ancora_ausente(app: QApplication) -> None:

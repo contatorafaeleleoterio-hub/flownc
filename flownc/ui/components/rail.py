@@ -4,20 +4,24 @@ Lugares fixos (índices fixos — mesma ordem do QStackedWidget do maestro):
 0=Lote · 1=Editor · 2=Códigos · 3=Histórico. Emite ``tela_mudou(int)`` ao clicar.
 O botão ativo recebe o filete laranja (via QSS, propriedade ``active``); o botão
 Editor exibe uma bolinha laranja quando há alteração não salva (``set_editor_dirty``).
+
+Os ícones são desenhados via QPainter (`ui.icons`) — independem de fonte, então
+não viram quadradinhos em máquinas sem os glifos unicode.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QResizeEvent
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QIcon, QResizeEvent
 from PySide6.QtWidgets import (
     QButtonGroup,
     QLabel,
-    QPushButton,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
 from ui import theme
+from ui.icons import icon_pixmap
 
 # Índices-lugar (espelham a ordem das telas no QStackedWidget do maestro)
 LOTE = 0
@@ -26,11 +30,13 @@ CODIGOS = 2
 HISTORICO = 3
 
 _ITENS = [
-    (LOTE, "▦", "Lote"),
-    (EDITOR, "✎", "Editor"),
-    (CODIGOS, "🏷", "Códigos"),
-    (HISTORICO, "🕘", "Histórico"),
+    (LOTE, "grid", "Lote"),
+    (EDITOR, "pencil", "Editor"),
+    (CODIGOS, "tag", "Códigos"),
+    (HISTORICO, "clock", "Histórico"),
 ]
+
+_ICON_SIZE = 20
 
 
 def _repolish(w: QWidget) -> None:
@@ -50,7 +56,8 @@ class RailWidget(QWidget):
         self.setObjectName("Rail")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setFixedWidth(theme.DIM_RAIL)
-        self._botoes: list[QPushButton] = []
+        self._botoes: list[QToolButton] = []
+        self._icones: list[tuple[QIcon, QIcon]] = []  # (normal, ativo)
         self._build_ui()
         self.set_tela_ativa(LOTE)
 
@@ -59,18 +66,27 @@ class RailWidget(QWidget):
         lay.setContentsMargins(theme.SP_8, theme.SP_12, theme.SP_8, theme.SP_12)
         lay.setSpacing(theme.SP_8)
 
-        logo = QLabel("◉")
+        logo = QLabel()
         logo.setObjectName("RailLogo")
         logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        logo.setPixmap(icon_pixmap("dot", 18, theme.COLOR_WHITE))
         lay.addWidget(logo, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         grupo = QButtonGroup(self)
         grupo.setExclusive(True)
-        for idx, icon, texto in _ITENS:
-            btn = QPushButton(f"{icon}\n{texto}")
+        for idx, icone, texto in _ITENS:
+            btn = QToolButton()
             btn.setObjectName("RailItem")
+            btn.setText(texto)
+            normal = QIcon(icon_pixmap(icone, _ICON_SIZE, theme.COLOR_RAIL_TEXT))
+            ativo = QIcon(icon_pixmap(icone, _ICON_SIZE, theme.COLOR_WHITE))
+            self._icones.append((normal, ativo))
+            btn.setIcon(normal)
+            btn.setIconSize(QSize(_ICON_SIZE, _ICON_SIZE))
+            btn.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
             btn.setCheckable(True)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            btn.setMinimumWidth(theme.DIM_RAIL - 2 * theme.SP_8)
             btn.clicked.connect(lambda _checked=False, i=idx: self._on_click(i))
             grupo.addButton(btn, idx)
             self._botoes.append(btn)
@@ -99,6 +115,7 @@ class RailWidget(QWidget):
             ativo = i == idx
             btn.setChecked(ativo)
             btn.setProperty("active", ativo)
+            btn.setIcon(self._icones[i][1] if ativo else self._icones[i][0])
             _repolish(btn)
 
     def set_editor_dirty(self, dirty: bool) -> None:

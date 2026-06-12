@@ -208,7 +208,7 @@ class CodigosScreen(QWidget):
             tag.setObjectName("LibBlk")
             tag.setToolTip(entry.replace)
             lay.addWidget(tag)
-        btn = QPushButton("✕")
+        btn = QPushButton("×")
         btn.setObjectName("RowFileX")
         btn.setFixedSize(28, 28)
         btn.setCursor(Qt.CursorShape.PointingHandCursor)

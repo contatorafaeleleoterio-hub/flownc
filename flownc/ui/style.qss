@@ -589,8 +589,12 @@ QProgressBar#PubProgress::chunk {
 }
 
 #StripDot {
-    color: ${COLOR_ACCENT};
-    font-size: 12px;
+    background-color: ${COLOR_ACCENT};
+    border-radius: 4px;
+    min-width: 8px;
+    max-width: 8px;
+    min-height: 8px;
+    max-height: 8px;
 }
 
 #EdFileName {
@@ -625,6 +629,29 @@ QPushButton#EdToastBtn {
     color: ${COLOR_WHITE};
     font-size: 13px;
     font-weight: 600;
+}
+
+/* Banner: arquivo alterado fora do FlowNC */
+#ExtChangeBanner {
+    background-color: ${COLOR_WARNING_BG};
+    border: 1px solid ${COLOR_WARNING_BORDER};
+    border-radius: 4px;
+}
+
+#ExtChangeMsg {
+    color: ${COLOR_WARNING};
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QPushButton#ExtChangeBtn {
+    background-color: ${COLOR_WARNING};
+    color: ${COLOR_WHITE};
+    border: none;
+    border-radius: 4px;
+    min-height: 32px;
+    padding: 0px 12px;
+    font-weight: 700;
 }
 
 #StepBar {
@@ -710,7 +737,7 @@ QPushButton#EdInsertBtn:hover {
     max-height: 40px;
 }
 
-QPushButton#RailItem {
+QToolButton#RailItem {
     background-color: transparent;
     color: ${COLOR_RAIL_TEXT};
     border: none;
@@ -722,12 +749,12 @@ QPushButton#RailItem {
     font-weight: 700;
 }
 
-QPushButton#RailItem:hover {
+QToolButton#RailItem:hover {
     background-color: ${COLOR_SLATE_2};
     color: ${COLOR_WHITE};
 }
 
-QPushButton#RailItem[active="true"] {
+QToolButton#RailItem[active="true"] {
     background-color: ${COLOR_SLATE_2};
     color: ${COLOR_WHITE};
     border-left: 3px solid ${COLOR_ACCENT};
@@ -922,6 +949,8 @@ QPushButton#RowEditBtn:hover {
 }
 
 QPushButton#RowFileX {
+    padding: 0px;
+    font-size: 16px;
     background-color: ${COLOR_BG_RAIL};
     color: ${COLOR_DANGER};
     border: none;
@@ -1239,6 +1268,7 @@ QPushButton#InsChip:hover {
 
 QPushButton#RcAct,
 QPushButton#RcActDel {
+    padding: 0px;
     background-color: transparent;
     border: none;
     border-radius: 4px;
@@ -1253,6 +1283,7 @@ QPushButton#RcAct:hover {
 
 QPushButton#RcActDel {
     color: ${COLOR_DANGER};
+    font-size: 16px;
     font-weight: 700;
 }
 

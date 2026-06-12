@@ -7,8 +7,8 @@ para ▴ enquanto a lista está aberta, dando resposta visual ao clique.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtGui import QPainter
+from ui.icons import icon_pixmap
 from PySide6.QtWidgets import (
     QComboBox,
     QStyle,
@@ -48,12 +48,11 @@ class CodeCombo(QComboBox):
             QStyle.ComplexControl.CC_ComboBox, opt,
             QStyle.SubControl.SC_ComboBoxArrow, self)
         if rect.isValid():
+            # Triângulo desenhado (a fonte da UI não tem os glifos ▴/▾).
+            pm = icon_pixmap(
+                "caret-up" if self._popup_open else "caret-down", 14, "#56616D")
             p = QPainter(self)
-            p.setRenderHint(QPainter.RenderHint.Antialiasing)
-            p.setPen(QColor("#56616D"))
-            f = p.font()
-            f.setPixelSize(12)
-            p.setFont(f)
-            p.drawText(rect, Qt.AlignmentFlag.AlignCenter,
-                       "▴" if self._popup_open else "▾")
+            x = rect.x() + (rect.width() - pm.width()) // 2
+            y = rect.y() + (rect.height() - pm.height()) // 2
+            p.drawPixmap(x, y, pm)
             p.end()

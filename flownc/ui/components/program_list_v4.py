@@ -20,6 +20,7 @@ from PySide6.QtGui import (
     QDropEvent,
     QMouseEvent,
 )
+from ui.icons import icon_pixmap
 from PySide6.QtWidgets import (
     QFileDialog,
     QFrame,
@@ -108,15 +109,19 @@ class _FileRow(QFrame):
         for lbl in (self._chk, self._name, self._mod, self._size):
             lbl.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
-        self._btn_abrir = QPushButton("✎ Abrir")
+        self._btn_abrir = QPushButton("Abrir")
         self._btn_abrir.setObjectName("RowEditBtn")
         self._btn_abrir.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._btn_abrir.setToolTip("Abrir este programa no Editor")
         self._btn_abrir.clicked.connect(self.abrir.emit)
 
-        self._btn_x = QPushButton("✕")
+        # "×" (sinal de multiplicação latin-1): existe em qualquer fonte — o
+        # "✕" (U+2715) vira quadradinho quando a fonte empacotada não o tem.
+        self._btn_x = QPushButton("×")
         self._btn_x.setObjectName("RowFileX")
         self._btn_x.setFixedSize(32, 32)
         self._btn_x.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._btn_x.setToolTip("Remover da lista (não apaga o arquivo)")
         self._btn_x.clicked.connect(self.remover.emit)
 
         lay.addWidget(self._chk)
@@ -183,6 +188,13 @@ class ProgramListV4(QWidget):
         self._chip.setObjectName("ProgChip")
         phead.addWidget(self._chip)
         phead.addStretch(1)
+        btn_refresh = QPushButton("↻ Atualizar")
+        btn_refresh.setObjectName("GhostBtnV4")
+        btn_refresh.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_refresh.setToolTip(
+            "Relê data e tamanho dos arquivos; remove da lista os que não existem mais")
+        btn_refresh.clicked.connect(self.atualizar_lista)
+        phead.addWidget(btn_refresh)
         self._btn_all = QPushButton("Marcar todos")
         self._btn_all.setObjectName("GhostBtnV4")
         self._btn_all.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -236,8 +248,9 @@ class ProgramListV4(QWidget):
         lay = QVBoxLayout(box)
         lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay.setSpacing(12)
-        ic = QLabel("📂")
+        ic = QLabel()
         ic.setObjectName("EmptyIcon")
+        ic.setPixmap(icon_pixmap("folder", 36, "#8FA5C2"))
         ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
         t1 = QLabel("Nenhum programa carregado")
         t1.setObjectName("EmptyT1")
@@ -277,6 +290,27 @@ class ProgramListV4(QWidget):
 
     def get_paths(self) -> list[Path]:
         return list(self._paths)
+
+    def desmarcar_todos(self) -> None:
+        for row in self._rows:
+            row.set_marcado(False)
+        self._update_chip()
+        self.selecao_alterada.emit()
+
+    def atualizar_lista(self) -> None:
+        """Relê os arquivos do disco (data/tamanho) e descarta os apagados.
+
+        Preserva a marcação dos que continuam existindo.
+        """
+        marcados = {str(p) for p in self.get_marcados()}
+        self._paths = [p for p in self._paths if p.exists()]
+        self._rebuild_rows()
+        for row in self._rows:
+            if str(row.path) in marcados:
+                row.set_marcado(True)
+        self._refresh()
+        self.programas_alterados.emit()
+        self.selecao_alterada.emit()
 
     # ============ interno ============
     def _rebuild_rows(self) -> None:

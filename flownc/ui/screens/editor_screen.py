@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import QFileSystemWatcher, Qt, QTimer, Signal
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.library_store import CodeEntry
+from ui.icons import icon_pixmap
 from ui.editor_panel import EditorPanel
 
 
@@ -40,7 +41,7 @@ class _StripRow(QFrame):
         lay = QHBoxLayout(self)
         lay.setContentsMargins(12, 8, 12, 8)
         lay.setSpacing(8)
-        self._dot = QLabel("●")
+        self._dot = QLabel()
         self._dot.setObjectName("StripDot")
         self._dot.setVisible(False)
         lay.addWidget(self._dot)
@@ -118,7 +119,10 @@ class EditorScreen(QWidget):
         self._paths: list[Path] = []
         self._rows: list[_StripRow] = []
         self._atual: Path | None = None
+        self._ignorar_watch = False  # save próprio também dispara fileChanged
         self._build()
+        self._watcher = QFileSystemWatcher(self)
+        self._watcher.fileChanged.connect(self._on_arquivo_mudou_fora)
 
     # ============ construção ============
     def _build(self) -> None:
@@ -155,6 +159,29 @@ class EditorScreen(QWidget):
         rlay.setContentsMargins(0, 0, 0, 0)
         rlay.setSpacing(8)
 
+        # Banner de alteração externa (arquivo mudou fora do FlowNC)
+        self._banner_ext = QFrame()
+        self._banner_ext.setObjectName("ExtChangeBanner")
+        self._banner_ext.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        blay = QHBoxLayout(self._banner_ext)
+        blay.setContentsMargins(12, 8, 12, 8)
+        blay.setSpacing(12)
+        self._banner_msg = QLabel()
+        self._banner_msg.setObjectName("ExtChangeMsg")
+        self._banner_msg.setWordWrap(True)
+        blay.addWidget(self._banner_msg, stretch=1)
+        btn_rec = QPushButton("↻ Recarregar do disco")
+        btn_rec.setObjectName("ExtChangeBtn")
+        btn_rec.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_rec.clicked.connect(self._recarregar_do_disco)
+        blay.addWidget(btn_rec)
+        btn_ign = QPushButton("Manter como está")
+        btn_ign.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_ign.clicked.connect(self._banner_ext.hide)
+        blay.addWidget(btn_ign)
+        self._banner_ext.hide()
+        rlay.addWidget(self._banner_ext)
+
         self._empty = self._build_empty()
         rlay.addWidget(self._empty, stretch=1)
 
@@ -176,8 +203,9 @@ class EditorScreen(QWidget):
         lay = QVBoxLayout(box)
         lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay.setSpacing(12)
-        ic = QLabel("✎")
+        ic = QLabel()
         ic.setObjectName("EmptyIcon")
+        ic.setPixmap(icon_pixmap("pencil", 36, "#8FA5C2"))
         ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
         t1 = QLabel("Nenhum arquivo aberto")
         t1.setObjectName("EmptyT1")
@@ -241,8 +269,54 @@ class EditorScreen(QWidget):
         self.panel.abrir(path)
         self._atual = path
         self._empty.hide()
+        self._banner_ext.hide()
         self.panel.show()
+        self._vigiar(path)
         self._sync_strip()
+
+    # ============ vigilância de alteração externa ============
+    def _vigiar(self, path: Path) -> None:
+        """Observa só o arquivo aberto; mudou fora do FlowNC → banner de aviso."""
+        antigos = self._watcher.files()
+        if antigos:
+            self._watcher.removePaths(antigos)
+        if path.exists():
+            self._watcher.addPath(str(path))
+
+    def _on_arquivo_mudou_fora(self, caminho: str) -> None:
+        if self._ignorar_watch or self._atual is None:
+            return
+        if str(self._atual) != caminho:
+            return
+        # Editores externos costumam trocar o arquivo (delete+rename): re-armar.
+        QTimer.singleShot(300, lambda: self._vigiar(self._atual) if self._atual else None)
+        nome = self._atual.name
+        if self._atual.exists():
+            self._banner_msg.setText(
+                f"O arquivo {nome} foi alterado fora do FlowNC. O que você vê pode estar "
+                "desatualizado — recarregue para ver a versão do disco.")
+        else:
+            self._banner_msg.setText(
+                f"O arquivo {nome} foi removido ou renomeado fora do FlowNC.")
+        self._banner_ext.show()
+
+    def _recarregar_do_disco(self) -> None:
+        if self._atual is None:
+            return
+        if not self._atual.exists():
+            self._banner_ext.hide()
+            return
+        if self.panel.tem_alteracao():
+            resp = QMessageBox.question(
+                self,
+                "Recarregar do disco",
+                "Recarregar descarta as alterações não salvas deste arquivo. Continuar?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
+            if resp != QMessageBox.StandardButton.Yes:
+                return
+        self._banner_ext.hide()
+        self._abrir_sem_guarda(self._atual)
 
     # ============ guarda de alterações ============
     def _guarda_ok(self) -> bool:
@@ -274,6 +348,15 @@ class EditorScreen(QWidget):
 
     def _on_saved(self, anterior: str) -> None:
         self._pre_save = anterior
+        # O save do próprio FlowNC também dispara o watcher — ignora por 1 s.
+        self._ignorar_watch = True
+
+        def rearmar() -> None:
+            self._ignorar_watch = False
+            if self._atual is not None:
+                self._vigiar(self._atual)
+
+        QTimer.singleShot(1000, rearmar)
         self._toast.mostrar("Salvo ✓ — gravado no original")
         self._sync_strip()
 

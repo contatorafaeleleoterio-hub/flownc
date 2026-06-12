@@ -459,7 +459,7 @@ class EditorPanel(QWidget):
         self.lbl_file.setObjectName("EdFileName")
         head.addWidget(self.lbl_file, stretch=1)
 
-        warn = QLabel("⚠ salva direto, sem cópia")
+        warn = QLabel("salva direto, sem cópia — sobrescreve o original")
         warn.setObjectName("EdNoBackup")
         head.addWidget(warn)
 
@@ -468,7 +468,7 @@ class EditorPanel(QWidget):
         self.btn_save_as.clicked.connect(self._on_save_as)
         head.addWidget(self.btn_save_as)
 
-        self.btn_save = QPushButton("💾 Salvar")
+        self.btn_save = QPushButton("Salvar")
         self.btn_save.setEnabled(False)
         self.btn_save.clicked.connect(self._on_save)
         head.addWidget(self.btn_save)
@@ -478,7 +478,7 @@ class EditorPanel(QWidget):
         # toolbar de busca — grupo "Localizar"
         find_row = QHBoxLayout()
         find_row.setSpacing(6)
-        lbl_loc = QLabel("🔍 Localizar")
+        lbl_loc = QLabel("Localizar")
         lbl_loc.setObjectName("EdGroup")
         find_row.addWidget(lbl_loc)
         self.cb_find = self._make_code_combo()
@@ -520,7 +520,7 @@ class EditorPanel(QWidget):
         sep.setFrameShape(QFrame.Shape.VLine)
         sep.setFixedWidth(1)
         repl_row.addWidget(sep)
-        self.btn_insert = QPushButton("➕ Inserir bloco")
+        self.btn_insert = QPushButton("+ Inserir bloco")
         self.btn_insert.setObjectName("EdInsertBtn")
         self.btn_insert.clicked.connect(self._on_inserir_bloco)
         repl_row.addWidget(self.btn_insert)

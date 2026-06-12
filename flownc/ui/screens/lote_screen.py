@@ -8,6 +8,7 @@ Conferência liga no CTA pelo sinal `conferir_solicitado` (Bloco 5).
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -19,6 +20,7 @@ from PySide6.QtWidgets import (
 )
 
 from ui import theme
+from ui.icons import icon_pixmap
 from ui.components.compositor_v4 import CompositorV4, Edicao
 from ui.components.program_list_v4 import ProgramListV4
 
@@ -101,23 +103,32 @@ class _EdicaoCard(QFrame):
         formula.setTextFormat(Qt.TextFormat.RichText)
         linha.addWidget(formula, stretch=1)
 
-        for simbolo, dica, sinal, eh_del in (
-            ("✎", "Editar (volta ao compositor)", self.editar, False),
-            ("⧉", "Duplicar", self.duplicar, False),
-            ("✕", "Remover do lote", self.excluir, True),
+        # Editar/duplicar usam ícones desenhados (a fonte da UI não tem ✎/⧉);
+        # excluir usa "×" (latin-1, presente em qualquer fonte).
+        for icone, dica, sinal in (
+            ("pencil", "Editar (volta ao compositor)", self.editar),
+            ("copy", "Duplicar", self.duplicar),
         ):
-            btn = QPushButton(simbolo)
-            btn.setObjectName("RcActDel" if eh_del else "RcAct")
+            btn = QPushButton()
+            btn.setObjectName("RcAct")
+            btn.setIcon(QIcon(icon_pixmap(icone, 16, theme.COLOR_TEXT_SECONDARY)))
             btn.setFixedSize(32, 32)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.setToolTip(dica)
             btn.clicked.connect(sinal.emit)
             linha.addWidget(btn)
+        btn_x = QPushButton("×")
+        btn_x.setObjectName("RcActDel")
+        btn_x.setFixedSize(32, 32)
+        btn_x.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_x.setToolTip("Remover do lote")
+        btn_x.clicked.connect(self.excluir.emit)
+        linha.addWidget(btn_x)
         lay.addLayout(linha)
 
         if conflito:
             aviso = QLabel(
-                f"▲ Conflito: <b>{ed.origem}</b> é alterado por mais de uma edição.")
+                f"Conflito: <b>{ed.origem}</b> é alterado por mais de uma edição.")
             aviso.setObjectName("RcConflict")
             aviso.setTextFormat(Qt.TextFormat.RichText)
             lay.addWidget(aviso)
@@ -131,7 +142,7 @@ class _EdicaoCard(QFrame):
                 f"após {ed.codigo}" if ed.modo == "code" else f"após a linha {ed.linha}")
             cor = theme.COLOR_TEXT_TERTIARY
             return (
-                f"➕ bloco · {n} linha{plural} "
+                f"+ bloco · {n} linha{plural} "
                 f"<span style='color:{cor};'>{ancora}</span>"
             )
         if ed.remover:
@@ -240,8 +251,9 @@ class LoteScreen(QWidget):
         lay = QVBoxLayout(box)
         lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay.setSpacing(12)
-        ic = QLabel("📋")
+        ic = QLabel()
         ic.setObjectName("EmptyIcon")
+        ic.setPixmap(icon_pixmap("grid", 36, theme.COLOR_TEXT_TERTIARY))
         ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
         t1 = QLabel("Lote vazio")
         t1.setObjectName("EmptyT1")
@@ -333,7 +345,7 @@ class LoteScreen(QWidget):
             n_conf = sum(1 for n in origem.values() if n > 1)
             if n_conf:
                 plural = "s" if n_conf > 1 else ""
-                texto, estado = f"⚠ {n_conf} conflito{plural}", "warn"
+                texto, estado = f"! {n_conf} conflito{plural}", "warn"
             else:
                 n = len(self._edicoes)
                 texto = f"{n} edição" if n == 1 else f"{n} edições"

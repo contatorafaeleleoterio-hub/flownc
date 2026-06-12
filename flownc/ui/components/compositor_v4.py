@@ -1,6 +1,6 @@
 """CompositorV4: compositor de edições da tela Lote (mockup v4).
 
-`QTabWidget` com duas abas — "Trocar código" e "➕ Inserir bloco" — e um único
+`QTabWidget` com duas abas — "Trocar código" e "+ Inserir bloco" — e um único
 botão "+ Adicionar ao lote" abaixo, compartilhado pelas duas. O botão só habilita
 com os campos obrigatórios da aba ativa preenchidos; remover é escolha explícita
 ("✕ Remover (sem código)" no dropdown de destino, estado vermelho).
@@ -36,6 +36,7 @@ from PySide6.QtWidgets import (
 )
 
 from core.matcher import find_spans
+from ui.icons import icon_pixmap
 from core.models import Mode
 
 # Amostra da biblioteca (FASE 2) — espelha LIB/FREQ de mockups/painel-final.v4.html.
@@ -51,7 +52,7 @@ LIB_EXEMPLO: list[tuple[str, str]] = [
 ]
 FREQ_EXEMPLO: list[str] = ["M8", "M08", "G54", "G55", "M6", "T1", "T01"]
 
-_TXT_REMOVER = "✕ Remover (sem código)"
+_TXT_REMOVER = "× Remover (sem código)"
 
 
 @dataclass(frozen=True)
@@ -127,8 +128,9 @@ class LibDropdown(QWidget):
         blay.setContentsMargins(12, 0, 12, 0)
         self._code = QLabel()
         self._code.setObjectName("LibDropCode")
-        self._caret = QLabel("▾")
+        self._caret = QLabel()
         self._caret.setObjectName("LibDropCaret")
+        self._caret.setPixmap(icon_pixmap("caret-down", 14, "#4E6278"))
         for lbl in (self._code, self._caret):
             lbl.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         blay.addWidget(self._code)
@@ -177,7 +179,7 @@ class LibDropdown(QWidget):
         self._btn.setProperty("empty", empty)
         self._btn.setProperty("remove", self._is_remove)
         if self._is_remove:
-            self._code.setText("✕ remover")
+            self._code.setText("× remover")
         else:
             self._code.setText(self._value or self._placeholder)
         for w in (self._btn, self._code):
@@ -292,7 +294,7 @@ class CompositorV4(QWidget):
         self.tabs = QTabWidget()
         self.tabs.setObjectName("CompTabs")
         self.tabs.addTab(self._build_swap(), "Trocar código")
-        self.tabs.addTab(self._build_ins(), "➕ Inserir bloco")
+        self.tabs.addTab(self._build_ins(), "+ Inserir bloco")
         self.tabs.currentChanged.connect(self._on_tab_changed)
         root.addWidget(self.tabs)
 
@@ -387,7 +389,7 @@ class CompositorV4(QWidget):
         campo_pos.addLayout(l2)
 
         self.aviso_linha = QLabel(
-            "⚠ o número da linha pode variar entre programas — prefira a opção por código")
+            "O número da linha pode variar entre programas — prefira a opção por código.")
         self.aviso_linha.setObjectName("InsWarnLine")
         self.aviso_linha.setWordWrap(True)
         self.aviso_linha.setVisible(False)
@@ -489,7 +491,7 @@ class CompositorV4(QWidget):
             elif not self.drop_origem.value():
                 dica = "Escolha o código de origem"
             else:
-                dica = "Escolha o destino — ou ✕ Remover para apagar o código"
+                dica = "Escolha o destino — ou × Remover para apagar o código"
         else:
             ok = self._ins_ok()
             if ok:

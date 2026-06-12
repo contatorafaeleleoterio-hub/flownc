@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal
+
+from ui.icons import icon_pixmap
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -75,8 +77,9 @@ class HistoricoScreen(QWidget):
         lay = QVBoxLayout(box)
         lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay.setSpacing(12)
-        ic = QLabel("🕘")
+        ic = QLabel()
         ic.setObjectName("EmptyIcon")
+        ic.setPixmap(icon_pixmap("clock", 36, "#8FA5C2"))
         ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
         t1 = QLabel("Nenhuma publicação ainda")
         t1.setObjectName("EmptyT1")
@@ -133,7 +136,7 @@ class HistoricoScreen(QWidget):
         cfg.setObjectName("HistCfg")
         lay.addWidget(cfg)
 
-        btn = QPushButton("↩ Restaurar originais")
+        btn = QPushButton("Restaurar originais")
         btn.setObjectName("GhostBtnV4")
         btn.setCursor(Qt.CursorShape.PointingHandCursor)
         existe = self._backup_existe(entrada.backup)
