@@ -1,23 +1,18 @@
 # Handoff — FlowNC — 2026-06-12
-Status: Fase 2 CONCLUÍDA — 63/64 tarefas (falta só o gate 12.5 = aprovação "é esse" do Mestre).
-
-Feito (loop autônomo, todos os blocos do plano v4):
-- Blocos 1-11 implementados e verdes: fundação visual, rail+4 telas, Programas, Compositor com
-  abas, modais Conferência (varredura real) e Publicação (gravação real: backup versionado +
-  atômica + SHA-256), Editor (faixa, guarda, toast, toolbar 3 grupos, inserir bloco, salvar como),
-  Códigos (biblioteca + blocos), Histórico, Topo (receitas + backup).
-- **Bloco 12:** pytest **166 verde**, mypy(core) limpo, ruff limpo (inclusive os 7 pré-existentes),
-  smoke visual das 4 telas + fluxo lote→conferência OK.
-- **EXE entregue:** `flownc/dist/FlowNC/FlowNC.exe` (portátil — copiar a pasta `dist/FlowNC` inteira
-  para o pendrive; cria `data/` ao lado do .exe). Build: `python -m PyInstaller FlowNC.spec --noconfirm --clean`.
-- **GitHub:** repo público criado e com push — https://github.com/contatorafaeleleoterio-hub/flownc
-  (descrição + 15 topics + README.md otimizado para descoberta por IAs). Commit `18b631a`.
-
-Onde parou: tudo implementado e verificado; aguardando revisão visual do Mestre.
-Próximo passo: Mestre abrir o EXE, conferir contra `mockups/painel-final.v4.html` e dar o "é esse"
-  (tarefa 12.5). Com o aval → `/opsx:archive plano-execucao-mockup-v4` e Fase 3 (publicação real
-  multi-pasta, seed Fanuc, persistência de receitas — já há base funcional).
-Blockers: nenhum. GitHub feito (não ficou em pausa).
-Arquivos novos: ui/lote_scan.py, ui/components/compositor_v4.py, ui/modals/*, README.md;
-  reescritos: ui/screens/* (Lote/Editor/Códigos/Histórico), ui/main_window.py, ui/editor_panel.py, ui/style.qss.
+Status: **Fase 2 CONCLUÍDA E APROVADA pelo Mestre (64/64 tarefas)** — gate 12.5 ✓.
+Feito nesta sessão:
+- Blocos 4–12 do plano v4 completos: compositor com abas, modais Conferência (varredura real)
+  e Publicação (gravação real: backup versionado + atômica + SHA-256), Editor (faixa, guarda,
+  toast Desfazer, inserir bloco, salvar como), Códigos, Histórico, topo (receitas/backup).
+- Revisão pós-feedback: ícones desenhados via `ui/icons.py` (IBM Plex não tem ✕✎⧉▦▾ — sem
+  quadradinhos), botão "↻ Atualizar" na lista, banner de mudança externa no Editor
+  (QFileSystemWatcher + Recarregar), pós-publicação limpa o lote mesmo fechando pelo ✕.
+- EXEs: `flownc/dist-onefile/FlowNC-portatil.exe` (47MB, único) + `flownc/dist/FlowNC/`.
+- GitHub: repo público https://github.com/contatorafaeleleoterio-hub/flownc (README p/ IAs,
+  15 topics); commits até `42180c6` com push.
+Onde parou: Fase 2 aprovada ("tudo aprovado"); app validado pelo Mestre no EXE.
+Próximo passo: `/opsx:archive plano-execucao-mockup-v4` e propor a Fase 3 (restauração real
+  do Histórico, persistência de receitas com edições de bloco, seed Fanuc ampliado).
+Blockers: nenhum.
+Verificação: pytest 170 verde; mypy(core) limpo; ruff limpo.
 Retomar com: "continuar"

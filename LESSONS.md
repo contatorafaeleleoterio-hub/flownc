@@ -72,3 +72,12 @@ O Mestre pediu "resolver as pontas soltas, uma pergunta de cada vez". Em vez dis
 - **Processo de plano:** o pipeline `/plan-*` opera no `PLAN.md` (raiz). Quando o detalhamento vive numa change OpenSpec, definir o **PLAN.md como fonte de verdade** e regenerar o `tasks.md` a partir dele (mantê-los em sincronia).
 - **Arquivar change não-implementada polui specs:** usar `openspec archive --skip-specs` guarda o histórico **sem** consolidar os deltas nos specs base (ou descartar a pasta). Foi a escolha do Mestre para a change v2 `redesign-fase2-fidelidade-visual`.
 - **Achado:** a "Fase 2" já tinha sido codada uma vez contra o v2 (commit `f28fdb8`) apesar do HANDOFF dizer que não havia começado — sempre conferir o git, não só o HANDOFF. Decisão do Mestre: refazer a UI do zero pro v4, preservando o `core/`.
+
+## 2026-06-12 — Glifos unicode na UI: a fonte empacotada decide, não o sistema
+Sintoma: botões "✕"/"✎" e ícones do rail viravam quadradinho ou sumiam no EXE do Mestre.
+Causa dupla: (1) a IBM Plex empacotada NÃO tem dingbats/formas (✕ ✎ ⧉ ▦ ▾ ● ⚠ emojis) e o
+fallback por glifo do Qt não salvou; (2) o padding global de QPushButton (16px por lado)
+esmagava o texto em botões de 32px — botão "vazio".
+Regra daqui pra frente: ícone na UI = desenhado via QPainter (`ui/icons.py`) ou caractere
+latin-1 comprovado (× ✓ → ↻ ↺). Nunca confiar em dingbat/emoji em texto de widget.
+Diagnóstico rápido: QRawFont.supportsCharacter(ord(ch)) com a fonte real carregada.

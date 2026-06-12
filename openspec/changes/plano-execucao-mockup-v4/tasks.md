@@ -108,4 +108,4 @@
 - [x] 12.2 [CRÍTICO] Rodar mypy (sem novos erros de tipo)
 - [x] 12.3 [CRÍTICO] Rodar ruff (sem violações)
 - [x] 12.4 Smoke visual de todas as telas vs `mockups/painel-final.v4.html` (divergências anotadas)
-- [ ] 12.5 Pedir aprovação explícita do Mestre ("é esse") — gate de saída da Fase 2
+- [x] 12.5 Pedir aprovação explícita do Mestre ("é esse") — gate de saída da Fase 2
