@@ -14,29 +14,29 @@
 
 ## 1. Fundação visual v4 (tokens + QSS)
 
-- [ ] 1.1 [CRÍTICO] Atualizar `flownc/ui/theme.py` com os tokens da paleta v4 (ok: `COLOR_CTA == "#E85D04"`, existem `COLOR_RAIL`/`COLOR_TOP`, import sem erro)
-- [ ] 1.2 Atualizar `flownc/ui/style.qss` com seletores `QTabWidget` e `QDialog` via tokens (ok: blocos presentes, nenhuma cor hexadecimal literal)
-- [ ] 1.3 [CRÍTICO] Verificar a fundação (ok: pytest/mypy/ruff verdes)
+- [x] 1.1 [CRÍTICO] Atualizar `flownc/ui/theme.py` com os tokens da paleta v4 (ok: `COLOR_CTA == "#E85D04"`, existem `COLOR_RAIL`/`COLOR_TOP`, import sem erro)
+- [x] 1.2 Atualizar `flownc/ui/style.qss` com seletores `QTabWidget` e `QDialog` via tokens (ok: blocos presentes, nenhuma cor hexadecimal literal)
+- [x] 1.3 [CRÍTICO] Verificar a fundação (ok: pytest/mypy/ruff verdes)
 
 ## 2. Estrutura raiz (rail + topo + pilha de telas)
 
-- [ ] 2.1 Criar `flownc/ui/components/rail.py` (`RailWidget`: 4 botões + sinal `tela_mudou(int)`)
-- [ ] 2.2 Filete laranja no botão ativo do rail
-- [ ] 2.3 Bolinha de status no botão Editor do rail (método liga/desliga)
-- [ ] 2.4 Criar `flownc/ui/components/top_bar.py` (`TopBar`: combo de receitas com "💾 Salvar lote atual como…" + chip de backup)
-- [ ] 2.5 Criar o pacote `flownc/ui/screens/` (com `__init__.py`) + 4 stubs: `LoteScreen`, `EditorScreen`, `CodigosScreen`, `HistoricoScreen`
-- [ ] 2.6 [CRÍTICO] Reestruturar `flownc/ui/main_window.py`: topo + (rail + `QStackedWidget`), ordem 0=Lote/1=Editor/2=Códigos/3=Histórico; sem `QSplitter` raiz
-- [ ] 2.7 Conectar `RailWidget.tela_mudou` → `QStackedWidget.setCurrentIndex`
-- [ ] 2.8 [CRÍTICO] Verificar a estrutura raiz (app abre, 4 botões trocam de tela, pytest verde)
+- [x] 2.1 Criar `flownc/ui/components/rail.py` (`RailWidget`: 4 botões + sinal `tela_mudou(int)`)
+- [x] 2.2 Filete laranja no botão ativo do rail
+- [x] 2.3 Bolinha de status no botão Editor do rail (método liga/desliga)
+- [x] 2.4 Criar `flownc/ui/components/top_bar.py` (`TopBar`: combo de receitas com "💾 Salvar lote atual como…" + chip de backup)
+- [x] 2.5 Criar o pacote `flownc/ui/screens/` (com `__init__.py`) + 4 stubs: `LoteScreen`, `EditorScreen`, `CodigosScreen`, `HistoricoScreen`
+- [x] 2.6 [CRÍTICO] Reestruturar `flownc/ui/main_window.py`: topo + (rail + `QStackedWidget`), ordem 0=Lote/1=Editor/2=Códigos/3=Histórico; sem `QSplitter` raiz
+- [x] 2.7 Conectar `RailWidget.tela_mudou` → `QStackedWidget.setCurrentIndex`
+- [x] 2.8 [CRÍTICO] Verificar a estrutura raiz (app abre, 4 botões trocam de tela, pytest verde)
 
 ## 3. Tela Lote · painel Programas
 
-- [ ] 3.1 Criar `flownc/ui/components/program_list_v4.py` (checkbox, nome mono, data, tamanho, "✎ Abrir", "✕")
-- [ ] 3.2 Marcar/desmarcar com destaque visual + chip "N de M marcados"
-- [ ] 3.3 Botão "Marcar todos / Desmarcar todos"
-- [ ] 3.4 Arrastar-e-soltar arquivos na lista
-- [ ] 3.5 Estado vazio com botão "+ Adicionar programa(s)…"
-- [ ] 3.6 Integrar `program_list_v4` na coluna esquerda da `LoteScreen`
+- [x] 3.1 Criar `flownc/ui/components/program_list_v4.py` (checkbox, nome mono, data, tamanho, "✎ Abrir", "✕")
+- [x] 3.2 Marcar/desmarcar com destaque visual + chip "N de M marcados"
+- [x] 3.3 Botão "Marcar todos / Desmarcar todos"
+- [x] 3.4 Arrastar-e-soltar arquivos na lista
+- [x] 3.5 Estado vazio com botão "+ Adicionar programa(s)…"
+- [x] 3.6 Integrar `program_list_v4` na coluna esquerda da `LoteScreen`
 
 ## 4. Tela Lote · Compositor com abas e Lote de edições
 

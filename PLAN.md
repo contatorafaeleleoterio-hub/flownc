@@ -7,11 +7,9 @@ status: pronto
 > **`docs/CONTEXTO-IA.md`** (fonte central). Onde houver dúvida visual/comportamental, vale o
 > mockup v4 + o CONTEXTO-IA.
 >
-> **Decisão do Mestre (2026-06-11):** a interface é **reconstruída do zero** seguindo o v4. O
-> código de UI feito antes contra o mockup v2 (commit `f28fdb8`: `compositor.py`, `header.py`,
-> `program_list.py`, `summary.py`, `editor_panel.py` no formato de 2 colunas) **não é base** —
-> será substituído pela estrutura nova do v4 (rail + 4 telas). O **núcleo (`core/`)** é
-> preservado e reaproveitado.
+> **Decisão do Mestre (2026-06-11):** a interface é **reconstruída do zero** seguindo o v4 (rail +
+> 4 telas). O **núcleo (`core/`)** e o motor de edição (`editor_panel.py`) são preservados e
+> reaproveitados; a UI que não serve ao v4 foi arquivada em `_descarte/` e não volta ao fluxo.
 >
 > **Detalhamento executável:** a Fase 2 está atomizada na change OpenSpec
 > **`plano-execucao-mockup-v4`** (`openspec/changes/plano-execucao-mockup-v4/`: `proposal.md`,
@@ -50,10 +48,9 @@ nada é gravado sem uma conferência com números reais, e toda publicação cri
 - Suíte de testes verde (o número atual e os comandos exatos estão na seção **Tecnologias e
   verificação**; usar sempre o venv `flownc/.venv`, PySide6 6.11.1 — nunca o `pytest` global).
 
-**A refazer (interface — Fase 2):**
-- A UI atual está na **estrutura de 2 colunas do v2** (`main_window.py` com `QSplitter`;
-  componentes `compositor.py`, `header.py`, `summary.py`, `program_list.py`). **Será substituída**
-  pela estrutura do v4 (rail + topo + 4 telas + modais), conforme decisão do Mestre.
+**Em construção (interface — Fase 2):**
+- A interface v4 (`main_window.py` como maestro: topo + rail + `QStackedWidget` de 4 telas) está
+  sendo montada tela a tela. A UI que não serve ao v4 já foi arquivada em `_descarte/ui_v2/`.
 
 **A ligar/empacotar (Fase 3):**
 - Ligar as telas v4 ao núcleo (conferência, publicação, biblioteca, receitas, histórico).
@@ -81,6 +78,8 @@ o núcleo (`flownc/core/`) **não muda**. Detalhamento tarefa a tarefa na change
 Alvo de estrutura de arquivos (novos):
 - `flownc/ui/components/rail.py` — barra lateral com os 4 botões-lugar.
 - `flownc/ui/components/top_bar.py` — topo global (configuração/receita + chip de backup).
+- `flownc/ui/components/program_list_v4.py` — lista de programas da tela Lote (Bloco 3).
+- `flownc/ui/components/compositor_v4.py` — compositor com 2 abas (Trocar código / Inserir bloco) (Bloco 4).
 - `flownc/ui/screens/lote_screen.py` — tela Lote (Programas + Compositor com abas + Lote de edições).
 - `flownc/ui/screens/editor_screen.py` — tela Editor (faixa de arquivos + editor tela cheia).
 - `flownc/ui/screens/codigos_screen.py` — tela Códigos (biblioteca).
@@ -144,16 +143,12 @@ empacotamento**, nunca o layout aprovado. Será proposta como uma ou mais change
 > Regra geral de parada segura: nenhum `git commit` enquanto pytest/mypy/ruff da mudança não
 > estiverem verdes; em qualquer falha não prevista, parar e reportar em vez de improvisar.
 
-### Gate 0 — Resolver a pendência da change v2 ✅ RESOLVIDO (2026-06-11)
+### Gate 0 — Quadro limpo ✅ (2026-06-12)
 
-> **Decisão do Mestre:** **arquivar guardando só o histórico** — executado com
-> `openspec archive redesign-fase2-fidelidade-visual --skip-specs -y`. A change foi para
-> `openspec/changes/archive/2026-06-11-redesign-fase2-fidelidade-visual` **sem** consolidar os
-> deltas do v2 nos specs base (documentação oficial intacta). `openspec list` não a mostra mais
-> como ativa. Gate liberado para o Bloco 1.
->
-> ⚠️ Ainda há outra change ativa fora deste plano — `add-code-combo-placeholder` (0/17). Não faz
-> parte do v4; decidir o destino dela à parte para respeitar "uma mudança por vez".
+> A **única** change ativa é `plano-execucao-mockup-v4`. Todo material de versões antigas (changes,
+> componentes de UI, mockups e docs) foi arquivado em `_descarte/` / `openspec/changes/archive/` e
+> **não volta a entrar no fluxo** — nada de versão antiga interrompe o desenvolvimento do v4. Gate
+> liberado.
 
 ### Bloco 1 — Fundação visual v4 (tokens + QSS)
 
@@ -416,6 +411,10 @@ empacotamento**, nunca o layout aprovado. Será proposta como uma ou mais change
    mockup v4 e as divergências anotadas (ou nenhuma encontrada)._
    ↳ Se falhar (divergência relevante): anotar e voltar ao bloco da tela correspondente antes de
    pedir o aval do Mestre — é o gate da Fase 2.
+12.5 **Pedir** a aprovação explícita do Mestre ("é esse") — _Concluído quando: o Mestre conferiu o
+   smoke visual de todas as telas e deu o aval; é o **gate de saída da Fase 2** que libera a Fase 3._
+   ↳ Se falhar (Mestre aponta divergência): anotar, voltar ao bloco da tela correspondente e
+   reapresentar; não iniciar a Fase 3 sem o "é esse".
 
 ## Etapas da Fase 3 (alto nível — atomizar na proposta da change da Fase 3)
 
@@ -474,21 +473,6 @@ empacotamento**, nunca o layout aprovado. Será proposta como uma ou mais change
   `plano-execucao-mockup-v4`; Fase 3 = change(s) futura(s). "Validar" = conferir que os artefatos
   existem e estão coerentes (+ `openspec validate <nome>` opcional). Não existe `/opsx:validate`.
 
-## Histórico (registro — não reexecutar)
-
-- **Fundação visual** (`redesign-fundacao-visual`) e **Layout 2 colunas** (`redesign-layout-principal`):
-  propostas, implementadas e **arquivadas** (2026-06-06/07) no OpenSpec. Eram do desenho anterior
-  (v2). O **mecanismo** de tokens (`flownc/ui/theme.py` + `flownc/ui/style.qss`) é reaproveitável,
-  mas os **valores** serão atualizados para a paleta do v4; o layout de 2 colunas (`QSplitter`)
-  será substituído pelo rail + `QStackedWidget` do v4.
-- **Fidelidade v2** (`redesign-fase2-fidelidade-visual`): change proposta e parcialmente codada
-  (commit `f28fdb8`) contra o mockup **v2**. **Descartada como base** pela decisão de refazer do
-  zero no v4 (ver topo).
-  ✅ **Resolvido (2026-06-11):** arquivada com `openspec archive --skip-specs -y` →
-  `openspec/changes/archive/2026-06-11-redesign-fase2-fidelidade-visual`. O `--skip-specs` preserva
-  o histórico do trabalho v2 **sem** consolidar os deltas nos specs base, mantendo a documentação
-  oficial (`openspec/specs/`) intacta e evitando conflito quando o v4 for arquivado.
-
 ## Glossário rápido
 
 **Termos do produto/v4**
@@ -517,8 +501,6 @@ empacotamento**, nunca o layout aprovado. Será proposta como uma ou mais change
   troca a tela ativa. Não contém lógica de conteúdo de tela.
 - **QStackedWidget:** empilhador de telas do Qt em que **só uma** fica visível por vez; o rail
   escolhe qual mostrar. É o que troca entre Lote/Editor/Códigos/Histórico.
-- **QSplitter:** divisor de painéis redimensionável do Qt (era a base do layout v2 de 2 colunas;
-  será removido como estrutura raiz no v4).
 - **Sinais/slots (Qt):** mecanismo do Qt em que um widget "emite um sinal" (ex.: botão clicado) e
   um método conectado ("slot") responde. As telas avisam o maestro por sinais; o maestro reage.
 - **Tokens:** constantes de estilo (cores, fontes, espaçamentos) definidas em `flownc/ui/theme.py`

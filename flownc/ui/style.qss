@@ -1,124 +1,132 @@
-/* FlowNC — folha de estilo central
-   Tokens: flownc/ui/theme.py
-   Fontes: IBM Plex Sans / Segoe UI (fallback) + IBM Plex Mono / Consolas (fallback)
+/* FlowNC — folha de estilo central (paleta v4 "Precisão Laranja")
+   Tokens: flownc/ui/theme.py — este arquivo é um TEMPLATE interpolado por
+   theme.render_qss(): cada placeholder (cifrao + nome entre chaves) vira o
+   valor da constante de mesmo nome em theme.py.
+   REGRA: nenhuma cor hexadecimal literal aqui — toda cor vem de um token.
+   Cobre os widgets-base do v4; os seletores especificos de cada tela entram
+   junto com a tela (Blocos 3+ do PLAN.md).
 */
 
 /* -----------------------------------------------------------------------
-   QMainWindow — janela principal
+   Base — janela, diálogo e fonte padrão
    ----------------------------------------------------------------------- */
-QMainWindow {
-    background-color: #C2C9D1;
-    color: #1B2128;
-    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+QMainWindow,
+QDialog {
+    background-color: ${COLOR_BG_SURFACE};
+    color: ${COLOR_TEXT_PRIMARY};
+    font-family: ${FONT_SANS};
     font-size: 14px;
     font-weight: 400;
 }
 
-/* Container central (atras dos paineis): tom "superficie" do mockup,
-   para os paineis claros (#F8FAFB) destacarem como cartoes flutuantes. */
-QStackedWidget,
-#LeftColumn,
-#RightColumn {
-    background-color: #C2C9D1;
+QWidget {
+    font-family: ${FONT_SANS};
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+QStackedWidget {
+    background-color: ${COLOR_BG_SURFACE};
+}
+
+QScrollArea {
+    border: none;
+    background: transparent;
 }
 
 /* -----------------------------------------------------------------------
    QPushButton — botão padrão (secundário / ghost)
    ----------------------------------------------------------------------- */
 QPushButton {
-    background-color: #FFFFFF;
-    color: #1B2128;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_TEXT_PRIMARY};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
     padding: 0px 16px;
     min-height: 32px;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-family: ${FONT_SANS};
     font-size: 13px;
     font-weight: 600;
 }
 
 QPushButton:hover {
-    background-color: #ECEFF3;
-    border-color: #aeb6bf;
+    background-color: ${COLOR_PANEL_LEFT};
+    border-color: ${COLOR_BORDER_STRONG};
 }
 
 QPushButton:pressed {
-    background-color: #E1E6EC;
-    border-color: #aeb6bf;
+    background-color: ${COLOR_PANEL_RIGHT};
+    border-color: ${COLOR_BORDER_STRONG};
 }
 
 QPushButton:disabled {
-    background-color: #ECEFF3;
-    color: #899099;
-    border-color: #CDD4DB;
+    background-color: ${COLOR_BTN_DISABLED_BG};
+    color: ${COLOR_BTN_DISABLED_TEXT};
+    border-color: ${COLOR_BORDER};
 }
 
-/* Botão primário (CTA — classe via setProperty) */
-QPushButton[primary="true"] {
-    background-color: qlineargradient(
-        x1:0, y1:0, x2:0, y2:1,
-        stop:0 #3A434E,
-        stop:1 #232A33
-    );
-    color: #F4F7FA;
+/* Botão principal (CTA laranja) — via setProperty("primary", True) ou #CTA */
+QPushButton[primary="true"],
+QPushButton#CTA {
+    background-color: ${COLOR_CTA};
+    color: ${COLOR_CTA_TEXT};
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     min-height: 44px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
-QPushButton[primary="true"]:hover {
-    background-color: qlineargradient(
-        x1:0, y1:0, x2:0, y2:1,
-        stop:0 #4a5460,
-        stop:1 #2e3744
-    );
+QPushButton[primary="true"]:hover,
+QPushButton#CTA:hover {
+    background-color: ${COLOR_ACCENT_HV};
 }
 
-QPushButton[primary="true"]:pressed {
-    background-color: #232A33;
+QPushButton[primary="true"]:pressed,
+QPushButton#CTA:pressed {
+    background-color: ${COLOR_ACCENT_ACTIVE};
 }
 
-QPushButton[primary="true"]:disabled {
-    background-color: #9fb3c6;
-    color: #ECEFF3;
+QPushButton[primary="true"]:disabled,
+QPushButton#CTA:disabled {
+    background-color: ${COLOR_BTN_DISABLED_BG};
+    color: ${COLOR_BTN_DISABLED_TEXT};
 }
 
-/* Botão interativo (azul) */
+/* Botão de ação secundária (azul-ardósia) */
 QPushButton[interactive="true"] {
-    background-color: #E4EEF7;
-    color: #1F5F9E;
-    border: 1px solid #CDD4DB;
+    background-color: ${COLOR_INTERACTIVE_BG};
+    color: ${COLOR_INTERACTIVE};
+    border: 1px solid ${COLOR_BORDER};
 }
 
 QPushButton[interactive="true"]:hover {
-    background-color: #d0e3f4;
-    border-color: #1F5F9E;
+    background-color: ${COLOR_INTERACTIVE};
+    color: ${COLOR_WHITE};
+    border-color: ${COLOR_INTERACTIVE};
 }
 
 /* -----------------------------------------------------------------------
    QComboBox — dropdown
    ----------------------------------------------------------------------- */
 QComboBox {
-    background-color: #FFFFFF;
-    color: #1B2128;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_TEXT_PRIMARY};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
     padding: 0px 12px;
     min-height: 44px;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-family: ${FONT_SANS};
     font-size: 13px;
     font-weight: 600;
-    selection-background-color: #E4EEF7;
+    selection-background-color: ${COLOR_INTERACTIVE_BG};
 }
 
 QComboBox:hover {
-    border-color: #aeb6bf;
+    border-color: ${COLOR_BORDER_STRONG};
 }
 
 QComboBox:focus {
-    border-color: #1F5F9E;
+    border-color: ${COLOR_ACCENT};
     border-width: 2px;
 }
 
@@ -126,17 +134,17 @@ QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;
     width: 28px;
-    border-left: 1px solid #CDD4DB;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-left: 1px solid ${COLOR_BORDER};
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 
 QComboBox QAbstractItemView {
-    background-color: #FFFFFF;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-    selection-background-color: #E4EEF7;
-    selection-color: #1B2128;
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+    selection-background-color: ${COLOR_INTERACTIVE_BG};
+    selection-color: ${COLOR_TEXT_PRIMARY};
     padding: 4px;
     outline: none;
 }
@@ -145,11 +153,11 @@ QComboBox QAbstractItemView {
    QListWidget — lista de programas / itens
    ----------------------------------------------------------------------- */
 QListWidget {
-    background-color: #FFFFFF;
-    color: #1B2128;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_TEXT_PRIMARY};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+    font-family: ${FONT_SANS};
     font-size: 13px;
     outline: none;
 }
@@ -160,81 +168,77 @@ QListWidget::item {
 }
 
 QListWidget::item:hover {
-    background-color: #ECEFF3;
+    background-color: ${COLOR_PANEL_LEFT};
 }
 
-QListWidget::item:selected {
-    background-color: #E4EEF7;
-    color: #1F5F9E;
-}
-
+QListWidget::item:selected,
 QListWidget::item:selected:active {
-    background-color: #E4EEF7;
-    color: #1F5F9E;
+    background-color: ${COLOR_INTERACTIVE_BG};
+    color: ${COLOR_INTERACTIVE};
 }
 
 /* -----------------------------------------------------------------------
    QLineEdit — campo de texto
    ----------------------------------------------------------------------- */
 QLineEdit {
-    background-color: #FFFFFF;
-    color: #1B2128;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_TEXT_PRIMARY};
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
     padding: 0px 12px;
     min-height: 44px;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    font-family: ${FONT_SANS};
     font-size: 13px;
-    selection-background-color: #E4EEF7;
-    selection-color: #1B2128;
+    selection-background-color: ${COLOR_INTERACTIVE_BG};
+    selection-color: ${COLOR_TEXT_PRIMARY};
 }
 
 QLineEdit:hover {
-    border-color: #aeb6bf;
+    border-color: ${COLOR_BORDER_STRONG};
 }
 
 QLineEdit:focus {
-    border-color: #1F5F9E;
+    border-color: ${COLOR_ACCENT};
     border-width: 2px;
 }
 
 QLineEdit:disabled {
-    background-color: #ECEFF3;
-    color: #899099;
+    background-color: ${COLOR_PANEL_LEFT};
+    color: ${COLOR_TEXT_TERTIARY};
 }
 
 /* -----------------------------------------------------------------------
    QLabel — rótulos
    ----------------------------------------------------------------------- */
 QLabel {
-    color: #1B2128;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    color: ${COLOR_TEXT_PRIMARY};
+    font-family: ${FONT_SANS};
     font-size: 13px;
     font-weight: 400;
     background: transparent;
 }
 
 QLabel[secondary="true"] {
-    color: #56616D;
+    color: ${COLOR_TEXT_SECONDARY};
 }
 
 QLabel[tertiary="true"] {
-    color: #899099;
+    color: ${COLOR_TEXT_TERTIARY};
     font-size: 12px;
 }
 
 QLabel[heading="true"] {
-    color: #1B2128;
+    color: ${COLOR_TEXT_PRIMARY};
     font-size: 15px;
     font-weight: 700;
 }
 
 /* -----------------------------------------------------------------------
-   QCheckBox — caixa de seleção
+   QCheckBox — caixa de seleção (marcado = verde "success" do v4)
    ----------------------------------------------------------------------- */
 QCheckBox {
-    color: #1B2128;
-    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    color: ${COLOR_TEXT_PRIMARY};
+    font-family: ${FONT_SANS};
     font-size: 13px;
     spacing: 8px;
 }
@@ -242,524 +246,350 @@ QCheckBox {
 QCheckBox::indicator {
     width: 18px;
     height: 18px;
-    border: 1px solid #CDD4DB;
+    border: 1px solid ${COLOR_BORDER};
     border-radius: 4px;
-    background-color: #FFFFFF;
+    background-color: ${COLOR_WHITE};
 }
 
 QCheckBox::indicator:hover {
-    border-color: #aeb6bf;
-    background-color: #ECEFF3;
+    border-color: ${COLOR_BORDER_STRONG};
+    background-color: ${COLOR_PANEL_LEFT};
 }
 
 QCheckBox::indicator:checked {
-    background-color: #1C8A4D;
-    border-color: #1C8A4D;
+    background-color: ${COLOR_SUCCESS};
+    border-color: ${COLOR_SUCCESS};
     image: none;
 }
 
-QCheckBox::indicator:checked:hover {
-    background-color: #24A65E;
-    border-color: #24A65E;
-}
-
 QCheckBox:disabled {
-    color: #899099;
+    color: ${COLOR_TEXT_TERTIARY};
 }
 
 QCheckBox::indicator:disabled {
-    background-color: #ECEFF3;
-    border-color: #CDD4DB;
+    background-color: ${COLOR_PANEL_LEFT};
+    border-color: ${COLOR_BORDER};
 }
 
 /* -----------------------------------------------------------------------
-   QSplitter — divisor de painéis
+   QTabWidget — compositor com abas ("Trocar código" / "➕ Inserir bloco")
    ----------------------------------------------------------------------- */
-QSplitter {
-    background-color: #C2C9D1;
+QTabWidget::pane {
+    border: 1px solid ${COLOR_BORDER};
+    border-radius: 4px;
+    background-color: ${COLOR_WHITE};
+    top: -1px;
 }
 
-QSplitter::handle {
-    background-color: #C2C9D1;
-    width: 8px;
-    height: 8px;
+QTabBar::tab {
+    background-color: ${COLOR_PANEL_LEFT};
+    color: ${COLOR_TEXT_SECONDARY};
+    border: 1px solid ${COLOR_BORDER};
+    border-bottom: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 8px 16px;
+    font-family: ${FONT_SANS};
+    font-size: 13px;
+    font-weight: 600;
 }
 
-QSplitter::handle:hover {
-    background-color: #aeb6bf;
+QTabBar::tab:hover {
+    color: ${COLOR_TEXT_PRIMARY};
 }
 
-QSplitter::handle:horizontal {
-    width: 4px;
+QTabBar::tab:selected {
+    background-color: ${COLOR_WHITE};
+    color: ${COLOR_ACCENT};
+    border-bottom: 2px solid ${COLOR_ACCENT};
 }
 
-QSplitter::handle:vertical {
-    height: 4px;
+QTabBar::tab:disabled {
+    color: ${COLOR_TEXT_TERTIARY};
 }
 
 /* -----------------------------------------------------------------------
-   HeaderBar — barra superior (gradiente metálico, tokens COLOR_HEAD_*)
+   QDialog — rodapé fixo dos modais (Conferência / Publicação)
    ----------------------------------------------------------------------- */
-#HeaderBar {
-    min-height: 70px;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #D3DAE1, stop:0.5 #c3cbd3, stop:1 #B9C2CB);
-    border-bottom: 1px solid #a7afb8;
+QDialog QFrame[modalFooter="true"] {
+    background-color: ${COLOR_MODAL_FOOTER};
+    border-top: 1px solid ${COLOR_BORDER};
 }
 
-#HeaderBar #Logo {
-    font-weight: 700;
-    font-size: 16px;
-    color: #1B2128;
+/* -----------------------------------------------------------------------
+   Rail — barra lateral escura com os 4 botões-lugar (RailWidget)
+   ----------------------------------------------------------------------- */
+#Rail {
+    background-color: ${COLOR_RAIL};
+    border-right: 1px solid ${COLOR_HEAD_BORDER};
 }
 
-#LogoBadge {
-    background-color: #1F5F9E;
-    color: #FFFFFF;
-    border-radius: 19px;
+#RailLogo {
+    color: ${COLOR_WHITE};
     font-size: 18px;
+    background-color: ${COLOR_SLATE_2};
+    border-radius: 20px;
+    min-width: 40px;
+    max-width: 40px;
+    min-height: 40px;
+    max-height: 40px;
 }
 
-/* -----------------------------------------------------------------------
-   Painéis das colunas — fundo base, cantos arredondados, padding SP_16
-   ----------------------------------------------------------------------- */
-#CompositorPanel,
-#ProgramListPanel,
-#SummaryPanel {
-    background-color: #F8FAFB;
-    border-radius: 12px;
-    padding: 16px;
-}
-
-QScrollArea {
+QPushButton#RailItem {
+    background-color: transparent;
+    color: ${COLOR_RAIL_TEXT};
     border: none;
-    background: transparent;
-}
-
-#Counter {
-    background-color: #F8FAFB;
-    border: none;
-    color: #1B2128;
-    padding: 6px 4px;
-}
-
-#Counter b {
-    font-family: "IBM Plex Mono", "Consolas", monospace;
-    font-size: 24px;
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    padding: 12px 4px;
+    min-height: 44px;
+    font-size: 10px;
     font-weight: 700;
 }
 
-#StateChip {
-    border-radius: 12px;
+QPushButton#RailItem:hover {
+    background-color: ${COLOR_SLATE_2};
+    color: ${COLOR_WHITE};
+}
+
+QPushButton#RailItem[active="true"] {
+    background-color: ${COLOR_SLATE_2};
+    color: ${COLOR_WHITE};
+    border-left: 3px solid ${COLOR_ACCENT};
+}
+
+#RailDot {
+    background-color: ${COLOR_ACCENT};
+    border-radius: 4px;
+}
+
+#RailFoot {
+    color: ${COLOR_RAIL_FOOT};
+    font-size: 10px;
+}
+
+/* -----------------------------------------------------------------------
+   TopBar — topo global (marca + seletor de receita + chip de backup)
+   ----------------------------------------------------------------------- */
+#TopBar {
+    background-color: ${COLOR_TOP};
+    border-bottom: 1px solid ${COLOR_HEAD_BORDER};
+}
+
+#TopBrandName {
+    color: ${COLOR_WHITE};
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#TopBrandSub {
+    color: ${COLOR_TEXT_TERTIARY};
+    font-size: 10px;
+    font-weight: 700;
+}
+
+QComboBox#CfgSelect {
+    background-color: ${COLOR_SLATE_2};
+    color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_TOP_BORDER_SOFT};
+    border-radius: 4px;
+    min-height: 32px;
+    padding: 0px 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QComboBox#CfgSelect:hover {
+    border-color: ${COLOR_RAIL_TEXT};
+}
+
+QComboBox#CfgSelect::drop-down {
+    border-left: 1px solid ${COLOR_TOP_BORDER_SOFT};
+}
+
+QPushButton#ChipBackup {
+    background-color: transparent;
+    color: ${COLOR_TOP_BTN_TEXT};
+    border: 1px solid ${COLOR_TOP_BORDER_SOFT};
+    border-radius: 4px;
+    min-height: 32px;
+    padding: 0px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#ChipBackup:hover {
+    background-color: ${COLOR_SLATE_2};
+    color: ${COLOR_WHITE};
+}
+
+/* -----------------------------------------------------------------------
+   Tela Lote · painel Programas (program_list_v4)
+   ----------------------------------------------------------------------- */
+#ProgramListV4 {
+    background-color: ${COLOR_PANEL_LEFT};
+    border-radius: 6px;
+}
+
+#LotePanelRight {
+    background-color: ${COLOR_PANEL_RIGHT};
+    border-radius: 6px;
+}
+
+#ProgramListV4[dragover="true"] {
+    border: 1px dashed ${COLOR_INTERACTIVE};
+}
+
+#PTitle {
+    color: ${COLOR_TEXT_SECONDARY};
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#ProgChip {
+    color: ${COLOR_TEXT_SECONDARY};
+    background-color: ${COLOR_BG_RAIL};
+    border-radius: 4px;
     padding: 4px 12px;
     font-size: 12px;
     font-weight: 600;
 }
 
-#StateChip[state="ok"] {
-    background-color: #E1F1E8;
-    color: #1C8A4D;
-}
-
-#StateChip[state="warn"] {
-    background-color: #FAEED5;
-    color: #A86A07;
-}
-
-#RuleCard {
-    background-color: #ECEFF3;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-    padding: 10px;
-}
-
-#RuleCard[conflict="true"] {
-    background-color: #FAEED5;
-    border-left: 4px solid #A86A07;
-}
-
-#RuleFormula {
-    color: #1F5F9E;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-#ValidChip {
-    background-color: #E1F1E8;
-    color: #1C8A4D;
-    border-radius: 10px;
-    padding: 2px 8px;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-#ConflictLine {
-    color: #A86A07;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-#BackupSeal {
-    background-color: #E1F1E8;
-    color: #1C8A4D;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-QPushButton#CTA {
-    background-color: qlineargradient(
-        x1:0, y1:0, x2:0, y2:1,
-        stop:0 #3A434E,
-        stop:1 #232A33
-    );
-    color: #F4F7FA;
-    border: none;
-    border-radius: 12px;
-    min-height: 56px;
-    font-size: 15px;
-    font-weight: 700;
-}
-
-#MatchBanner {
-    background-color: #E1F1E8;
-    color: #1C8A4D;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-#ProgramName {
-    font-family: "IBM Plex Mono", "Consolas", monospace;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-/* =======================================================================
-   ACABAMENTO — elementos que faltavam (fidelidade ao mockup v2)
-   ======================================================================= */
-
-/* ---- Titulos de secao: badge numerado + texto em maiusculas ---- */
-#ZNum {
-    background-color: #E1E6EC;
-    color: #56616D;
-    border: 1px solid #CDD4DB;
-    border-radius: 4px;
-    min-width: 20px;
-    max-width: 20px;
-    min-height: 20px;
-    max-height: 20px;
-    font-size: 12px;
-    font-weight: 700;
-    qproperty-alignment: AlignCenter;
-}
-
-#ZTitle {
-    color: #56616D;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* ---- Rotulo em caixa-alta (CODIGO DE ORIGEM, TROCAR POR, Perfil) ---- */
-#LabelCaps {
-    color: #56616D;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* ---- Cabecalho: subtitulo da marca + separador vertical ---- */
-#BrandSub {
-    color: #56616D;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-#VLine {
-    background-color: #aeb6bf;
-}
-
-/* ---- Botao azul solido "+ Adicionar codigo" (header) ---- */
-QPushButton#BtnInteractive {
-    background-color: #1F5F9E;
-    color: #FFFFFF;
-    border: none;
-}
-
-QPushButton#BtnInteractive:hover {
-    background-color: #2B76C0;
-}
-
-QPushButton#BtnInteractive:pressed {
-    background-color: #1A527E;
-}
-
-/* ---- Combos de codigo (origem / destino) em fonte mono ---- */
-#CodeCombo {
-    font-family: "IBM Plex Mono", "Consolas", monospace;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-QComboBox#CodeCombo::down-arrow {
-    image: none;
-}
-
-/* sem divisória antes da seta (fidelidade ao mockup: só padding) */
-QComboBox#CodeCombo::drop-down {
-    border-left: none;
-}
-
-/* ---- Botao tracejado "+ adicionar outra edicao" ---- */
-QPushButton#CompAddBtn {
-    background-color: #E4EEF7;
-    color: #1F5F9E;
-    border: 1px dashed #1F5F9E;
-    border-radius: 8px;
-    min-height: 44px;
-    font-weight: 600;
-    font-size: 13px;
-}
-
-QPushButton#CompAddBtn:hover {
-    background-color: #1F5F9E;
-    color: #FFFFFF;
-}
-
-/* ---- Lista "Edicoes montadas" (mata a caixa preta) ---- */
-#EditList {
-    background-color: #FFFFFF;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-}
-
-#EditListHead {
-    background-color: #ECEFF3;
-    color: #56616D;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 8px 12px;
-}
-
-#EditListBody {
-    background-color: #FFFFFF;
-}
-
-#EditListSep {
-    background-color: #CDD4DB;
-    max-height: 1px;
-    border: none;
-}
-
-/* "selinhos" de codigo (M8 -> M08) e a seta */
-#ElPill {
-    background-color: #FFFFFF;
-    color: #1B2128;
-    border: 1px solid #CDD4DB;
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-family: "IBM Plex Mono", "Consolas", monospace;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-#ElArr {
-    color: #1F5F9E;
-    font-size: 16px;
-    font-weight: 700;
-}
-
-/* linha "em edicao" (rascunho) com realce azul a esquerda */
-#DraftRow {
-    background-color: #E4EEF7;
-    border-left: 3px solid #1F5F9E;
-}
-
-#DraftBadge {
-    color: #1F5F9E;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* botao ✕ de remover edicao da lista */
-QPushButton#ElRemove {
-    background-color: transparent;
-    color: #BB3324;
+QPushButton#GhostBtnV4 {
+    background-color: ${COLOR_BG_RAIL};
+    color: ${COLOR_TEXT_SECONDARY};
     border: none;
     border-radius: 4px;
+    min-height: 32px;
+    padding: 0px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#GhostBtnV4:hover {
+    background-color: ${COLOR_GHOST_HOVER};
+}
+
+QPushButton#GhostBtnV4:disabled {
+    color: ${COLOR_TEXT_TERTIARY};
+}
+
+#FilesHead {
+    border-bottom: 1px solid ${COLOR_BORDER};
+}
+
+#FilesHead QLabel {
+    color: ${COLOR_TEXT_TERTIARY};
+    font-size: 10px;
     font-weight: 700;
-    padding: 0px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-QPushButton#ElRemove:hover {
-    background-color: #FAE4E1;
+#FileRow {
+    background-color: ${COLOR_WHITE};
+    border-radius: 4px;
+    border-left: 3px solid transparent;
 }
 
-/* ---- Botao azul grande "Adicionar edicao ao lote ->" (rodape secao 2) ---- */
-QPushButton#AddRuleBtn {
-    background-color: #1F5F9E;
-    color: #FFFFFF;
+#FileRow:hover {
+    border: 1px solid ${COLOR_BORDER_STRONG};
+}
+
+#FileRow[marcado="true"] {
+    background-color: ${COLOR_SUCCESS_BG};
+    border-left: 3px solid ${COLOR_SUCCESS};
+}
+
+#Chk {
+    background-color: ${COLOR_WHITE};
+    border: 1px solid ${COLOR_BORDER_STRONG};
+    border-radius: 2px;
+    color: ${COLOR_WHITE};
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#Chk[marcado="true"] {
+    background-color: ${COLOR_SUCCESS};
+    border: 1px solid ${COLOR_SUCCESS};
+    color: ${COLOR_WHITE};
+}
+
+#FName {
+    font-family: ${FONT_MONO};
+    font-size: 14px;
+    font-weight: 600;
+    color: ${COLOR_TEXT_PRIMARY};
+}
+
+#FCol {
+    color: ${COLOR_TEXT_SECONDARY};
+    font-size: 12px;
+}
+
+QPushButton#RowEditBtn {
+    background-color: ${COLOR_INTERACTIVE_BG};
+    color: ${COLOR_INTERACTIVE};
     border: none;
-    border-radius: 8px;
-    min-height: 44px;
+    border-radius: 4px;
+    min-height: 32px;
+    padding: 0px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPushButton#RowEditBtn:hover {
+    background-color: ${COLOR_INTERACTIVE};
+    color: ${COLOR_WHITE};
+}
+
+QPushButton#RowFileX {
+    background-color: ${COLOR_BG_RAIL};
+    color: ${COLOR_DANGER};
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+QPushButton#RowFileX:hover {
+    background-color: ${COLOR_DANGER_BG};
+}
+
+#EmptyState {
+    border: 1px dashed ${COLOR_BORDER_STRONG};
+    border-radius: 4px;
+}
+
+#EmptyIcon {
+    font-size: 32px;
+}
+
+#EmptyT1 {
+    color: ${COLOR_TEXT_PRIMARY};
     font-size: 14px;
     font-weight: 600;
 }
 
-QPushButton#AddRuleBtn:hover {
-    background-color: #2B76C0;
-}
-
-QPushButton#AddRuleBtn:disabled {
-    background-color: #9fb3c6;
-    color: #ECEFF3;
-}
-
-/* ---- Botao "ghost" cinza "+ Adicionar programa(s)..." ---- */
-QPushButton#GhostBtn {
-    background-color: #E1E6EC;
-    color: #56616D;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-    min-height: 32px;
+#EmptyT2 {
+    color: ${COLOR_TEXT_TERTIARY};
     font-size: 12px;
-    font-weight: 600;
 }
 
-QPushButton#GhostBtn:hover {
-    background-color: #CDD4DB;
-}
-
-/* ---- Cada programa como cartao cinza-claro ---- */
-#ProgramListPanel QListWidget {
-    background-color: transparent;
-    border: none;
-}
-
-#ProgramListPanel QListWidget::item {
-    border-radius: 8px;
-    margin-bottom: 2px;
-}
-
-#ProgramListPanel QListWidget::item:selected {
-    background-color: transparent;
-}
-
-#ProgramRow {
-    background-color: #ECEFF3;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-}
-
-#ProgramRow[fileOff="true"] {
-    background-color: #F2F4F7;
-}
-
-/* botao "✎ Editar" (azul claro) e "Voltar" (cinza) */
-QPushButton#EditBtn {
-    background-color: #E4EEF7;
-    color: #1F5F9E;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-    min-height: 32px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-QPushButton#EditBtn:hover {
-    background-color: #1F5F9E;
-    color: #FFFFFF;
-}
-
-QPushButton#BackBtn {
-    background-color: #E1E6EC;
-    color: #56616D;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-    min-height: 32px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-QPushButton#BackBtn:hover {
-    background-color: #CDD4DB;
-}
-
-/* botao ✕ de remover programa da lista */
-QPushButton#FileRemoveBtn {
-    background-color: #E1E6EC;
-    color: #BB3324;
-    border: 1px solid #CDD4DB;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    padding: 0px;
-}
-
-QPushButton#FileRemoveBtn:hover {
-    background-color: #FAE4E1;
-}
-
-/* CTA do estado vazio */
 QPushButton#EmptyCTA {
-    background-color: #1F5F9E;
-    color: #FFFFFF;
+    background-color: ${COLOR_INTERACTIVE};
+    color: ${COLOR_WHITE};
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     min-height: 44px;
+    padding: 0px 16px;
     font-size: 14px;
     font-weight: 600;
 }
 
 QPushButton#EmptyCTA:hover {
-    background-color: #2B76C0;
-}
-
-/* ---- Resumo: area dos cartoes (mata a 2a caixa preta) ---- */
-#CardsHost {
-    background-color: #F8FAFB;
-}
-
-/* botoes de acao dos cartoes (editar / duplicar / excluir) */
-QPushButton#CardAction {
-    background-color: transparent;
-    color: #56616D;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    padding: 0px;
-}
-
-QPushButton#CardAction:hover {
-    background-color: #E1E6EC;
-}
-
-/* ---- Selo de backup: escudo + duas linhas ---- */
-#BackupShield {
-    font-size: 17px;
-}
-
-#BackupLine1 {
-    color: #1C8A4D;
-    font-size: 12px;
-    font-weight: 600;
-    background: transparent;
-}
-
-#BackupLine2 {
-    color: #56616D;
-    font-family: "IBM Plex Mono", "Consolas", monospace;
-    font-size: 11px;
-    background: transparent;
+    background-color: ${COLOR_INTERACTIVE_HV};
 }

@@ -1,9 +1,14 @@
-"""Tokens de design do FlowNC — extraídos de mockups/painel-final.v2.html.
+"""Tokens de design do FlowNC — extraídos de mockups/painel-final.v4.html.
 
-Constantes Python para uso no QSS e em código de UI.
+Paleta "Precisão Laranja" do v4: laranja #E85D04 como ação principal (CTA),
+fundo cinza-azulado claro, topo/rail em azul-ardósia escuro.
+
+Constantes Python para uso no QSS (via ``render_qss``) e em código de UI.
 Importável sem instanciar QApplication.
 """
 from __future__ import annotations
+
+import string
 
 # ---------------------------------------------------------------------------
 # Espaçamentos (px)
@@ -21,7 +26,7 @@ SP_48 = 48
 # ---------------------------------------------------------------------------
 # Fontes (family stacks — para uso em QSS font-family)
 # ---------------------------------------------------------------------------
-FONT_SANS = '"IBM Plex Sans", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif'
+FONT_SANS = '"IBM Plex Sans", system-ui, "Segoe UI", Roboto, sans-serif'
 FONT_MONO = '"IBM Plex Mono", "Consolas", ui-monospace, monospace'
 
 # Família curta (para QFont)
@@ -32,7 +37,6 @@ FONT_MONO_FALLBACK = "Consolas"
 
 # ---------------------------------------------------------------------------
 # Tipografia — (peso, tamanho px, line-height)
-# Usados para montar regras QSS: font-size / font-weight / line-height
 # ---------------------------------------------------------------------------
 T_LABEL_WEIGHT = 700
 T_LABEL_SIZE = 10
@@ -83,59 +87,79 @@ ED_FONT_SIZE = 13
 ED_LINE_HEIGHT = 21
 
 # ---------------------------------------------------------------------------
-# Cores
+# Cores — paleta v4 (:root de painel-final.v4.html)
 # ---------------------------------------------------------------------------
 
 # Fundos
-COLOR_BG_BASE = "#F8FAFB"
-COLOR_BG_SUBTLE = "#ECEFF3"
-COLOR_BG_RAIL = "#E1E6EC"
-COLOR_BG_SURFACE = "#C2C9D1"
+COLOR_BG_BASE = "#FFFFFF"
+COLOR_BG_SUBTLE = "#FFFFFF"
+COLOR_BG_RAIL = "#DDE3EE"
+COLOR_BG_SURFACE = "#F7F9FC"
 COLOR_WHITE = "#FFFFFF"
+COLOR_PANEL_LEFT = "#EDF0F5"
+COLOR_PANEL_RIGHT = "#E5EAF2"
 
 # Textos
-COLOR_TEXT_PRIMARY = "#1B2128"
-COLOR_TEXT_SECONDARY = "#56616D"
-COLOR_TEXT_TERTIARY = "#899099"
+COLOR_TEXT_PRIMARY = "#1A2533"
+COLOR_TEXT_SECONDARY = "#4E6278"
+COLOR_TEXT_TERTIARY = "#8FA5C2"
 
 # Bordas
-COLOR_BORDER = "#CDD4DB"
-COLOR_BORDER_STRONG = "#aeb6bf"
+COLOR_BORDER = "#CCD4E0"
+COLOR_BORDER_STRONG = "#B8C6D6"
 
-# Interativo (links, botões secundários, foco)
-COLOR_INTERACTIVE = "#1F5F9E"
-COLOR_INTERACTIVE_HV = "#2B76C0"
-COLOR_INTERACTIVE_BG = "#E4EEF7"
+# Interativo (azul-ardósia)
+COLOR_INTERACTIVE = "#2B3A4A"
+COLOR_INTERACTIVE_HV = "#1F2C39"
+COLOR_INTERACTIVE_BG = "#E5EAF2"
+COLOR_SLATE_2 = "#3A4F63"
+
+# Botão "ghost" (ações leves do cabeçalho de seção)
+COLOR_GHOST_HOVER = "#CDD5E2"
 
 # Semânticas
-COLOR_SUCCESS = "#1C8A4D"
-COLOR_SUCCESS_BG = "#E1F1E8"
-COLOR_WARNING = "#A86A07"
-COLOR_WARNING_BG = "#FAEED5"
-COLOR_DANGER = "#BB3324"
-COLOR_DANGER_BG = "#FAE4E1"
-COLOR_DANGER_DEEP = "#8a2a2a"
-COLOR_DANGER_DEEP_BG = "#efd6d6"
+COLOR_SUCCESS = "#2D6B2D"
+COLOR_SUCCESS_BG = "#EAF5EA"
+COLOR_SUCCESS_BORDER = "#8FC98F"
+COLOR_WARNING = "#A16207"
+COLOR_WARNING_BG = "#FFF8E1"
+COLOR_WARNING_BORDER = "#D4A840"
+COLOR_DANGER = "#D93025"
+COLOR_DANGER_BG = "#FEECEB"
+COLOR_DANGER_BORDER = "#F0948D"
 
-# CTA (botão principal / Executar Lote)
-COLOR_CTA_START = "#3A434E"
-COLOR_CTA_END = "#232A33"
-COLOR_CTA_TEXT = "#F4F7FA"
-COLOR_CTA_TEXT_SOFT = "#aeb8c2"
+# CTA / Acento laranja "Precisão Laranja" (ação principal)
+COLOR_CTA = "#E85D04"
+COLOR_CTA_START = "#E85D04"
+COLOR_CTA_END = "#E85D04"
+COLOR_CTA_TEXT = "#FFFFFF"
+COLOR_CTA_TEXT_SOFT = "#FFE3D1"
+COLOR_ACCENT = "#E85D04"
+COLOR_ACCENT_HV = "#C94E00"
+COLOR_ACCENT_ACTIVE = "#A83E00"
+COLOR_ACCENT_BG = "#FFF3ED"
+COLOR_ACCENT_BORDER = "#F0A87A"
+
+# Desabilitado
+COLOR_BTN_DISABLED_BG = "#EEF1F5"
+COLOR_BTN_DISABLED_TEXT = "#B0BFD0"
+COLOR_DISABLED_BG = "#EEF1F5"
 
 # Utilitários
 COLOR_OVERLAY = "rgba(15,20,25,.55)"
-COLOR_CODE_BG = "#eef1f4"
-COLOR_ROW_DELETED = "#fcf2f2"
-COLOR_MODAL_FOOTER = "#e7ebee"
-COLOR_DISABLED_BG = "#9fb3c6"
-COLOR_SPINNER_TRACK = "#d6dee4"
+COLOR_CODE_BG = "#EDF0F5"
+COLOR_MODAL_FOOTER = "#E5EAF2"
+COLOR_SPINNER_TRACK = "#DDE3EE"
 
-# Header gradiente
-COLOR_HEAD_TOP = "#D3DAE1"
-COLOR_HEAD_MID = "#c3cbd3"
-COLOR_HEAD_BOT = "#B9C2CB"
-COLOR_HEAD_BORDER = "#a7afb8"
+# Topo + Rail (azul-ardósia escuro — color-head do v4; topo e rail compartilham)
+COLOR_HEAD = "#2B3A4A"
+COLOR_HEAD_BORDER = "#1F2C39"
+COLOR_RAIL = "#2B3A4A"
+COLOR_TOP = "#2B3A4A"
+COLOR_RAIL_TEXT = "#B9C6D6"
+COLOR_RAIL_FOOT = "#5E748B"
+COLOR_TOP_BORDER_SOFT = "#4A6076"
+COLOR_TOP_BTN_TEXT = "#D7E0EA"
 
 # Editor
 COLOR_EDITOR_GUTTER = "#EEF1F4"
@@ -144,11 +168,11 @@ COLOR_OCCURRENCE = "#FAEED5"
 COLOR_OCCURRENCE_CURRENT = "#FBD46A"
 
 # ---------------------------------------------------------------------------
-# Raios de borda (px)
+# Raios de borda (px) — v4
 # ---------------------------------------------------------------------------
-RADIUS_XS = 4
-RADIUS_SM = 8
-RADIUS_MD = 12
+RADIUS_XS = 2
+RADIUS_SM = 4
+RADIUS_MD = 6
 RADIUS_PILL = 20
 
 # ---------------------------------------------------------------------------
@@ -160,22 +184,40 @@ H_GHOST = 32
 H_FIELD = 44
 
 # ---------------------------------------------------------------------------
-# Dimensões de layout (px)
+# Dimensões de layout (px) — v4
 # ---------------------------------------------------------------------------
-DIM_SCREEN = 1340
-DIM_HEADER = 70
+DIM_TOP = 56
+DIM_RAIL = 84
 DIM_GUTTER = 48
+DIM_STRIP = 216
+APP_MIN = 1180
+APP_MAX = 1800
 BORDER_WIDTH = 1
 
 # ---------------------------------------------------------------------------
-# Sombras e efeitos (valores CSS — usados em QSS box-shadow quando suportado)
+# Sombras e efeitos (valores CSS — usados em QSS quando suportado)
 # ---------------------------------------------------------------------------
-FOCUS_RING = "0 0 0 3px rgba(31,95,158,.35)"
-CONFLICT_BAR = "inset 3px 0 0 #A86A07"
+FOCUS_RING = "0 0 0 3px rgba(43,58,74,.28)"
 METAL = (
-    "inset 0 1px 0 rgba(255,255,255,.85),"
-    " 0 1px 2px rgba(20,28,38,.10),"
-    " 0 2px 6px rgba(20,28,38,.05)"
+    "inset 0 1px 0 rgba(255,255,255,.35),"
+    " 0 1px 2px rgba(20,28,38,.08)"
 )
-SHADOW_SCREEN = "0 18px 50px rgba(0,0,0,.30)"
-SHADOW_MODAL = "0 20px 60px rgba(0,0,0,.40)"
+SHADOW_SCREEN = "0 12px 32px rgba(0,0,0,.22)"
+SHADOW_MODAL = "0 16px 40px rgba(0,0,0,.30)"
+
+
+# ---------------------------------------------------------------------------
+# Interpolação de tokens no QSS
+# ---------------------------------------------------------------------------
+def _token_map() -> dict[str, str]:
+    """Mapa nome→valor de todos os tokens string deste módulo (placeholders QSS)."""
+    return {k: v for k, v in globals().items() if k.isupper() and isinstance(v, str)}
+
+
+def render_qss(template: str) -> str:
+    """Interpola ``${TOKEN}`` no template QSS com os tokens deste módulo.
+
+    Levanta ``KeyError`` se o template referenciar um token inexistente — o que
+    mantém o contrato "todos os valores de cor vêm de tokens de theme.py".
+    """
+    return string.Template(template).substitute(_token_map())

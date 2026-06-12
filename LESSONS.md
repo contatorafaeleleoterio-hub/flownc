@@ -1,5 +1,13 @@
 # Lessons — FlowNC
 
+## 2026-06-12 — v4 é a única versão: decidir e arquivar, nunca perguntar sobre o antigo
+Perguntei ao Mestre como tratar os testes da UI antiga ao reestruturar o `main_window` — não devia. A regra já estava dada: a **v4 é a única versão considerada**; tudo de versão anterior do design (v2/v3, componentes/mockups/docs) se **arquiva** em `_descarte/` (sem impacto) ou se **refatora pra v4** (com impacto), sempre **sem deixar menções/rastros**, e **na dúvida arquiva** — sem usar AskUserQuestion.
+- **Distinguir** "versão do design" (v2/v3 do painel = eliminar) de versionamento técnico legítimo que permanece: "PRD v2.3", "schema v2" do settings, dados de teste `b"v2"`. Estes NÃO são o design antigo e ficam.
+- **Feito nesta sessão:** componentes UI v2 → `_descarte/ui_v2/`; mockups v2/v3 → `_descarte/mockups_antigos/`; docs antigos (CONTEXTO/CORRECOES_MOCKUP/STATUS) → `_descarte/docs_antigos/`; PLAN/HANDOFF/CLAUDE/spec/testes limpos.
+
+## 2026-06-12 — QSS como template tokenizado (sem cor hex literal)
+O `style.qss` é um **template** com placeholders `${TOKEN}` interpolados por `theme.render_qss()` (`string.Template`); nenhuma cor hexadecimal mora no `.qss` — todas vêm de `theme.py`. Armadilha: `string.Template` trata QUALQUER `$nome` como placeholder, inclusive dentro de comentário `/* */` — não escrever `${...}` em comentário (quebra com `KeyError`). "Verde" = comparar com o baseline (mypy caiu de 15→2 ao arquivar a UI v2), não fixar número absoluto.
+
 ## 2026-06-07 — Não inferir direção a partir de arquivo de exemplo
 O preset `MAZAK_VTC530.json` tem `global_rules`/`verifications` por ser exemplo antigo. Isso NÃO reflete o sistema definido no plano: verificações automáticas e regras de perfil foram **retiradas do escopo**. A biblioteca é só código + descrição editável (operador monta a troca manualmente, origem→destino). Antes de propor conteúdo de perfil/biblioteca, conferir a direção no `PLAN.md` — não copiar do exemplo. Quando algo antigo não reflete mais o plano, descartar e marcar "como fica na nova atualização" no próprio plano, para o próximo agente não reler nem perguntar.
 

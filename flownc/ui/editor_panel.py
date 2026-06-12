@@ -1,8 +1,8 @@
-"""Editor de texto integrado por arquivo (mudanca editor-integrado-por-arquivo).
+"""Editor de texto integrado por arquivo.
 
 Editor embutido com numeracao de linha, localizador e gravacao in-place segura.
-FASE 2: fidelidade visual ao mockup (glifos, realce QSyntaxHighlighter, stepbar inline,
-botao Voltar proeminente no topo-esquerdo).
+Sera adaptado a tela Editor do v4 (tela cheia + faixa de arquivos + toolbar em 3
+grupos) no Bloco 7; o motor de edicao/gravacao e reaproveitado sem alteracao.
 
 A logica de busca/substituicao mora em funcoes puras de modulo
 (`build_find_rule`, `replace_all_spans`, `replace_one_by_one`), testaveis sem GUI

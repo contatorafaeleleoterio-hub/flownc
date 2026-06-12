@@ -1,6 +1,6 @@
 ### Requirement: Tokens de design em theme.py
 
-O sistema SHALL expor todos os tokens visuais do mockup `painel-final.v2.html` como constantes Python em `flownc/ui/theme.py`, cobrindo: cores (`COLOR_*`), tipografia (`T_*`), espaçamentos (`SP_*`), raios (`RADIUS_*`), alturas (`H_*`), dimensões (`DIM_*`) e sombras (`SHADOW_*`/`METAL`). O módulo MUST ser importável sem instanciar QApplication.
+O sistema SHALL expor todos os tokens visuais do mockup `painel-final.v4.html` (paleta "Precisão Laranja", CTA `#E85D04`) como constantes Python em `flownc/ui/theme.py`, cobrindo: cores (`COLOR_*`), tipografia (`T_*`), espaçamentos (`SP_*`), raios (`RADIUS_*`), alturas (`H_*`), dimensões (`DIM_*`) e sombras (`SHADOW_*`/`METAL`). O módulo MUST ser importável sem instanciar QApplication.
 
 #### Scenario: Importação sem QApplication
 
@@ -28,7 +28,7 @@ O sistema SHALL registrar as fontes IBM Plex Sans e IBM Plex Mono via `QFontData
 
 ### Requirement: Folha QSS central aplicada no boot
 
-O sistema SHALL carregar `flownc/ui/style.qss` e aplicá-lo via `app.setStyleSheet()` durante a inicialização. O QSS MUST cobrir seletores para QMainWindow, QPushButton, QComboBox, QListWidget, QLineEdit, QLabel, QCheckBox e QSplitter. A aplicação do QSS MUST NOT criar, remover ou mover nenhum widget.
+O sistema SHALL carregar `flownc/ui/style.qss` (template interpolado pelos tokens de `theme.py` via `render_qss`) e aplicá-lo via `setStyleSheet()` durante a inicialização. O QSS MUST cobrir seletores para QMainWindow, QPushButton, QComboBox, QListWidget, QLineEdit, QLabel, QCheckBox, QTabWidget e QDialog, além do rail customizado. A aplicação do QSS MUST NOT criar, remover ou mover nenhum widget.
 
 #### Scenario: QSS aplicado sem erro
 
@@ -38,7 +38,7 @@ O sistema SHALL carregar `flownc/ui/style.qss` e aplicá-lo via `app.setStyleShe
 #### Scenario: Seletor para cada tipo de widget obrigatório
 
 - **WHEN** o conteúdo de `style.qss` é inspecionado
-- **THEN** o arquivo contém ao menos um bloco de regra para cada um dos 8 tipos: QMainWindow, QPushButton, QComboBox, QListWidget, QLineEdit, QLabel, QCheckBox, QSplitter
+- **THEN** o arquivo contém ao menos um bloco de regra para cada um dos tipos: QMainWindow, QPushButton, QComboBox, QListWidget, QLineEdit, QLabel, QCheckBox, QTabWidget, QDialog
 
 #### Scenario: Hierarquia de widgets preservada
 
