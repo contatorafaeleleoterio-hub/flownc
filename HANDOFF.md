@@ -1,18 +1,16 @@
 # Handoff — FlowNC — 2026-06-12
-Status: **Fase 2 CONCLUÍDA E APROVADA pelo Mestre (64/64 tarefas)** — gate 12.5 ✓.
+Status: **Fase 2 CONCLUÍDA E APROVADA (64/64)**. Sessão extra: docs de monetização criados.
 Feito nesta sessão:
-- Blocos 4–12 do plano v4 completos: compositor com abas, modais Conferência (varredura real)
-  e Publicação (gravação real: backup versionado + atômica + SHA-256), Editor (faixa, guarda,
-  toast Desfazer, inserir bloco, salvar como), Códigos, Histórico, topo (receitas/backup).
-- Revisão pós-feedback: ícones desenhados via `ui/icons.py` (IBM Plex não tem ✕✎⧉▦▾ — sem
-  quadradinhos), botão "↻ Atualizar" na lista, banner de mudança externa no Editor
-  (QFileSystemWatcher + Recarregar), pós-publicação limpa o lote mesmo fechando pelo ✕.
-- EXEs: `flownc/dist-onefile/FlowNC-portatil.exe` (47MB, único) + `flownc/dist/FlowNC/`.
-- GitHub: repo público https://github.com/contatorafaeleleoterio-hub/flownc (README p/ IAs,
-  15 topics); commits até `42180c6` com push.
-Onde parou: Fase 2 aprovada ("tudo aprovado"); app validado pelo Mestre no EXE.
-Próximo passo: `/opsx:archive plano-execucao-mockup-v4` e propor a Fase 3 (restauração real
-  do Histórico, persistência de receitas com edições de bloco, seed Fanuc ampliado).
+- Pesquisa de monetização para o mercado de usinagem CNC (BR primeiro). Decisões: produto é
+  utilitário COMPLEMENTAR ao CAM (não concorre com Machining Strategist/Mastercam); modelo
+  **Freemium + Assinatura** com opção de licença perpétua; pagamento BR via Pix (Hotmart/
+  Eduzz/Stripe); proteção via code signing + instalador Inno Setup + licença Keygen.sh.
+- Criados `docs/MONETIZACAO.md` (plano completo: público, preços, distribuição, tecnologia,
+  go-to-market, riscos, checklist) e `docs/PAGINA-DE-VENDAS.md` (roteiro/copy da landing,
+  estrutura baseada em pesquisa de conversão B2B/SaaS 2025–26).
+Onde parou: dois documentos prontos para revisão do Mestre (gate "é esse").
+Próximo passo: Mestre revisa os docs; validar faixas de preço com 5–10 oficinas reais.
+  (Pendência técnica anterior: `/opsx:archive plano-execucao-mockup-v4` + propor Fase 3.)
 Blockers: nenhum.
-Verificação: pytest 170 verde; mypy(core) limpo; ruff limpo.
+Verificação: pytest 170 verde; mypy(core) limpo; ruff limpo (sem mudança de código nesta sessão).
 Retomar com: "continuar"
