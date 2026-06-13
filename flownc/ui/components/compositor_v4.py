@@ -29,6 +29,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QRadioButton,
     QScrollArea,
+    QSizePolicy,
     QSpinBox,
     QTabWidget,
     QVBoxLayout,
@@ -120,6 +121,7 @@ class LibDropdown(QWidget):
 
         lay = QVBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self._btn = QPushButton()
         self._btn.setObjectName("LibDropBtn")
         self._btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -296,7 +298,15 @@ class CompositorV4(QWidget):
         self.tabs.addTab(self._build_swap(), "Trocar código")
         self.tabs.addTab(self._build_ins(), "+ Inserir bloco")
         self.tabs.currentChanged.connect(self._on_tab_changed)
+        # Cada aba tem altura natural diferente; sem isto o QTabWidget assume a
+        # altura da MAIOR (Inserir bloco) e a aba de troca fica com um vão enorme.
+        for i in range(self.tabs.count()):
+            w = self.tabs.widget(i)
+            if w is not None:
+                w.setSizePolicy(
+                    QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Ignored)
         root.addWidget(self.tabs)
+        self._ajustar_altura_aba()
 
         rodape = QHBoxLayout()
         rodape.addStretch(1)
@@ -316,8 +326,9 @@ class CompositorV4(QWidget):
     def _build_swap(self) -> QWidget:
         page = QWidget()
         lay = QHBoxLayout(page)
-        lay.setContentsMargins(16, 16, 16, 16)
+        lay.setContentsMargins(16, 12, 16, 12)
         lay.setSpacing(12)
+        lay.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         campo_src = QVBoxLayout()
         campo_src.setSpacing(8)
@@ -325,6 +336,7 @@ class CompositorV4(QWidget):
         self.drop_origem = LibDropdown(placeholder="Selecione o código")
         self.drop_origem.alterado.connect(self._refresh_add)
         campo_src.addWidget(self.drop_origem)
+        campo_src.addStretch(1)
         lay.addLayout(campo_src, stretch=1)
 
         campo_dst = QVBoxLayout()
@@ -334,14 +346,15 @@ class CompositorV4(QWidget):
             placeholder="Selecione o destino", com_remover=True)
         self.drop_destino.alterado.connect(self._refresh_add)
         campo_dst.addWidget(self.drop_destino)
+        campo_dst.addStretch(1)
         lay.addLayout(campo_dst, stretch=1)
         return page
 
     def _build_ins(self) -> QWidget:
         page = QWidget()
         lay = QVBoxLayout(page)
-        lay.setContentsMargins(16, 16, 16, 16)
-        lay.setSpacing(12)
+        lay.setContentsMargins(16, 12, 16, 12)
+        lay.setSpacing(10)
 
         linha = QHBoxLayout()
         linha.setSpacing(12)
@@ -352,37 +365,44 @@ class CompositorV4(QWidget):
         self.ins_texto = QPlainTextEdit()
         self.ins_texto.setObjectName("InsText")
         self.ins_texto.setPlaceholderText("ex.:\nG68 R90.\nG54")
-        self.ins_texto.setFixedHeight(96)
+        self.ins_texto.setFixedHeight(82)
         self.ins_texto.textChanged.connect(self._on_ins_mudou)
         campo_txt.addWidget(self.ins_texto)
-        linha.addLayout(campo_txt, stretch=2)
+        campo_txt.addStretch(1)
+        linha.addLayout(campo_txt, stretch=1)
 
         campo_pos = QVBoxLayout()
-        campo_pos.setSpacing(8)
+        campo_pos.setSpacing(6)
         campo_pos.addWidget(self._label_caps("POSIÇÃO EM CADA PROGRAMA"))
         self._grupo_pos = QButtonGroup(self)
 
-        l1 = QHBoxLayout()
-        l1.setSpacing(8)
+        # Cada opção: o rádio numa linha; o controle indentado logo abaixo —
+        # evita o estouro horizontal quando a coluna fica estreita no notebook.
         self.rad_code = QRadioButton("Abaixo da 1ª ocorrência de")
         self.rad_code.setChecked(True)
         self._grupo_pos.addButton(self.rad_code)
-        l1.addWidget(self.rad_code)
+        campo_pos.addWidget(self.rad_code)
+        l1 = QHBoxLayout()
+        l1.setContentsMargins(22, 0, 0, 0)
+        l1.setSpacing(8)
         self.drop_ancora = LibDropdown(big=False)
+        self.drop_ancora.setFixedWidth(128)
         self.drop_ancora.set_value("G54")
         self.drop_ancora.alterado.connect(self._on_ins_mudou)
         l1.addWidget(self.drop_ancora)
         l1.addStretch(1)
         campo_pos.addLayout(l1)
 
-        l2 = QHBoxLayout()
-        l2.setSpacing(8)
         self.rad_line = QRadioButton("Abaixo da linha Nº")
         self._grupo_pos.addButton(self.rad_line)
-        l2.addWidget(self.rad_line)
+        campo_pos.addWidget(self.rad_line)
+        l2 = QHBoxLayout()
+        l2.setContentsMargins(22, 0, 0, 0)
+        l2.setSpacing(8)
         self.ins_linha = QSpinBox()
         self.ins_linha.setObjectName("InsLineNum")
         self.ins_linha.setRange(1, 999999)
+        self.ins_linha.setFixedWidth(96)
         self.ins_linha.valueChanged.connect(self._on_ins_mudou)
         l2.addWidget(self.ins_linha)
         l2.addStretch(1)
@@ -463,8 +483,31 @@ class CompositorV4(QWidget):
 
     # ============ interno ============
     def _on_tab_changed(self, _idx: int) -> None:
+        self._ajustar_altura_aba()
         self._refresh_add()
         self._atualizar_previa()
+
+    def _ajustar_altura_aba(self) -> None:
+        """Faz o QTabWidget encolher para a altura da aba ativa.
+
+        Sem isto, o tab assume a altura da aba mais alta e a aba de troca de
+        código fica com um vão vazio enorme.
+        """
+        atual = self.tabs.currentIndex()
+        for i in range(self.tabs.count()):
+            w = self.tabs.widget(i)
+            if w is None:
+                continue
+            vpol = (
+                QSizePolicy.Policy.Preferred if i == atual
+                else QSizePolicy.Policy.Ignored
+            )
+            w.setSizePolicy(QSizePolicy.Policy.Preferred, vpol)
+        atual_w = self.tabs.widget(atual)
+        if atual_w is not None:
+            atual_w.adjustSize()
+        self.tabs.adjustSize()
+        self.updateGeometry()
 
     def _on_pos_mudou(self, _checked: bool) -> None:
         self.aviso_linha.setVisible(self.rad_line.isChecked())
