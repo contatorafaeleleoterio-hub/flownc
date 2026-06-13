@@ -1,5 +1,8 @@
 # Lessons — FlowNC
 
+## 2026-06-13 — `openspec archive` é estrito e NÃO é atômico
+Arquivar uma change com specs-delta exige que as specs casem 100% com a main, senão aborta — e em alguns casos **deixa pasta parcial** em `openspec/specs/` (limpar antes de repetir). Checklist quando recusar: (1) toda spec (delta e main) precisa de `# titulo` + `## Purpose` + `## Requirements`; requisitos fora da seção `## Requirements` ficam invisíveis. (2) `## MODIFIED Requirements` só aceita header **idêntico** a um já existente na main — requisito novo vai em `## ADDED Requirements`; para "renomear", use o nome antigo no header (o corpo atualiza). (3) `## REMOVED Requirements` precisa do header existir na main. Rodar `openspec archive <nome> --yes` e ir corrigindo o que ele aponta, um erro por vez. Alternativa rápida só p/ doc/infra: `--skip-specs`.
+
 ## 2026-06-12 — v4 é a única versão: decidir e arquivar, nunca perguntar sobre o antigo
 Perguntei ao Mestre como tratar os testes da UI antiga ao reestruturar o `main_window` — não devia. A regra já estava dada: a **v4 é a única versão considerada**; tudo de versão anterior do design (v2/v3, componentes/mockups/docs) se **arquiva** em `_descarte/` (sem impacto) ou se **refatora pra v4** (com impacto), sempre **sem deixar menções/rastros**, e **na dúvida arquiva** — sem usar AskUserQuestion.
 - **Distinguir** "versão do design" (v2/v3 do painel = eliminar) de versionamento técnico legítimo que permanece: "PRD v2.3", "schema v2" do settings, dados de teste `b"v2"`. Estes NÃO são o design antigo e ficam.

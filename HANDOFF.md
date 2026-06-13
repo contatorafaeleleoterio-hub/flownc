@@ -1,19 +1,19 @@
 # Handoff — FlowNC — 2026-06-13
-Status: **Fase 2 aprovada (64/64)**. Docs de negócio criados e refinados pelo Mestre.
+Status: **Fase 2 aprovada (64/64)**. Docs alinhados ao v4 e change arquivada. Repo no GitHub atualizado.
 Feito nesta sessão:
-- Criados `docs/MONETIZACAO.md` e `docs/PAGINA-DE-VENDAS.md` (BR-first, utilitário
-  complementar ao CAM; Freemium+Assinatura+perpétua; estrutura de landing por pesquisa).
-- Mestre fechou decisões nos docs: comprador-alvo = **dono/gestor da oficina** (não o
-  programador); pagamento = **Stripe** (Pix+cartão+recorrência, NF via eNotas; Hotmart/Eduzz
-  descartados); estratégia de preço = **cobrar barato para testar demanda** (sem validação
-  formal — Mestre é da área e confirma a dor); copy fala de tempo de máquina e erro evitado.
-- Identidade visual: logo wordmark aprovada (`docs/logo/`, `flownc/assets/logo/`, gerador
-  `flownc/tools/gera_logo_assets.py`); azul = marca, laranja #E85D04 = ação no app.
-- Prompts prontos p/ revisão profissional no Fable 5 (estratégia + copy) entregues no chat.
-Onde parou: docs com decisões fechadas; prompts de revisão prontos para uso.
-Próximo passo: rodar as revisões no Fable 5 e ajustar os docs; depois execução técnica
-  (Stripe, code signing, instalador, licença). Pendência antiga: `/opsx:archive
-  plano-execucao-mockup-v4` + propor Fase 3.
+- Documentação alinhada ao **mockup v4** (estava no v2): PRD, DECISOES, PRODUTO, README,
+  CONTEXTO-IA (§13 estado atual), CHANGELOG; nota de v4 em RESPONSIVIDADE/PALETA; corrigido
+  link quebrado README→CONTEXTO-IA.md.
+- Change OpenSpec `plano-execucao-mockup-v4` **arquivada** (archive/2026-06-13-...); as 12 specs
+  v4 sincronizadas para `openspec/specs/` (8 novas + 4 atualizadas). Tive que consertar as
+  delta-specs (ADDED vs MODIFIED, `## Purpose`/`## Requirements`) — ver LESSONS.
+- Commit feito e **push enviado** para github.com/contatorafaeleleoterio-hub/flownc
+  (3 commits parados + commit desta sessão). Local == origin/master.
+Onde parou: tudo salvo no GitHub; documentação coerente com o v4.
+Próximo passo: rodar revisões dos docs de negócio no Fable 5; depois execução técnica
+  (Stripe, code signing, instalador, licença). Avaliar propor Fase 3 (ligar backend a telas).
 Blockers: nenhum.
-Arquivos tocados: docs/MONETIZACAO.md, docs/PAGINA-DE-VENDAS.md, HANDOFF.md (+ logo/assets/tools).
+Resíduo menor: `layout-principal` ainda tem o requisito "HeaderBar" (v2) não tocado pela delta;
+  o topo do v4 já está em `topo-global-configuracao`. Limpar quando conveniente.
+Arquivos tocados: docs/*, openspec/specs/*, openspec/changes/archive/*, HANDOFF.md, LESSONS.md.
 Retomar com: "continuar"
