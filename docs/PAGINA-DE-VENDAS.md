@@ -1,5 +1,7 @@
 # Página de Vendas — FlowNC (roteiro + copy)
 
+> **Público da página: dono/gestor da oficina** (decisão 2026-06-12). A copy fala de tempo
+> de máquina, erro evitado e padronização da equipe — não de features para o programador.
 > Ordem que converte: **hero → dor/solução → benefícios → prova social → preço → CTA**.
 > Princípios (pesquisa 2025/26): headline curta, **1 CTA primário** acima da dobra, preço
 > **visível** (nunca "fale com vendas"), prova social junto do botão, formulário curto (3–5
@@ -9,28 +11,31 @@
 
 ## 1. Hero (acima da dobra)
 **Headline (curta, <44 caract.):**
-> Edite centenas de programas G-code em minutos.
+> Sua oficina perde horas editando G-code.
 
 **Subheadline:**
-> O FlowNC faz substituição em lote e salvamento seguro dos seus programas CNC — padronize
-> cabeçalhos, troque ferramentas e adapte máquinas sem editar arquivo por arquivo, sem erro.
+> O FlowNC edita centenas de programas CNC de uma vez, com backup automático — sua equipe
+> padroniza cabeçalhos, troca ferramentas e adapta máquinas em minutos, sem erro manual.
 
 **CTA primário (1 botão):** `Baixar teste grátis`
 **CTA secundário (texto):** Ver como funciona (demo de 60s)
 
 **Visual:** print/GIF do app aplicando uma edição em vários arquivos de uma vez.
+**Logo:** wordmark oficial em `docs/logo/logo FlowNC.jpeg` (fundo escuro) — usar no topo da
+página; versão PNG transparente em `flownc/assets/logo/logo_flownc.png`.
 
 ---
 
 ## 2. Dor → Solução
-Três dores do dia a dia do programador CNC, cada uma com a resposta do FlowNC:
+Três dores do gestor de usinagem, cada uma com a resposta do FlowNC:
 
-1. **"Edito arquivo por arquivo e perco horas."**
-   → Aplique a mesma troca em todos os programas de uma vez.
-2. **"Um erro de digitação quebra a peça (ou a máquina)."**
-   → Salvamento in-place seguro, com backup automático antes de gravar.
-3. **"Cada máquina/controle precisa de um ajuste diferente."**
-   → Perfis de controle (Fanuc, Mach, Heidenhain) e biblioteca de códigos reutilizável.
+1. **"Minha equipe perde horas editando programa por programa."**
+   → A mesma troca aplicada em todos os programas de uma vez — horas viram minutos.
+2. **"Um erro de digitação quebra a peça (ou a máquina) e o prejuízo é meu."**
+   → Salvamento in-place seguro, com backup automático antes de gravar. Tudo reversível.
+3. **"Cada máquina/controle precisa de um ajuste diferente e nada é padronizado."**
+   → Perfis de controle (Fanuc, Mach, Heidenhain) e biblioteca de códigos da oficina —
+   o padrão fica no sistema, não na cabeça de cada programador.
 
 Acompanhar cada item com mini-demo/GIF.
 
@@ -56,11 +61,14 @@ Acompanhar cada item com mini-demo/GIF.
 
 ## 5. Preço (transparente — sempre visível)
 
-| Free | Pro | Shop |
+| Free | Pro | Shop (destaque) |
 |---|---|---|
-| R$ 0 | **R$ 39–79/mês** ou R$ 390–790/ano | sob proposta (multi-posto) |
-| Find/replace básico, lote pequeno | Lote ilimitado, backup, biblioteca, perfis, histórico | Tudo do Pro + licença flutuante e suporte prioritário |
-| `Começar grátis` | `Assinar Pro` | `Falar com a gente` |
+| R$ 0 | preço baixo de teste (1 posto) | **preço público por posto** — plano principal da página |
+| Find/replace básico, lote pequeno | Lote ilimitado, backup, biblioteca, perfis, histórico | Tudo do Pro + vários postos, licença flutuante e suporte prioritário |
+| `Começar grátis` | `Assinar Pro` | `Assinar para minha oficina` |
+
+> Preços baixos de propósito nesta fase: **teste de demanda**. Definir valores no Stripe e
+> revisar após as primeiras vendas.
 
 **Também disponível:** licença **perpétua** (paga uma vez) + manutenção anual — para quem
 prefere não assinar. **Garantia de 30 dias** ou seu dinheiro de volta.

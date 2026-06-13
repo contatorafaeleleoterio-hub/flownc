@@ -1,16 +1,19 @@
-# Handoff — FlowNC — 2026-06-12
-Status: **Fase 2 CONCLUÍDA E APROVADA (64/64)**. Sessão extra: docs de monetização criados.
+# Handoff — FlowNC — 2026-06-13
+Status: **Fase 2 aprovada (64/64)**. Docs de negócio criados e refinados pelo Mestre.
 Feito nesta sessão:
-- Pesquisa de monetização para o mercado de usinagem CNC (BR primeiro). Decisões: produto é
-  utilitário COMPLEMENTAR ao CAM (não concorre com Machining Strategist/Mastercam); modelo
-  **Freemium + Assinatura** com opção de licença perpétua; pagamento BR via Pix (Hotmart/
-  Eduzz/Stripe); proteção via code signing + instalador Inno Setup + licença Keygen.sh.
-- Criados `docs/MONETIZACAO.md` (plano completo: público, preços, distribuição, tecnologia,
-  go-to-market, riscos, checklist) e `docs/PAGINA-DE-VENDAS.md` (roteiro/copy da landing,
-  estrutura baseada em pesquisa de conversão B2B/SaaS 2025–26).
-Onde parou: dois documentos prontos para revisão do Mestre (gate "é esse").
-Próximo passo: Mestre revisa os docs; validar faixas de preço com 5–10 oficinas reais.
-  (Pendência técnica anterior: `/opsx:archive plano-execucao-mockup-v4` + propor Fase 3.)
+- Criados `docs/MONETIZACAO.md` e `docs/PAGINA-DE-VENDAS.md` (BR-first, utilitário
+  complementar ao CAM; Freemium+Assinatura+perpétua; estrutura de landing por pesquisa).
+- Mestre fechou decisões nos docs: comprador-alvo = **dono/gestor da oficina** (não o
+  programador); pagamento = **Stripe** (Pix+cartão+recorrência, NF via eNotas; Hotmart/Eduzz
+  descartados); estratégia de preço = **cobrar barato para testar demanda** (sem validação
+  formal — Mestre é da área e confirma a dor); copy fala de tempo de máquina e erro evitado.
+- Identidade visual: logo wordmark aprovada (`docs/logo/`, `flownc/assets/logo/`, gerador
+  `flownc/tools/gera_logo_assets.py`); azul = marca, laranja #E85D04 = ação no app.
+- Prompts prontos p/ revisão profissional no Fable 5 (estratégia + copy) entregues no chat.
+Onde parou: docs com decisões fechadas; prompts de revisão prontos para uso.
+Próximo passo: rodar as revisões no Fable 5 e ajustar os docs; depois execução técnica
+  (Stripe, code signing, instalador, licença). Pendência antiga: `/opsx:archive
+  plano-execucao-mockup-v4` + propor Fase 3.
 Blockers: nenhum.
-Verificação: pytest 170 verde; mypy(core) limpo; ruff limpo (sem mudança de código nesta sessão).
+Arquivos tocados: docs/MONETIZACAO.md, docs/PAGINA-DE-VENDAS.md, HANDOFF.md (+ logo/assets/tools).
 Retomar com: "continuar"

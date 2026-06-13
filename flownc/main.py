@@ -35,14 +35,17 @@ def _install_excepthook() -> None:
 
 
 def main() -> int:
+    from PySide6.QtGui import QIcon
     from PySide6.QtWidgets import QApplication
 
+    from app_paths import resource_dir
     from core.seed import ensure_seed
     from ui.main_window import MainWindow
 
     ensure_seed()  # garante data/ ao lado do .exe antes de carregar biblioteca/presets
     app = QApplication(sys.argv)
     app.setApplicationName("FlowNC")
+    app.setWindowIcon(QIcon(str(resource_dir() / "assets" / "logo" / "flownc.ico")))
     _install_excepthook()
     window = MainWindow()
     window.show()

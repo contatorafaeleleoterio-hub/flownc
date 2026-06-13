@@ -9,6 +9,7 @@ ficam só os sinais e a estrutura visual.
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QComboBox,
     QHBoxLayout,
@@ -18,6 +19,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app_paths import resource_dir
 from ui import theme
 
 # Texto do item de ação no fim do seletor de receitas.
@@ -44,11 +46,16 @@ class TopBar(QWidget):
         lay.setContentsMargins(theme.SP_16, 0, theme.SP_16, 0)
         lay.setSpacing(theme.SP_12)
 
-        # Marca (nome + subtítulo)
+        # Marca (logo + subtítulo); se o PNG faltar, cai no texto "FlowNC".
         brand = QVBoxLayout()
         brand.setSpacing(0)
         nome = QLabel("FlowNC")
         nome.setObjectName("TopBrandName")
+        logo = QPixmap(str(resource_dir() / "assets" / "logo" / "logo_flownc.png"))
+        if not logo.isNull():
+            nome.setPixmap(
+                logo.scaledToHeight(22, Qt.TransformationMode.SmoothTransformation)
+            )
         brand.addWidget(nome)
         sub = QLabel("Editor de Lotes")
         sub.setObjectName("TopBrandSub")

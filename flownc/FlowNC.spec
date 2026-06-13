@@ -8,6 +8,7 @@ a = Analysis(
     datas=[
         ('ui/style.qss', 'ui'),
         ('assets/fonts', 'assets/fonts'),
+        ('assets/logo', 'assets/logo'),
         ('data_default', 'data_default'),
     ],
     hiddenimports=[],
@@ -36,6 +37,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='assets\\logo\\flownc.ico',
 )
 coll = COLLECT(
     exe,

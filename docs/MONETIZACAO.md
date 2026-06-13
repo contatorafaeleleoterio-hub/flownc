@@ -2,7 +2,27 @@
 
 > Documento executivo. Mercado prioritário: **Brasil**. Modelo recomendado:
 > **Freemium + Assinatura**, com opção de licença perpétua. Preços são **faixas de
-> hipótese** — validar com 5–10 oficinas reais antes de fixar.
+> hipótese** — estratégia: **preço baixo para teste de demanda**.
+
+## Decisões fechadas (2026-06-12)
+1. **Demanda:** o Mestre trabalha na área e confirma que a dor existe; validação formal de
+   mercado dispensada. Teste de demanda será feito **cobrando barato** desde o início.
+2. **Comprador-alvo: dono/gestor da oficina** (não o programador individual). Venda B2B,
+   ticket por posto, linguagem de economia de tempo e prejuízo evitado.
+3. **Pagamento: Stripe** (Pix + cartão + recorrência). Nota fiscal emitida à parte
+   (ex.: eNotas). Hotmart/Eduzz descartados (atrito com software desktop, taxas ~10%).
+4. **Argumento central:** otimização de tempo + redução de erro para o **gestor de
+   usinagem** — edição em lote segura (backup automático), interface moderna, execução
+   rápida. Na prática a oficina não cria solução interna (scripts/macros), então
+   "concorrência grátis" não é objeção relevante. Pesquisa com gestores ainda pode refinar
+   a mensagem exata.
+5. **Identidade visual:** logo wordmark aprovada ("Flow" itálico azul + "NC" branco +
+   linhas de velocidade). Original em `docs/logo/logo FlowNC.jpeg`; assets do app em
+   `flownc/assets/logo/` (PNG transparente na TopBar + `.ico` da janela/EXE), gerados por
+   `flownc/tools/gera_logo_assets.py`.
+   **Regra de cor (decidida):** o **azul** da logo é a cor da *marca* (logo, site,
+   materiais de venda); o **laranja `#E85D04`** segue como cor de *ação dentro do app*
+   (paleta v4 "Precisão Laranja" intocada). A logo não dita a UI e vice-versa.
 
 ## 1. Posicionamento (a tese)
 **"O editor em lote que o seu CAM não tem."**
@@ -18,11 +38,14 @@ barato como ferramenta de **produtividade complementar**:
 - tudo isso em **muitos arquivos de uma vez**, com salvamento seguro, sem erro manual.
 
 ## 2. Público-alvo (Brasil primeiro)
-1. **Programadores CNC / CAM** em ferramentarias e moldes & matrizes — editam muitos
-   programas e sofrem com ajuste manual repetitivo.
+**Comprador (quem paga): dono/gestor da oficina.** Usuário (quem usa): programador CNC.
+A venda fala com o gestor — tempo de máquina e erro evitado; o produto encanta o programador.
+
+1. **Donos/gestores de ferramentarias e moldes & matrizes** — equipe edita muitos
+   programas e perde horas com ajuste manual repetitivo.
 2. **Job shops / usinagem sob demanda** (pequenas e médias) — precisam padronizar programas
    entre máquinas diferentes.
-3. **Operadores de chão de fábrica** que ajustam programa direto no controle.
+3. **Programadores CNC / CAM e operadores** — usuários finais; influenciam a compra.
 
 Geografia: BR primeiro (Pix/boleto, comunidades em PT-BR). Depois LATAM e global (USD).
 
@@ -33,7 +56,7 @@ Geografia: BR primeiro (Pix/boleto, comunidades em PT-BR). Depois LATAM e global
 |---|---|---|---|
 | **Free** | Atrair / experimentar | Find/replace básico, lote pequeno (ex.: até N arquivos), sem biblioteca/perfis | R$ 0 |
 | **Pro (1 posto)** | Programador individual | Lote ilimitado, salvamento in-place seguro c/ backup, biblioteca de códigos, perfis de controle, histórico | **R$ 39–79/mês** ou **R$ 390–790/ano** |
-| **Shop (multi-posto)** | Oficina | Licença flutuante/rede, vários postos, suporte prioritário | sob proposta (por nº de postos) |
+| **Shop (multi-posto)** | Oficina (foco da venda) | Licença flutuante/rede, vários postos, suporte prioritário | **preço público por posto** (definir baixo p/ teste de demanda) |
 | **Perpétua + Manutenção** | Quem rejeita assinatura | Pro vitalício + ~20%/ano de manutenção (atualizações/suporte) | **R$ 1.200–1.900** + manutenção |
 
 **Por quê:** assinatura dá receita recorrente e preço de entrada baixo; freemium reduz o
@@ -55,9 +78,9 @@ Hoje o produto é um EXE portátil cru — insuficiente para vender. Necessário
 
 ## 5. Distribuição e pagamento (Brasil primeiro)
 - **Venda direta**: landing page (ex.: flownc.com.br) com download + trial + ativação.
-- **Pagamento BR**: **Pix/boleto/cartão** via **Hotmart/Eduzz** (recorrência + nota fiscal) ou
-  **Stripe** (cartão/recorrência). Pix é decisivo no BR. Global depois: **Paddle/Lemon
-  Squeezy** (Merchant of Record cuida de imposto/VAT).
+- **Pagamento BR (decidido): Stripe** — Pix + cartão + recorrência; nota fiscal à parte
+  (ex.: eNotas). Pix é decisivo no BR. Global depois: **Paddle/Lemon Squeezy**
+  (Merchant of Record cuida de imposto/VAT).
 - **Aquisição (conteúdo)**: YouTube/Instagram/TikTok mostrando edição em lote ao vivo; grupos
   de Facebook ("Programação CNC"), fóruns; SEO ("editar G-code em lote").
 - **Revendas/representantes** que já vendem CAM/ferramentas/máquinas às oficinas (comissão);
@@ -88,10 +111,10 @@ Conversão trial→pago, MRR/ARR, nº de postos ativos, churn, CAC via conteúdo
 - [ ] Certificado de assinatura de código (OV) e assinar o EXE/instalador.
 - [ ] Instalador Inno Setup (atalho, desinstalador, auto-update).
 - [ ] Integração com servidor de licença (Keygen.sh) — trial, ativação, offline, nº de postos.
-- [ ] Gateway de pagamento BR (Hotmart/Eduzz ou Stripe) com Pix e recorrência.
-- [ ] Landing page (ver `PAGINA-DE-VENDAS.md`).
+- [ ] Stripe com Pix e recorrência + emissão de NF (eNotas ou similar).
+- [ ] Landing page (ver `PAGINA-DE-VENDAS.md`) — falar com o dono da oficina.
 - [ ] Telemetria opt-in do funil.
-- [ ] Validar faixas de preço com 5–10 oficinas reais antes de fixar.
+- [ ] Fixar preços baixos de teste de demanda e revisar após primeiras vendas.
 
 ---
 _Fontes da pesquisa de conversão de landing: Instapage (B2B best practices), fibr.ai e
