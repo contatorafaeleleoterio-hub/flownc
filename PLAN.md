@@ -34,6 +34,11 @@ ligando-a ao núcleo já existente. O v4 organiza o app em **4 telas-lugar** num
 chip de backup) presente em todas elas. O coração do produto é o fluxo **Conferir → Publicar**:
 nada é gravado sem uma conferência com números reais, e toda publicação cria backup versionado.
 
+> **Trilha de negócio (paralela a este plano técnico):** a estratégia de monetização e o roteiro da
+> página de vendas vivem em `docs/MONETIZACAO.md` e `docs/PAGINA-DE-VENDAS.md` (BR-first; comprador =
+> dono/gestor da oficina; pagamento via Stripe; preço-teste). Este `PLAN.md` cobre só a **execução
+> técnica do v4**; as decisões de produto/preço estão naqueles documentos e no `docs/README.md`.
+
 ## Estado atual (honesto)
 
 **Pronto e testado (núcleo — preservar):**
