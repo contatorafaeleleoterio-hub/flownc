@@ -3,7 +3,12 @@
 status: **estratégia decidida (2026-06-08) — pronta para aplicar no protótipo** · largura máx. **1800px** · piso **1280×768**
 escopo: contrato visual de tamanho/adaptação da interface (FASE 1 — entra no protótipo antes de virar código)
 
-> ⛳ **REGRA DE OURO.** Nada disto vira código antes de aprovado e refletido no protótipo `mockups/painel-final.v2.html`. Este documento é o estudo pedido: largura mínima/máxima, grade, espaçamento e estratégia de adaptação — para decisão.
+> 📌 **Nota (2026-06-13):** este estudo foi feito sobre o protótipo v2, mas a estratégia
+> (largura fluida ~1180–1800px, rolagem interna nos painéis, compactação abaixo de 1440px) já
+> está **incorporada ao mockup v4** (`mockups/painel-final.v4.html`) — o contrato visual vigente.
+> As referências a `painel-final.v2.html` abaixo são históricas; valem para o v4.
+
+> ⛳ **REGRA DE OURO.** Nada disto vira código antes de aprovado e refletido no protótipo vigente (`mockups/painel-final.v4.html`). Este documento é o estudo pedido: largura mínima/máxima, grade, espaçamento e estratégia de adaptação — para decisão.
 
 ---
 

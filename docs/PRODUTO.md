@@ -4,15 +4,15 @@
 
 FlowNC é uma ferramenta para preparar lotes de programas CNC com segurança operacional. O fluxo é orientado por códigos e regras (origem → destino), complementado por um editor integrado por arquivo para ajustes manuais pontuais — não por edição dispersa arquivo a arquivo.
 
-## Núcleo da dinâmica
+## Núcleo da dinâmica (tela Lote)
 
-1. Escolher ou montar regras por código (compositor origem → destino).
-2. Empilhar as edições na lista "Edições montadas" (com rascunho "em edição" e `+ adicionar outra edição`).
-3. Selecionar os programas que receberão as regras e mandar ao lote (`Adicionar edição ao lote →`).
-4. Revisar um resumo dominante (selo de estado, contadores, cartões de regra, conflitos).
-5. Publicar com segurança e manter backup versionado dos originais (troca atômica + conferência SHA-256).
+1. Carregar os programas NC (botão ou arrastar-e-soltar) e **marcar** os que vão receber as edições.
+2. No compositor, montar a edição numa das **abas**: "Trocar código" (origem → destino, ou remover) ou "➕ Inserir bloco"; mandar ao lote com `+ Adicionar ao lote`.
+3. Empilhar quantas edições precisar — cada uma vira um **cartão numerado** (com editar/duplicar/excluir); conflitos aparecem em âmbar.
+4. **Conferir lote →**: o modal mostra os **números reais** (o que muda, onde, quantas vezes) — nada é gravado.
+5. **Publicar:** backup versionado dos originais → gravação na pasta original → dupla conferência SHA-256, com barra de progresso e resumo final.
 
-Para ajustes pontuais fora das regras, o operador abre o **editor integrado por arquivo** (`✎ Editar`): localizador com varredura/contagem, navegação i/N, substituir todos / um a um e salvamento direto.
+Para ajustes pontuais fora das regras, o operador abre o **editor por arquivo** (`✎ Abrir` ou a tela Editor): localizador com **contagem automática**, navegação i/N, substituir todos / um a um, inserir bloco e salvamento direto (com Desfazer).
 
 ## Princípios de produto
 
@@ -23,14 +23,13 @@ Para ajustes pontuais fora das regras, o operador abre o **editor integrado por 
 
 ## Interface vigente
 
-O mockup vigente e **único válido** é `mockups/painel-final.v2.html` (design aprovado). Ele privilegia:
+O mockup vigente e **único válido** é `mockups/painel-final.v4.html` (aprovado em 2026-06-11). A descrição detalhada de telas, fluxos e regras está em `docs/CONTEXTO-IA.md` (fonte central). O v4 organiza o app em **4 telas fixas num rail**:
 
-- composição de regras na coluna esquerda (Configurações + Edições montadas);
-- seleção de programas com editor por arquivo acessível por linha;
-- resumo forte do lote na coluna direita, que dá lugar ao editor integrado quando acionado.
-
-A contagem de ocorrências **não** aparece no painel principal: é função do editor (varredura sob demanda).
+- **Lote** (principal): Programas + Lote de edições (compositor com abas, conferência com números reais, publicação segura);
+- **Editor:** ajustes finos por arquivo, com contagem automática;
+- **Códigos:** biblioteca código + descrição que alimenta todos os dropdowns;
+- **Histórico:** publicações com "↩ Restaurar originais".
 
 ## Layout
 
-Duas colunas dinâmicas: ~60/40 no modo padrão e ~40/60 quando o editor está aberto (a coluna direita expande), com transição suave. O conceito antigo de 3 colunas e o mockup `painel-final.html` estão **descartados** — permanecem apenas como histórico de evolução, nunca como referência de implementação.
+Rail (barra lateral escura) + topo global (seletor de configuração + chip de backup) + área da tela ativa. O v2 (2 colunas dinâmicas), o conceito de 3 colunas e o `painel-final.html` estão **descartados** — só histórico em `_descarte/`, nunca referência de implementação.

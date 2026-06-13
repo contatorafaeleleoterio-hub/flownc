@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-06-13
+
+- Documentação alinhada ao **mockup v4**: `PRD.md`, `DECISOES.md`, `PRODUTO.md`, `README.md` e
+  este changelog atualizados (referência v2 → v4, link quebrado `CONTEXTO.md` → `CONTEXTO-IA.md`,
+  estado do projeto). `CONTEXTO-IA.md` segue como fonte central.
+- Change OpenSpec `plano-execucao-mockup-v4` arquivada (64/64 tarefas, Fase 2 aprovada).
+
+## 2026-06-12
+
+- **Fase 2 (interface v4) aprovada pelo Mestre (64/64 tarefas)**: rail + 4 telas (Lote · Editor ·
+  Códigos · Histórico), topo global, compositor com abas, conferência com números reais,
+  publicação com progresso, editor com contagem automática. EXE portátil gerado e repo publicado
+  no GitHub.
+- Docs de negócio criados: `MONETIZACAO.md` e `PAGINA-DE-VENDAS.md` (BR-first); decisões fechadas
+  (comprador = gestor da oficina, pagamento via Stripe, preço-teste). Identidade visual: logo
+  wordmark aprovada (azul = marca, laranja `#E85D04` = ação).
+
+## 2026-06-11
+
+- **Mockup `painel-final.v4.html` aprovado** como contrato visual único (rail + 4 telas).
+  Supera o v2 (2 colunas dinâmicas), que passa a ser histórico em `_descarte/`.
+
 ## 2026-06-07
 
 - Documentação (`docs/`) atualizada para refletir o mockup v2 aprovado (`mockups/painel-final.v2.html`); design antigo (3 colunas / `painel-final.html`) marcado como descartado.

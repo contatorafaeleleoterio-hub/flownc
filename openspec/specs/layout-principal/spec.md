@@ -1,63 +1,31 @@
-### Requirement: Layout de 2 colunas dinâmicas
+# layout-principal
 
-O sistema SHALL exibir a interface em 2 colunas horizontais separadas por `QSplitter`. A coluna esquerda SHALL ter proporção inicial de ~60% e a coluna direita de ~40% da largura total. Ao abrir o editor de arquivo, a proporção SHALL inverter para ~40/60 (esquerda/direita). Ao fechar o editor, SHALL retornar para ~60/40.
+## Purpose
 
-#### Scenario: Proporção inicial
-
-- **WHEN** o app é iniciado
-- **THEN** o splitter está posicionado com a coluna esquerda ocupando aproximadamente 60% da largura e a direita 40%
-
-#### Scenario: Expansão ao abrir editor
-
-- **WHEN** o usuário clica em "Editar" em um arquivo da lista
-- **THEN** o splitter ajusta para ~40% esquerda / ~60% direita e o painel direito exibe o EditorPanel
-
-#### Scenario: Retorno ao fechar editor
-
-- **WHEN** o usuário fecha o EditorPanel (botão voltar ou equivalente)
-- **THEN** o splitter retorna para ~60% esquerda / ~40% direita e o painel direito exibe o SummaryPanel
-
+Define a estrutura raiz do app: rail + QStackedWidget de telas, com MainWindow como maestro.
+## Requirements
 ### Requirement: Componentes isolados em flownc/ui/components/
 
-O sistema SHALL organizar os 4 painéis da interface como classes QWidget independentes em `flownc/ui/components/`: `HeaderBar`, `CompositorPanel`, `ProgramListPanel`, `SummaryPanel`. Cada componente SHALL ser importável e instanciável sem depender de outros componentes.
+O sistema SHALL organizar as 4 telas como classes QWidget independentes em `flownc/ui/screens/`: `LoteScreen`, `EditorScreen`, `CodigosScreen`, `HistoricoScreen`. Cada tela SHALL ser importável e instanciável sem depender das outras telas.
 
-#### Scenario: Importação independente de cada componente
+#### Scenario: Importação independente de cada tela
 
-- **WHEN** qualquer um dos 4 componentes é importado em isolamento
-- **THEN** a importação sucede sem erro e a instanciação com `QApplication` ativa não levanta exceção
-
-#### Scenario: Exportação via __init__.py
-
-- **WHEN** `from ui.components import HeaderBar, CompositorPanel, ProgramListPanel, SummaryPanel` é executado
-- **THEN** todos os 4 nomes estão disponíveis sem erro de importação
+- **WHEN** qualquer uma das 4 telas é importada em isolamento
+- **THEN** a importação sucede sem erro e a instanciação não levanta exceção
 
 ### Requirement: MainWindow como maestro
 
-O sistema SHALL manter toda a lógica de estado (preset, programas, regras, `_file_subs`) em `MainWindow`. Os componentes SHALL comunicar ações do usuário via sinais Qt e receber dados via métodos públicos (`set_programs`, `set_rules`, `set_summary`). `MainWindow` SHALL conectar todos os sinais no seu `__init__`.
+O sistema SHALL manter toda a lógica de estado global (preset/receita, lista de programas, edições do lote) em `MainWindow`. As telas SHALL comunicar ações via sinais Qt; `MainWindow` SHALL conectar os sinais no `__init__` e repassar dados entre telas conforme necessário. Lógica de conteúdo SHALL ficar nos widgets de tela, não no maestro.
 
-#### Scenario: Sinal de edição montada
+#### Scenario: Sinal do rail troca a tela ativa
 
-- **WHEN** o usuário monta uma edição no CompositorPanel
-- **THEN** o sinal correspondente do CompositorPanel é emitido e MainWindow atualiza o estado interno e repassa os dados ao SummaryPanel
+- **WHEN** o RailWidget emite `tela_mudou(2)` (Códigos)
+- **THEN** MainWindow chama `stack.setCurrentIndex(2)` e o filete laranja move para "Códigos"
 
-#### Scenario: Sinal de abertura do editor
+#### Scenario: Estado das telas preservado ao navegar
 
-- **WHEN** o usuário clica em "Editar" em um arquivo do ProgramListPanel
-- **THEN** ProgramListPanel emite o sinal `editar_arquivo(path: str)` e MainWindow ativa o EditorPanel com o arquivo correspondente
-
-### Requirement: Painel direito alternável via QStackedWidget
-
-O sistema SHALL implementar a coluna direita como `QStackedWidget` com dois widgets: índice 0 = `SummaryPanel`, índice 1 = `EditorPanel`. A troca SHALL ocorrer atomicamente junto com o ajuste do splitter.
-
-#### Scenario: Exibição do SummaryPanel por padrão
-
-- **WHEN** o app é iniciado e nenhum editor está ativo
-- **THEN** o QStackedWidget exibe o SummaryPanel (índice 0)
-
-#### Scenario: Troca para EditorPanel
-
-- **WHEN** MainWindow recebe o sinal `editar_arquivo`
-- **THEN** o QStackedWidget passa para o índice 1 (EditorPanel) e o splitter ajusta as proporções
+- **WHEN** o usuário carrega programas na tela Lote, navega para Histórico e volta
+- **THEN** a lista de programas na tela Lote mantém o conteúdo carregado
 
 ### Requirement: HeaderBar com logo, perfil e ações
 
@@ -81,3 +49,18 @@ O sistema SHALL manter todos os testes pytest existentes passando após a refato
 
 - **WHEN** `pytest flownc/tests/` é executado após a mudança
 - **THEN** todos os testes que passavam antes continuam passando (zero regressões)
+
+### Requirement: Estrutura raiz como Rail + QStackedWidget
+
+O sistema SHALL implementar a janela principal (`MainWindow`) como um layout horizontal de dois elementos: `RailWidget` (fixo, ~56px) à esquerda e um `QStackedWidget` (restante da largura) à direita. O `QSplitter` de 2 colunas da versão anterior SHALL ser removido. A `TopBar` SHALL ficar acima do `QStackedWidget` num layout vertical.
+
+#### Scenario: Janela abre com rail e tela Lote ativa
+
+- **WHEN** o app é iniciado
+- **THEN** a janela exibe o rail à esquerda e a tela Lote (índice 0 do QStackedWidget) à direita
+
+#### Scenario: MainWindow não tem mais QSplitter de 2 colunas
+
+- **WHEN** o código de `main_window.py` é inspecionado
+- **THEN** não existe instância de `QSplitter(Qt.Horizontal)` como layout raiz da janela
+

@@ -1,68 +1,8 @@
-# editor-de-arquivo
-
 ## Purpose
 
-Define a tela Editor: edição fina por arquivo, salvar direto com Desfazer e Salvar como.
-## Requirements
-### Requirement: Editor de texto integrado por programa
+Define a tela Editor do v4: edição fina por arquivo com faixa lateral, salvar direto com Desfazer e Salvar como.
 
-O sistema SHALL oferecer, para cada programa carregado, a ação **"✎ Abrir"** que abre o arquivo na tela Editor. O editor MUST exibir **numeração de linha** e usar **fonte monoespaçada**, permitindo **edição direta**. O conteúdo MUST ser lido com `read_file`, preservando codificação/EOL do original.
-
-#### Scenario: Abrir um programa no editor
-
-- **WHEN** o usuário clica em "✎ Abrir" num programa da lista na tela Lote
-- **THEN** o conteúdo do arquivo é carregado no editor com numeração de linha e fonte monoespaçada
-
-#### Scenario: Edição ocorre em memória até salvar
-
-- **WHEN** o usuário digita no editor
-- **THEN** as alterações ficam no buffer; o arquivo em disco NÃO é tocado até um Salvar explícito
-
-### Requirement: Gravação in-place segura, sem backup
-
-O sistema SHALL salvar sobrescrevendo o arquivo original. A gravação MUST ser **atômica** (gravar `.tmp` e renomear), MUST **preservar codificação/BOM/EOL** (`encode_text`/`write_atomic`) e MUST ser conferida por **SHA-256 pós-escrita**. A UI MUST exibir o aviso permanente **"⚠ salva direto, sem cópia"**.
-
-#### Scenario: Salvar sobrescreve o original preservando encoding/EOL
-
-- **WHEN** o usuário edita e salva um arquivo CRLF/cp1252
-- **THEN** o arquivo é sobrescrito com a mesma codificação/BOM/EOL, sem gerar backup
-
-#### Scenario: Round-trip fiel sem alteração
-
-- **WHEN** o usuário abre e salva sem mudar nada
-- **THEN** os bytes gravados são idênticos aos do original
-
-### Requirement: Botão Salvar reflete o estado de alteração
-
-O botão Salvar SHALL estar **desabilitado** quando não há alteração no buffer e **habilitado** ao primeiro edit. Após salvar com sucesso, volta a desabilitado.
-
-#### Scenario: Salvar começa desabilitado
-
-- **WHEN** um arquivo acaba de ser aberto
-- **THEN** o botão Salvar está desabilitado
-
-#### Scenario: Editar habilita Salvar
-
-- **WHEN** o usuário faz a primeira alteração
-- **THEN** o botão Salvar fica habilitado
-
-### Requirement: Guarda de alterações não salvas
-
-O sistema SHALL, ao tentar **trocar de arquivo** na faixa ou **sair da tela Editor** com alterações pendentes, apresentar confirmação com opções **Salvar / Descartar / Cancelar**. Cancelar MUST manter o editor sem perda.
-
-#### Scenario: Trocar arquivo com alteração pendente pede confirmação
-
-- **WHEN** há alteração no buffer e o usuário clica em outro arquivo na faixa
-- **THEN** um diálogo "salvar antes de trocar?" com Salvar / Descartar / Cancelar é exibido
-
-### Requirement: Convivência com o fluxo de Lote
-
-O sistema SHALL manter o fluxo de Lote inalterado quando o editor existe. A seleção de programas em lote (marcação) e a gravação de Lote (saída em pasta separada / backup) MUST continuar funcionando como antes; o editor é um caminho **independente** para ajuste de um único arquivo.
-
-#### Scenario: Lote permanece intacto
-
-- **WHEN** o usuário usa o editor para ajustar um arquivo e depois executa o Lote
-- **THEN** o Lote opera normalmente sobre os programas marcados, com seu próprio fluxo de saída/backup, sem interferência do editor
+## ADDED Requirements
 
 ### Requirement: Editor como tela cheia com faixa de arquivos
 
@@ -124,3 +64,55 @@ O botão **"Salvar como…"** no cabeçalho SHALL abrir um modal para salvar uma
 - **WHEN** o usuário usa "Salvar como…" para salvar uma cópia
 - **THEN** o Salvar normal continua salvando no arquivo original com o formato original
 
+## MODIFIED Requirements
+
+### Requirement: Editor de texto integrado por programa
+
+O sistema SHALL oferecer, para cada programa carregado, a ação **"✎ Abrir"** que abre o arquivo na tela Editor. O editor MUST exibir **numeração de linha** e usar **fonte monoespaçada**, permitindo **edição direta**. O conteúdo MUST ser lido com `read_file`, preservando codificação/EOL do original.
+
+#### Scenario: Abrir um programa no editor
+
+- **WHEN** o usuário clica em "✎ Abrir" num programa da lista na tela Lote
+- **THEN** o conteúdo do arquivo é carregado no editor com numeração de linha e fonte monoespaçada
+
+#### Scenario: Edição ocorre em memória até salvar
+
+- **WHEN** o usuário digita no editor
+- **THEN** as alterações ficam no buffer; o arquivo em disco NÃO é tocado até um Salvar explícito
+
+### Requirement: Gravação in-place segura, sem backup
+
+O sistema SHALL salvar sobrescrevendo o arquivo original. A gravação MUST ser **atômica** (gravar `.tmp` e renomear), MUST **preservar codificação/BOM/EOL** (`encode_text`/`write_atomic`) e MUST ser conferida por **SHA-256 pós-escrita**. A UI MUST exibir o aviso permanente **"⚠ salva direto, sem cópia"**.
+
+#### Scenario: Salvar sobrescreve o original preservando encoding/EOL
+
+- **WHEN** o usuário edita e salva um arquivo CRLF/cp1252
+- **THEN** o arquivo é sobrescrito com a mesma codificação/BOM/EOL, sem gerar backup
+
+#### Scenario: Round-trip fiel sem alteração
+
+- **WHEN** o usuário abre e salva sem mudar nada
+- **THEN** os bytes gravados são idênticos aos do original
+
+### Requirement: Botão Salvar reflete o estado de alteração
+
+O botão Salvar SHALL estar **desabilitado** quando não há alteração no buffer e **habilitado** ao primeiro edit. Após salvar com sucesso, volta a desabilitado.
+
+#### Scenario: Salvar começa desabilitado
+
+- **WHEN** um arquivo acaba de ser aberto
+- **THEN** o botão Salvar está desabilitado
+
+#### Scenario: Editar habilita Salvar
+
+- **WHEN** o usuário faz a primeira alteração
+- **THEN** o botão Salvar fica habilitado
+
+### Requirement: Guarda de alterações não salvas
+
+O sistema SHALL, ao tentar **trocar de arquivo** na faixa ou **sair da tela Editor** com alterações pendentes, apresentar confirmação com opções **Salvar / Descartar / Cancelar**. Cancelar MUST manter o editor sem perda.
+
+#### Scenario: Trocar arquivo com alteração pendente pede confirmação
+
+- **WHEN** há alteração no buffer e o usuário clica em outro arquivo na faixa
+- **THEN** um diálogo "salvar antes de trocar?" com Salvar / Descartar / Cancelar é exibido

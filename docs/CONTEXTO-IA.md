@@ -4,7 +4,7 @@
 > (pesquisa, análise de mercado, copywriting, ideação de funções, UX, aprimoramentos em geral)
 > como base única e suficiente sobre o produto. Ele reflete **exatamente o design aprovado**:
 > o mockup `mockups/painel-final.v4.html` (aprovado pelo dono do projeto em 2026-06-11).
-> Atualizado por último em: 2026-06-11.
+> Atualizado por último em: 2026-06-13.
 
 ---
 
@@ -251,13 +251,16 @@ e o **editor** (restante da tela — linhas de NC são longas, o editor é tela 
   embutidas: ✦ azuis = mudanças do v4 · 🛈 laranja = decisões herdadas do v3 (botão "🛈
   Anotações" liga/desliga). A interatividade do mockup é real: a conferência varre arquivos
   de exemplo de verdade.
-- **App:** Python 3.11+ / PySide6 (Qt), desktop Windows, com CLI auxiliar. O **núcleo já está
-  pronto e testado** (146 testes verdes): motor de substituição com borda CNC, contagem,
-  publicação com backup versionado + SHA-256, gravação in-place preservando
-  codificação/BOM/quebra de linha, biblioteca de códigos.
-- **Falta:** portar a interface do v4 para o app Qt (Fase 2 — visual fiel, tela por tela) e
-  ligar o backend ao novo layout (Fase 3), depois empacotar o `.exe` (PyInstaller).
-- **Distribuição:** executável portátil para Windows; sem instalador, sem internet.
+- **App:** Python 3.11+ / PySide6 (Qt), desktop Windows, com CLI auxiliar. O **núcleo está
+  pronto e testado**: motor de substituição com borda CNC, contagem, publicação com backup
+  versionado + SHA-256, gravação in-place preservando codificação/BOM/quebra de linha,
+  biblioteca de códigos.
+- **Interface v4:** **portada e aprovada pelo Mestre (Fase 2, 64/64 tarefas)** via change
+  OpenSpec `plano-execucao-mockup-v4` — rail + 4 telas, compositor com abas, conferência com
+  números reais, publicação com progresso, editor com contagem automática.
+- **Distribuição:** **EXE portátil para Windows já gerado** (PyInstaller, onedir); sem
+  instalador, sem internet. Próxima frente é a monetização/distribuição
+  (ver `docs/MONETIZACAO.md` e `docs/PAGINA-DE-VENDAS.md`).
 
 ## 14. O que o FlowNC NÃO é (limites de escopo)
 

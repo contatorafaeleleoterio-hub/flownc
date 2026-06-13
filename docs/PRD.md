@@ -2,7 +2,7 @@
 
 ## Resumo
 
-FlowNC é um app desktop Windows para edição em lote de programas CNC: substituição de códigos por regras (origem → destino), edição manual por arquivo num editor integrado, preview, verificações fortes e publicação segura com backup versionado dos originais. O design de referência é o mockup aprovado `mockups/painel-final.v2.html`; qualquer layout anterior está descartado.
+FlowNC é um app desktop Windows para edição em lote de programas CNC: substituição de códigos por regras (origem → destino), inserção de blocos, edição manual por arquivo num editor integrado, conferência com números reais e publicação segura com backup versionado dos originais. O design de referência é o mockup aprovado `mockups/painel-final.v4.html` (aprovado em 2026-06-11); qualquer layout anterior (incluindo o v2) está descartado. A descrição completa de telas, fluxos e regras está em `docs/CONTEXTO-IA.md` (fonte central).
 
 ## Escopo atual validado
 
@@ -20,18 +20,21 @@ FlowNC é um app desktop Windows para edição em lote de programas CNC: substit
 - Validação forte antes de salvar/publicar.
 - Comportamento previsível para zero ocorrências, conflitos e batchs mistos.
 
-## Dinâmica de UI (mockup v2)
+## Dinâmica de UI (mockup v4)
 
-- **Duas colunas dinâmicas:** ~60/40 no modo padrão; ao abrir o editor a coluna direita expande para ~60% (~40/60), com transição suave.
-- **Coluna esquerda:** ① Configurações (compositor origem → destino + lista única "Edições montadas" com rascunho "em edição" e `+ adicionar outra edição`) e ② Seleção de Programas (lista com checkbox e botão `✎ Editar` por linha, CTA `Adicionar edição ao lote →`).
-- **Coluna direita:** ③ Resumo (selo de estado, contadores, cartões de regra com ações editar/duplicar/excluir, selo "Editados → backup", CTA "Executar Lote") ↔ Editor integrado.
-- **Sem contagem automática no painel principal:** a varredura/contagem de ocorrências passou a ser função exclusiva do editor.
+- **Navegação por 4 telas fixas** numa barra lateral (rail): **Lote · Editor · Códigos · Histórico**. O item ativo tem filete laranja; o Editor ganha bolinha laranja quando há alteração não salva.
+- **Topo global** (visível em todas as telas): seletor de configuração ("receita"), com "💾 Salvar lote atual como…", e chip da pasta de backup (clicável para trocar).
+- **Tela Lote (principal):** duas colunas — **Programas** (lista com checkbox, `✎ Abrir`, `✕`, arrastar-e-soltar) e **Lote de edições** (compositor com **abas "Trocar código" / "➕ Inserir bloco"** e um único `+ Adicionar ao lote`; cartões numerados com editar/duplicar/excluir; CTA laranja **"Conferir lote →"**).
+- **Conferência → Publicação:** o modal "Conferência do lote — números reais" varre os arquivos e mostra o que mudaria (nada grava); a publicação faz backup versionado + gravação + dupla conferência SHA-256, com barra de progresso.
+- **Tela Editor:** ajustes finos por arquivo; localizador com **contagem automática** (sem botão de varredura), substituir todos / um a um, inserir bloco, salvar direto (com Desfazer) e "Salvar como…".
+- **Tela Códigos:** biblioteca código + descrição (com bloco opcional = modelo reutilizável), que alimenta todos os dropdowns.
+- **Tela Histórico:** uma linha por publicação com "↩ Restaurar originais".
 
 ## Decisões funcionais consolidadas
 
 - A ação separada `Retirar` foi **descartada**: remoção de código é feita por substituição-por-vazio dentro do mesmo fluxo de regras.
 - Remoção que esvazia a linha apaga a linha; espaços remanescentes são normalizados.
 
-## Em andamento
+## Estado
 
-Redesign visual do app para fidelidade ao mockup v2, via OpenSpec em mudanças sequenciais (fundação visual → layout/painéis → editor/limpeza/entrega). Estado vivo em `PLAN.md` (raiz) e `HANDOFF.md`.
+Interface v4 portada para o app e **aprovada pelo Mestre (Fase 2, 64/64)** via change OpenSpec `plano-execucao-mockup-v4`; EXE portátil gerado. Estado vivo em `PLAN.md` (raiz) e `HANDOFF.md`. Próxima frente: monetização/distribuição (ver `docs/MONETIZACAO.md` e `docs/PAGINA-DE-VENDAS.md`).

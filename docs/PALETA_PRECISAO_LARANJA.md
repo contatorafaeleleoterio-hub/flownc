@@ -1,7 +1,8 @@
 # Paleta "Precisão Laranja" — FlowNC
 
-**Fonte da verdade de cores do FlowNC.** Aplicada ao mockup `mockups/painel-final.v2.html`
-e a ser portada ao app na fase de implementação. Filosofia: fundo slate azulado sóbrio
+**Fonte da verdade de cores do FlowNC.** Paleta mantida intacta do v3/v2 ao **v4**
+(`mockups/painel-final.v4.html`, contrato visual vigente) e já portada ao app. As referências a
+`painel-final.v2.html` abaixo são históricas; as cores valem para o v4. Filosofia: fundo slate azulado sóbrio
 (seriedade técnica) + um laranja industrial de alto contraste **reservado exclusivamente**
 para a ação executável de maior impacto por tela. O laranja nunca é decoração.
 
